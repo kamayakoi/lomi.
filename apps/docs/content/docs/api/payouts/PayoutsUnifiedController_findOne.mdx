@@ -1,22 +1,19 @@
 ---
-title: "Lister les virements"
-description: "Lister les virements"
+title: "Obtenir un virement"
+description: "Obtenir un virement"
 full: true
 method: get
-path: /payouts
-operationId: PayoutsListController_findAll
+path: /payouts/{id}
+operationId: PayoutsUnifiedController_findOne
 ---
 
 ## Overview
 
-Lister les virements
-
-Liste les virements du marchand pour l’organisation (RPC fetch_payouts).
-
+Obtenir un virement
 
 ### When to use this
 
-Use this endpoint when your flow needs `GET /payouts` (Lister les virements).
+Use this endpoint when your flow needs `GET /payouts/&#123;id&#125;` (Obtenir un virement).
 
 
 ## Authentication
@@ -25,7 +22,7 @@ Merchant routes require an API key in the `X-API-KEY` header (see [Integration o
 
 ## Endpoint
 
-`GET /payouts`
+`GET /payouts/{id}`
 
 Base URLs:
 
@@ -36,18 +33,14 @@ Base URLs:
 
 ### Path parameters
 
-_No path parameters beyond the URL pattern._
-
+| Name | Required | Schema | Description |
+| --- | --- | --- | --- |
+| `id` | Yes | — | Payout ID |
 
 ### Query parameters
 
-| Name | In | Required | Schema | Description |
-| --- | --- | --- | --- | --- |
-| `endDate` | query | No | — |  |
-| `startDate` | query | No | — |  |
-| `pageSize` | query | No | — |  |
-| `page` | query | No | — |  |
-| `status` | query | No | — |  |
+_No query parameters._
+
 
 
 
@@ -55,7 +48,7 @@ _No path parameters beyond the URL pattern._
 
 | Status | Description |
 | --- | --- |
-| `200` | Liste des virements |
+| `200` | Détail du virement |
 
 ## Errors
 
@@ -64,13 +57,13 @@ Errors follow the standard JSON error format (status code and machine-readable m
 ## Example
 
 ```bash
-curl -sS -X GET "https://sandbox.api.lomi.africa/payouts?endDate=value&startDate=value" \
+curl -sS -X GET "https://sandbox.api.lomi.africa/payouts/value" \
   -H "X-API-KEY: $LOMI_API_KEY"
 ```
 
 ## OpenAPI
 
-- **operationId**: `PayoutsListController_findAll`
-- **Operation**: `GET /payouts`
+- **operationId**: `PayoutsUnifiedController_findOne`
+- **Operation**: `GET /payouts/{id}`
 
 Full schemas and **Try it**: [API reference](/api/index). Machine-readable contract: repo `apps/docs/openapi.json`.

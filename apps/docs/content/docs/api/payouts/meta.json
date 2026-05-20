@@ -1,6 +1,8 @@
 {
   "title": "Payouts",
   "pages": [
-    "PayoutsListController_findAll"
+    "PayoutsUnifiedController_create",
+    "PayoutsUnifiedController_findAll",
+    "PayoutsUnifiedController_findOne"
   ]
 }

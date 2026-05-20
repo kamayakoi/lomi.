@@ -23,7 +23,9 @@ async function bootstrap() {
   const page = await lomi.customers.list({ page: 1, pageSize: 20 });
   console.log('- Customers page payload:', page);
 
-  await lomi.payouts.createWavePayout({
+  await lomi.payouts.create({
+    destination: 'beneficiary',
+    rail: 'wave',
     amount: 10000,
     currency: 'XOF',
     beneficiary: { name: 'Test User', phoneNumber: '+221771234567' },

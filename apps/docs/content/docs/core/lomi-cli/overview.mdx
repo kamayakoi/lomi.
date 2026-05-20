@@ -1,70 +1,162 @@
 ---
 title: 'Getting started'
-description: 'Install and configure to match your development workflow.'
+description: 'Install the lomi. CLI, verify your setup, and run your first commands.'
 ---
 
-The **lomi.** Command Line Interface (**CLI**) is the primary tool for interacting with our API, managing your projects, handling webhooks, and streamlining your development workflow directly from the terminal.
+The **lomi. CLI** is distributed via **npm** as `lomi.cli`. It helps you authenticate with lomi., scaffold SDK projects, test webhooks locally, create checkout sessions and payment links, and install AI agent rules.
+
+Both `lomi` and `lomi.` work as command names after install.
 
 ## Installation
 
 <Steps>
 
-### Prerequisites
+### npm (recommended)
 
-Ensure you have **Node.js** (version 18 or higher recommended) and **npm** (or `yarn`/`pnpm`) installed on your system.
-
-### Install globally
-
-Using `npm`:
+Requires **Node.js 18+** (used only to download the native binary on install).
 
 ```bash filename="Terminal"
-npm install -g lomi.
+npm install -g lomi.cli
 ```
 
-Or using `yarn`:
+Or with pnpm:
 
 ```bash filename="Terminal"
-yarn global add lomi.
+pnpm add -g lomi.cli
 ```
 
-Or using `pnpm`:
+On `npm install`, the package downloads the correct native binary for your platform from [GitHub Releases](https://github.com/lomiafrica/lomi./releases).
+
+### Homebrew
+
+Homebrew support is available via the project formula. After a release is published:
 
 ```bash filename="Terminal"
-pnpm add -g lomi.
+brew tap lomiafrica/tap
+brew install lomi
 ```
 
-### Verify installation
+You can also install from the repo formula when developing locally (update SHA256 checksums after each release).
 
-Check if the installation was successful:
+### From source
 
 ```bash filename="Terminal"
-lomi. --version
+git clone https://github.com/lomiafrica/lomi.
+cd lomi./apps/cli
+cargo install --path .
 ```
 
 </Steps>
 
-## Core commands
+### Verify installation
 
-Here's a summary of the main commands available in the **lomi. CLI**:
+```bash filename="Terminal"
+lomi --version
+lomi --help
+```
 
-- **`lomi. login`**: [Authenticate](/core/lomi-cli/auth) the CLI with your **lomi.** account via a browser-based flow. This is required for most commands that interact with the **lomi. API**. Stores a global **CLI Token**.
-- **`lomi. init`**: [Initialize](/core/lomi-cli/init) a **lomi.** integration in the current directory. Sets up example code for the **lomi. Node.js SDK**, creates a `.env` file, and installs dependencies.
-- **`lomi. status`**: Check your current login status and verify connectivity to the **lomi. API** using the stored global **CLI Token**. (Mentioned in [Configuration](/core/lomi-cli/configuration) and [Initialize](/core/lomi-cli/init)).
-- **`lomi. payments`**: Manage payment links (e.g., `lomi. payments create`). Requires login.
-- **`lomi. webhook`**: Manage webhook endpoints (e.g., `lomi. webhook register`, `lomi. webhook list`). Requires login.
-- **`lomi. dev`**: Start a local development server to receive and inspect webhook events sent to your machine, simplifying webhook testing. Requires login.
+### Supported platforms
+
+| Platform | Install method |
+| --- | --- |
+| macOS (Apple Silicon) | npm, Homebrew, GitHub Release |
+| macOS (Intel) | npm, Homebrew, GitHub Release |
+| Linux (x64) | npm, Homebrew, GitHub Release |
+| Windows (x64) | Coming soon |
+
+## Quick start
+
+<Steps>
+
+### Log in
+
+```bash filename="Terminal"
+lomi login
+```
+
+Opens a browser device-authorization flow and saves a CLI token globally. See [Authenticate](/core/lomi-cli/auth).
+
+### Check status
+
+```bash filename="Terminal"
+lomi status
+```
+
+Verifies your stored token and connectivity to the lomi. API.
+
+### Scaffold a project
+
+```bash filename="Terminal"
+cd my-app
+lomi init
+```
+
+Creates SDK client setup, checkout and webhook examples, and a `.env` file. See [Initialize a project](/core/lomi-cli/init).
+
+### Install AI agent rules (optional)
+
+```bash filename="Terminal"
+lomi install-rules
+```
+
+Installs Cursor rules, `CLAUDE.md`, `AGENTS.md`, VS Code instructions, and `llms.txt`. See [Install agent rules](/core/lomi-cli/install-rules).
+
+### Run local webhook server
+
+```bash filename="Terminal"
+lomi dev
+```
+
+Starts a webhook receiver on `http://localhost:4242/webhook`. See [Local development server](/core/lomi-cli/dev).
+
+</Steps>
+
+## Command overview
+
+| Command | Description |
+| --- | --- |
+| `lomi login` | Browser authentication |
+| `lomi logout` | Clear credentials for a profile |
+| `lomi whoami` | Show current profile |
+| `lomi status` | Check login and API connectivity |
+| `lomi init` | Scaffold SDK project files |
+| `lomi dev` | Local webhook development server |
+| `lomi checkout create` | Create a hosted checkout session |
+| `lomi payments create` | Create a payment link |
+| `lomi install-rules` | Install AI agent documentation |
+| `lomi update` | Update `@lomi./sdk` in current project |
+| `lomi list-profiles` | List saved auth profiles |
+| `lomi switch` | Change active profile |
+
+Full reference: [Command reference](/core/lomi-cli/commands).
 
 ## Global options
 
-These options can be used with any command:
+These flags work with any command:
 
-- `-h, --help`: Display help information for the CLI or a specific command.
-- `-v, --version`: Display the installed version of the **lomi. CLI**.
+| Flag | Description |
+| --- | --- |
+| `--profile <name>` | Profile to use (default: `default`) |
+| `-a, --api-url <url>` | Override API base URL |
+| `-l, --log-level <level>` | `debug`, `info`, `warn`, `error` |
+| `--skip-telemetry` | Opt out of telemetry |
+| `-h, --help` | Help for the CLI or a subcommand |
+| `--version` | Print version |
+
+## Two kinds of credentials
+
+<Callout type="info" emoji="💡" title="CLI token vs API key">
+  **`lomi login`** stores a **CLI token** in your global config — used by CLI commands like `status`, `checkout create`, and `dev`.
+
+  **`lomi init`** writes your **secret API key** (`LOMI_API_KEY`) into the project `.env` file — used by the **SDK inside your application code**.
+
+  These are different credentials serving different purposes.
+</Callout>
 
 ## Next steps
 
-1.  **Authenticate**: Run [`lomi. login`](/core/lomi-cli/auth) first to enable API interactions.
-2.  **Set up a project**: Use [`lomi. init`](/core/lomi-cli/init) inside your project folder to configure the SDK.
-3.  **Explore commands**: Dive deeper into each command's specific documentation page using the sidebar navigation.
-
-For detailed help on any command, use `lomi. help [command]`. For support, contact `hello@lomi.africa`.
+- [Authenticate](/core/lomi-cli/auth) — device flow, profiles, CI
+- [Initialize a project](/core/lomi-cli/init) — SDK scaffolding
+- [Command reference](/core/lomi-cli/commands) — all commands and flags
+- [Configuration](/core/lomi-cli/configuration) — config file paths and environment variables
+- [API integration](/reference/setup/integration) — HTTP and SDK integration guide

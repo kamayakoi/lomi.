@@ -1,26 +1,19 @@
 ---
-title: "Get refund"
-description: "Get refund"
+title: "Obtenir un encaissement carte"
+description: "Obtenir un encaissement carte"
 full: true
 method: get
-path: /refunds/{id}
-operationId: RefundsController_findOne
+path: /charge/card/{id}
+operationId: ChargesController_getCardCharge
 ---
 
 ## Overview
 
-Get refund
-
-Returns a single refund by ID scoped to your organization.
-
+Obtenir un encaissement carte
 
 ### When to use this
 
-Use after create or from webhook-driven flows to confirm refund details.
-
-### See also
-
-[Create refund](/api/refunds/RefundsController_create)
+Use this endpoint when your flow needs `GET /charge/card/&#123;id&#125;` (Obtenir un encaissement carte).
 
 
 ## Authentication
@@ -29,7 +22,7 @@ Merchant routes require an API key in the `X-API-KEY` header (see [Integration o
 
 ## Endpoint
 
-`GET /refunds/{id}`
+`GET /charge/card/{id}`
 
 Base URLs:
 
@@ -42,7 +35,7 @@ Base URLs:
 
 | Name | Required | Schema | Description |
 | --- | --- | --- | --- |
-| `id` | Yes | — | Refund ID |
+| `id` | Yes | — | Card payment id (pi_...) |
 
 ### Query parameters
 
@@ -55,7 +48,7 @@ _No query parameters._
 
 | Status | Description |
 | --- | --- |
-| `200` | Détail du remboursement |
+| `200` | Encaissement carte |
 
 ## Errors
 
@@ -64,13 +57,13 @@ Errors follow the standard JSON error format (status code and machine-readable m
 ## Example
 
 ```bash
-curl -sS -X GET "https://sandbox.api.lomi.africa/refunds/value" \
+curl -sS -X GET "https://sandbox.api.lomi.africa/charge/card/value" \
   -H "X-API-KEY: $LOMI_API_KEY"
 ```
 
 ## OpenAPI
 
-- **operationId**: `RefundsController_findOne`
-- **Operation**: `GET /refunds/{id}`
+- **operationId**: `ChargesController_getCardCharge`
+- **Operation**: `GET /charge/card/{id}`
 
 Full schemas and **Try it**: [API reference](/api/index). Machine-readable contract: repo `apps/docs/openapi.json`.

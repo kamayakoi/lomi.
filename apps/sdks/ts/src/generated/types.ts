@@ -11,9 +11,9 @@
  * This file contains only the types exposed through the API.
  *
  * Generated from database.types.ts - only includes:
- * - Exposed enums (36 enums)
+ * - Exposed enums (39 enums)
  * - Exposed tables (15 tables)
- * - Exposed functions (54 functions)
+ * - Exposed functions (74 functions)
  *
  * DO NOT EDIT MANUALLY - This file is auto-generated
  * Run: npm run generate:api-types
@@ -1691,8 +1691,8 @@ export type Database = {
       };
       list_accounts: {
         Args: {
-          p_limit?: number;
-          p_offset?: number;
+          p_limit?: number | null;
+          p_offset?: number | null;
           p_organization_id: string;
         };
         Returns: {
@@ -1710,17 +1710,6 @@ export type Database = {
           spi_account_type: APIEnums['spi_account_type'];
           updated_at: string;
         }[];
-      };
-      update_webhook: {
-        Args: {
-          p_authorized_events?: APIEnums['webhook_event'][] | null;
-          p_is_active?: boolean | null;
-          p_merchant_id: string;
-          p_metadata?: Json | null;
-          p_url?: string | null;
-          p_webhook_id: string;
-        };
-        Returns: boolean;
       };
       get_account: {
         Args: { p_account_id: string; p_organization_id: string };
@@ -1763,260 +1752,71 @@ export type Database = {
           rate_limited: boolean;
         }[];
       };
-      create_checkout_session: {
+      log_api_interaction: {
         Args: {
-          p_allow_coupon_code?: boolean | null;
-          p_allow_quantity?: boolean | null;
-          p_amount: number;
-          p_cancel_url?: string | null;
-          p_created_by?: string | null;
-          p_currency_code: APIEnums['currency_code'];
-          p_customer_address?: string | null;
-          p_customer_city?: string | null;
-          p_customer_country?: string | null;
-          p_customer_email?: string | null;
-          p_customer_id?: string | null;
-          p_customer_name?: string | null;
-          p_customer_phone?: string | null;
-          p_customer_postal_code?: string | null;
-          p_description?: string | null;
-          p_environment?: string | null;
-          p_expiration_minutes?: number | null;
-          p_metadata?: Json | null;
+          p_api_key: string;
+          p_endpoint: string;
           p_organization_id: string;
-          p_payment_link_id?: string | null;
-          p_price_id?: string | null;
-          p_product_id?: string | null;
-          p_quantity?: number | null;
-          p_require_billing_address?: boolean | null;
-          p_subscription_id?: string | null;
-          p_success_url?: string | null;
-          p_title?: string | null;
+          p_request_method: string;
+          p_request_payload?: Json | null;
+          p_response_payload?: Json | null;
+          p_response_status?: number | null;
+          p_response_time?: number | null;
         };
-        Returns: Json;
+        Returns: string;
       };
-      create_checkout_session_with_line_items: {
-        Args: {
-          p_allow_coupon_code?: boolean | null;
-          p_cancel_url?: string | null;
-          p_created_by: string;
-          p_currency_code: APIEnums['currency_code'];
-          p_customer_address?: string | null;
-          p_customer_city?: string | null;
-          p_customer_country?: string | null;
-          p_customer_email?: string | null;
-          p_customer_id?: string | null;
-          p_customer_name?: string | null;
-          p_customer_phone?: string | null;
-          p_customer_postal_code?: string | null;
-          p_description?: string | null;
-          p_environment?: string | null;
-          p_expiration_minutes?: number | null;
-          p_line_items: Json;
-          p_metadata?: Json | null;
-          p_organization_id: string;
-          p_payment_link_id?: string | null;
-          p_require_billing_address?: boolean | null;
-          p_shipping_amount?: number | null;
-          p_success_url?: string | null;
-          p_tax_amount?: number | null;
-          p_title?: string | null;
-        };
-        Returns: Json;
-      };
-      list_checkout_sessions: {
-        Args: {
-          p_limit?: number | null;
-          p_merchant_id: string;
-          p_offset?: number | null;
-          p_status?: APIEnums['checkout_session_status'] | null;
-        };
-        Returns: {
-          amount: number;
-          cancel_url: string;
-          checkout_session_id: string;
-          created_at: string;
-          currency_code: APIEnums['currency_code'];
-          customer_email: string;
-          customer_id: string;
-          customer_name: string;
-          customer_phone: string;
-          description: string;
-          expires_at: string;
-          merchant_id: string;
-          metadata: Json;
-          organization_id: string;
-          payment_link_id: string;
-          product_id: string;
-          status: APIEnums['checkout_session_status'];
-          subscription_id: string;
-          success_url: string;
-          title: string;
-          updated_at: string;
-        }[];
-      };
-      get_webhook: {
-        Args: { p_merchant_id: string; p_webhook_id: string };
-        Returns: {
-          authorized_events: APIEnums['webhook_event'][];
-          created_at: string;
-          created_by: string | null;
-          deleted_at: string | null;
-          environment: string;
-          is_active: boolean;
-          last_payload: Json | null;
-          last_response_body: string | null;
-          last_response_status: number | null;
-          last_triggered_at: string | null;
-          metadata: Json | null;
-          organization_id: string;
-          retry_count: number | null;
-          spi_event_types: string[] | null;
-          supports_spi: boolean;
-          updated_at: string;
-          url: string;
-          verification_token: string;
-          webhook_id: string;
-        }[];
-        SetofOptions: {
-          from: '*';
-          to: 'webhooks';
-          isOneToOne: false;
-          isSetofReturn: true;
-        };
-      };
-      get_webhook_by_id: {
-        Args: { p_webhook_id: string };
-        Returns: {
-          authorized_events: APIEnums['webhook_event'][];
-          created_at: string;
-          created_by: string | null;
-          deleted_at: string | null;
-          environment: string;
-          is_active: boolean;
-          last_payload: Json | null;
-          last_response_body: string | null;
-          last_response_status: number | null;
-          last_triggered_at: string | null;
-          metadata: Json | null;
-          organization_id: string;
-          retry_count: number | null;
-          spi_event_types: string[] | null;
-          supports_spi: boolean;
-          updated_at: string;
-          url: string;
-          verification_token: string;
-          webhook_id: string;
-        }[];
-        SetofOptions: {
-          from: '*';
-          to: 'webhooks';
-          isOneToOne: false;
-          isSetofReturn: true;
-        };
-      };
-      fetch_organization_webhooks: {
-        Args: {
-          p_environment?: string | null;
-          p_event?: APIEnums['webhook_event'] | null;
-          p_is_active?: boolean | null;
-          p_merchant_id: string;
-          p_organization_id?: string | null;
-          p_search_term?: string | null;
-        };
-        Returns: {
-          authorized_events: APIEnums['webhook_event'][];
-          created_at: string;
-          created_by: string | null;
-          deleted_at: string | null;
-          environment: string;
-          is_active: boolean;
-          last_payload: Json | null;
-          last_response_body: string | null;
-          last_response_status: number | null;
-          last_triggered_at: string | null;
-          metadata: Json | null;
-          organization_id: string;
-          retry_count: number | null;
-          spi_event_types: string[] | null;
-          supports_spi: boolean;
-          updated_at: string;
-          url: string;
-          verification_token: string;
-          webhook_id: string;
-        }[];
-        SetofOptions: {
-          from: '*';
-          to: 'webhooks';
-          isOneToOne: false;
-          isSetofReturn: true;
-        };
-      };
-      get_merchant_from_organization: {
+      list_organizations: {
         Args: { p_organization_id: string };
-        Returns: string;
-      };
-      log_webhook_delivery: {
-        Args: {
-          p_attempt_number?: number | null;
-          p_event_type: string;
-          p_headers?: Json | null;
-          p_ip_address?: string | null;
-          p_merchant_id: string;
-          p_organization_id: string;
-          p_payload: Json;
-          p_request_duration_ms?: number | null;
-          p_response_body: string;
-          p_response_status: number;
-          p_user_agent?: string | null;
-          p_webhook_id: string;
-        };
-        Returns: string;
-      };
-      create_beneficiary_payout: {
-        Args: {
-          p_amount: number;
-          p_currency_code: APIEnums['currency_code'];
-          p_merchant_id: string;
-          p_metadata?: Json | null;
-          p_payment_method_code?: APIEnums['payment_method_code'] | null;
-          p_payout_method_id?: string | null;
-          p_provider_code?: APIEnums['provider_code'] | null;
-          p_status?: APIEnums['payout_status'] | null;
-        };
         Returns: {
-          fee_amount: number;
-          message: string;
-          payout_id: string;
-          status: APIEnums['payout_status'];
-          total_deduction: number;
+          arr: number;
+          created_at: string;
+          default_currency: APIEnums['currency_code'];
+          email: string;
+          employee_number: string;
+          industry: string;
+          is_starter_business: boolean;
+          logo_url: string;
+          mrr: number;
+          name: string;
+          organization_id: string;
+          phone_number: string;
+          slug: string;
+          status: string;
+          storefront_enabled: boolean;
+          total_customers: number;
+          total_merchants: number;
+          total_revenue: number;
+          total_transactions: number;
+          updated_at: string;
+          verification_status: string;
+          website_url: string;
         }[];
       };
-      fetch_beneficiary_payouts: {
-        Args: {
-          p_currency_code?: APIEnums['currency_code'] | null;
-          p_end_date?: string | null;
-          p_merchant_id: string;
-          p_organization_id?: string | null;
-          p_page_number?: number | null;
-          p_page_size?: number | null;
-          p_start_date?: string | null;
-          p_statuses?: string[] | null;
-        };
+      fetch_organization_details: {
+        Args: { p_merchant_id: string; p_organization_id?: string };
         Returns: {
-          account_id: string;
-          amount: number;
-          created_at: string;
-          created_by: string;
-          currency_code: APIEnums['currency_code'];
-          metadata: Json;
+          arr: number;
+          city: string;
+          country: string;
+          default_currency: APIEnums['currency_code'];
+          district: string;
+          email: string;
+          logo_url: string;
+          mrr: number;
+          name: string;
           organization_id: string;
-          payment_method_code: APIEnums['payment_method_code'];
-          payout_id: string;
-          payout_method_id: string;
-          provider_code: APIEnums['provider_code'];
-          status: APIEnums['payout_status'];
+          pin_code: string;
+          postal_code: string;
+          region: string;
+          storefront_enabled: boolean;
+          street: string;
+          total_customers: number;
+          total_merchants: number;
+          total_revenue: number;
+          total_transactions: number;
           updated_at: string;
+          verification_status: APIEnums['organization_verification_status'];
+          website_url: string;
         }[];
       };
       fetch_customers_with_status: {
@@ -2091,6 +1891,178 @@ export type Database = {
           transaction_id: string;
         }[];
       };
+      create_or_update_customer: {
+        Args: {
+          p_address: string;
+          p_city: string;
+          p_country: string;
+          p_custom_fields_metadata?: Json | null;
+          p_email: string;
+          p_merchant_id: string;
+          p_name: string;
+          p_organization_id: string;
+          p_phone_number: string;
+          p_postal_code: string;
+          p_whatsapp_number: string;
+        };
+        Returns: string;
+      };
+      create_customer_portal_launch_session: {
+        Args: {
+          p_customer_id: string;
+          p_environment?: string | null;
+          p_flow_after_completion_url?: string | null;
+          p_flow_subscription_id?: string | null;
+          p_flow_type?: string | null;
+          p_merchant_id: string;
+          p_organization_id: string;
+          p_return_url?: string | null;
+        };
+        Returns: {
+          launch_token: string;
+        }[];
+      };
+      merchant_list_customer_portal_audit_events: {
+        Args: {
+          p_customer_id?: string | null;
+          p_event_type?: string | null;
+          p_limit?: number | null;
+          p_merchant_id: string;
+          p_offset?: number | null;
+          p_organization_id: string;
+        };
+        Returns: {
+          created_at: string;
+          customer_id: string;
+          event_id: string;
+          event_type: string;
+          metadata: Json;
+          organization_id: string;
+          total_count: number;
+        }[];
+      };
+      create_checkout_session: {
+        Args: {
+          p_allow_coupon_code?: boolean | null;
+          p_allow_quantity?: boolean | null;
+          p_amount: number;
+          p_cancel_url?: string | null;
+          p_created_by?: string | null;
+          p_currency_code: APIEnums['currency_code'];
+          p_customer_address?: string | null;
+          p_customer_city?: string | null;
+          p_customer_country?: string | null;
+          p_customer_email?: string | null;
+          p_customer_id?: string | null;
+          p_customer_name?: string | null;
+          p_customer_phone?: string | null;
+          p_customer_postal_code?: string | null;
+          p_description?: string | null;
+          p_environment?: string | null;
+          p_expiration_minutes?: number | null;
+          p_idempotency_body_hash?: string | null;
+          p_idempotency_key?: string | null;
+          p_metadata?: Json | null;
+          p_organization_id: string;
+          p_payment_link_id?: string | null;
+          p_price_id?: string | null;
+          p_product_id?: string | null;
+          p_quantity?: number | null;
+          p_require_billing_address?: boolean | null;
+          p_subscription_id?: string | null;
+          p_success_url?: string | null;
+          p_title?: string | null;
+        };
+        Returns: Json;
+      };
+      create_checkout_session_with_line_items: {
+        Args: {
+          p_allow_coupon_code?: boolean | null;
+          p_cancel_url?: string | null;
+          p_created_by: string;
+          p_currency_code: APIEnums['currency_code'];
+          p_customer_address?: string | null;
+          p_customer_city?: string | null;
+          p_customer_country?: string | null;
+          p_customer_email?: string | null;
+          p_customer_id?: string | null;
+          p_customer_name?: string | null;
+          p_customer_phone?: string | null;
+          p_customer_postal_code?: string | null;
+          p_description?: string | null;
+          p_environment?: string | null;
+          p_expiration_minutes?: number | null;
+          p_idempotency_body_hash?: string | null;
+          p_idempotency_key?: string | null;
+          p_line_items: Json;
+          p_metadata?: Json | null;
+          p_organization_id: string;
+          p_payment_link_id?: string | null;
+          p_require_billing_address?: boolean | null;
+          p_shipping_amount?: number | null;
+          p_success_url?: string | null;
+          p_tax_amount?: number | null;
+          p_title?: string | null;
+        };
+        Returns: Json;
+      };
+      list_checkout_sessions: {
+        Args: {
+          p_limit?: number | null;
+          p_merchant_id: string;
+          p_offset?: number | null;
+          p_status?: APIEnums['checkout_session_status'] | null;
+        };
+        Returns: {
+          amount: number;
+          cancel_url: string;
+          checkout_session_id: string;
+          created_at: string;
+          currency_code: APIEnums['currency_code'];
+          customer_email: string;
+          customer_id: string;
+          customer_name: string;
+          customer_phone: string;
+          description: string;
+          expires_at: string;
+          merchant_id: string;
+          metadata: Json;
+          organization_id: string;
+          payment_link_id: string;
+          product_id: string;
+          status: APIEnums['checkout_session_status'];
+          subscription_id: string;
+          success_url: string;
+          title: string;
+          updated_at: string;
+        }[];
+      };
+      get_checkout_session_api: {
+        Args: { p_checkout_session_id: string; p_organization_id: string };
+        Returns: {
+          amount: number;
+          cancel_url: string;
+          checkout_session_id: string;
+          created_at: string;
+          currency_code: APIEnums['currency_code'];
+          customer_email: string;
+          customer_id: string;
+          customer_name: string;
+          customer_phone: string;
+          description: string;
+          expires_at: string;
+          merchant_id: string;
+          metadata: Json;
+          organization_id: string;
+          payment_link_id: string;
+          product_id: string;
+          status: APIEnums['checkout_session_status'];
+          subscription_id: string;
+          success_url: string;
+          title: string;
+          updated_at: string;
+        }[];
+      };
       create_payment_link: {
         Args: {
           p_allow_coupon_code?: boolean | null;
@@ -2147,6 +2119,66 @@ export type Database = {
           url: string;
         }[];
       };
+      get_payment_link_api: {
+        Args: { p_link_id: string; p_organization_id: string };
+        Returns: {
+          allow_coupon_code: boolean;
+          allow_quantity: boolean;
+          amount: number;
+          cancel_url: string;
+          created_at: string;
+          created_by: string;
+          currency_code: APIEnums['currency_code'];
+          description: string;
+          environment: string;
+          expires_at: string;
+          is_active: boolean;
+          line_items: Json;
+          link_id: string;
+          link_type: APIEnums['link_type'];
+          metadata: Json;
+          organization_id: string;
+          price_id: string;
+          product_id: string;
+          quantity: number;
+          require_billing_address: boolean;
+          success_url: string;
+          title: string;
+          updated_at: string;
+          url: string;
+        }[];
+      };
+      create_payment_request_api: {
+        Args: {
+          p_amount: number;
+          p_created_by: string;
+          p_currency_code: APIEnums['currency_code'];
+          p_customer_id: string;
+          p_description: string;
+          p_environment?: string | null;
+          p_expiry_date: string;
+          p_idempotency_body_hash?: string | null;
+          p_idempotency_key?: string | null;
+          p_organization_id: string;
+          p_payment_reference: string;
+        };
+        Returns: {
+          amount: number;
+          created_at: string;
+          created_by: string;
+          currency_code: APIEnums['currency_code'];
+          customer_id: string;
+          description: string;
+          environment: string;
+          expiry_date: string;
+          organization_id: string;
+          payment_link: string;
+          payment_reference: string;
+          request_id: string;
+          status: APIEnums['transaction_status'];
+          updated_at: string;
+        }[];
+      };
       list_payment_requests: {
         Args: {
           p_customer_id?: string | null;
@@ -2173,43 +2205,52 @@ export type Database = {
           updated_at: string;
         }[];
       };
-      initiate_withdrawal: {
-        Args: {
-          p_amount: number;
-          p_currency_code?: APIEnums['currency_code'] | null;
-          p_merchant_id: string;
-          p_payout_method_id: string;
-          p_provider_code?: APIEnums['provider_code'] | null;
-        };
+      get_payment_request_api: {
+        Args: { p_organization_id: string; p_request_id: string };
         Returns: {
-          message: string;
-          success: boolean;
-        }[];
-      };
-      fetch_payouts: {
-        Args: {
-          p_end_date?: string | null;
-          p_merchant_id: string;
-          p_organization_id?: string | null;
-          p_page_number?: number | null;
-          p_page_size?: number | null;
-          p_start_date?: string | null;
-          p_statuses?: APIEnums['payout_status'][] | null;
-        };
-        Returns: {
-          account_id: string;
           amount: number;
           created_at: string;
+          created_by: string;
           currency_code: APIEnums['currency_code'];
-          merchant_id: string;
+          customer_id: string;
+          description: string;
+          environment: string;
+          expiry_date: string;
           metadata: Json;
           organization_id: string;
-          payout_id: string;
-          payout_method_id: string;
-          provider_code: APIEnums['provider_code'];
-          status: APIEnums['payout_status'];
+          payment_link: string;
+          payment_reference: string;
+          request_id: string;
+          status: string;
           updated_at: string;
         }[];
+      };
+      prepare_stripe_payment_amount: {
+        Args: { p_amount: number; p_currency: string };
+        Returns: {
+          original_amount_xof: number;
+          rate_xof_to_eur: number;
+          stripe_amount_cents: number;
+          stripe_currency: string;
+        }[];
+      };
+      create_stripe_transaction: {
+        Args: {
+          p_amount: number;
+          p_checkout_session_id?: string | null;
+          p_currency_code: APIEnums['currency_code'];
+          p_customer_id: string;
+          p_description?: string | null;
+          p_environment?: string | null;
+          p_merchant_id: string;
+          p_metadata?: Json | null;
+          p_organization_id: string;
+          p_product_id?: string | null;
+          p_provider_transaction_id: string;
+          p_quantity?: number | null;
+          p_subscription_id?: string | null;
+        };
+        Returns: string;
       };
       fetch_products: {
         Args: {
@@ -2287,121 +2328,6 @@ export type Database = {
         Args: { p_price_id: string; p_product_id: string };
         Returns: undefined;
       };
-      create_refund: {
-        Args: {
-          p_amount: number;
-          p_created_by?: string | null;
-          p_metadata?: Json | null;
-          p_provider_code?: APIEnums['provider_code'] | null;
-          p_provider_merchant_id?: string | null;
-          p_provider_transaction_id?: string | null;
-          p_reason?: string | null;
-          p_transaction_id: string;
-        };
-        Returns: string;
-      };
-      list_refunds: {
-        Args: {
-          p_end_date?: string | null;
-          p_limit?: number | null;
-          p_offset?: number | null;
-          p_organization_id: string;
-          p_start_date?: string | null;
-          p_status?: APIEnums['refund_status'] | null;
-        };
-        Returns: {
-          amount: number;
-          created_at: string;
-          fee_amount: number;
-          metadata: Json;
-          reason: string;
-          refund_id: string;
-          refunded_amount: number;
-          status: APIEnums['refund_status'];
-          transaction_id: string;
-          updated_at: string;
-        }[];
-      };
-      list_organizations: {
-        Args: { p_organization_id: string };
-        Returns: {
-          arr: number;
-          created_at: string;
-          default_currency: APIEnums['currency_code'];
-          email: string;
-          employee_number: string;
-          industry: string;
-          is_starter_business: boolean;
-          logo_url: string;
-          mrr: number;
-          name: string;
-          organization_id: string;
-          phone_number: string;
-          slug: string;
-          status: string;
-          storefront_enabled: boolean;
-          total_customers: number;
-          total_merchants: number;
-          total_revenue: number;
-          total_transactions: number;
-          updated_at: string;
-          verification_status: string;
-          website_url: string;
-        }[];
-      };
-      fetch_organization_details: {
-        Args: { p_merchant_id: string; p_organization_id?: string };
-        Returns: {
-          arr: number;
-          city: string;
-          country: string;
-          default_currency: APIEnums['currency_code'];
-          district: string;
-          email: string;
-          logo_url: string;
-          mrr: number;
-          name: string;
-          organization_id: string;
-          pin_code: string;
-          postal_code: string;
-          region: string;
-          storefront_enabled: boolean;
-          street: string;
-          total_customers: number;
-          total_merchants: number;
-          total_revenue: number;
-          total_transactions: number;
-          updated_at: string;
-          verification_status: APIEnums['organization_verification_status'];
-          website_url: string;
-        }[];
-      };
-      get_webhook_delivery_logs: {
-        Args: {
-          p_failed_only?: boolean | null;
-          p_limit?: number | null;
-          p_merchant_id: string;
-          p_offset?: number | null;
-          p_success_only?: boolean | null;
-          p_webhook_id: string;
-        };
-        Returns: {
-          attempt_number: number;
-          created_at: string;
-          event_type: string;
-          headers: Json;
-          ip_address: string;
-          log_id: string;
-          organization_id: string;
-          payload: Json;
-          request_duration_ms: number;
-          response_body: string;
-          response_status: number;
-          success: boolean;
-          user_agent: string;
-          webhook_id: string;
-        }[];
-      };
       get_product_api: {
         Args: { p_organization_id: string; p_product_id: string };
         Returns: {
@@ -2422,86 +2348,6 @@ export type Database = {
           track_inventory: boolean;
           updated_at: string;
         }[];
-      };
-      get_payment_link_api: {
-        Args: { p_link_id: string; p_organization_id: string };
-        Returns: {
-          allow_coupon_code: boolean;
-          allow_quantity: boolean;
-          amount: number;
-          cancel_url: string;
-          created_at: string;
-          created_by: string;
-          currency_code: APIEnums['currency_code'];
-          description: string;
-          environment: string;
-          expires_at: string;
-          is_active: boolean;
-          line_items: Json;
-          link_id: string;
-          link_type: APIEnums['link_type'];
-          metadata: Json;
-          organization_id: string;
-          price_id: string;
-          product_id: string;
-          quantity: number;
-          require_billing_address: boolean;
-          success_url: string;
-          title: string;
-          updated_at: string;
-          url: string;
-        }[];
-      };
-      create_payment_request_api: {
-        Args: {
-          p_amount: number;
-          p_created_by: string;
-          p_currency_code: APIEnums['currency_code'];
-          p_customer_id: string;
-          p_description: string;
-          p_environment?: string | null;
-          p_expiry_date: string;
-          p_organization_id: string;
-          p_payment_reference: string;
-        };
-        Returns: {
-          amount: number;
-          created_at: string;
-          created_by: string;
-          currency_code: APIEnums['currency_code'];
-          customer_id: string;
-          description: string;
-          environment: string;
-          expiry_date: string;
-          organization_id: string;
-          payment_link: string;
-          payment_reference: string;
-          request_id: string;
-          status: APIEnums['transaction_status'];
-          updated_at: string;
-        }[];
-      };
-      create_discount_coupon: {
-        Args: {
-          p_code: string;
-          p_customer_type?: APIEnums['customer_type'] | null;
-          p_description?: string | null;
-          p_discount_fixed_amount?: number | null;
-          p_discount_percentage?: number | null;
-          p_discount_type?: APIEnums['discount_type'] | null;
-          p_expires_at?: string | null;
-          p_is_active?: boolean | null;
-          p_max_quantity_per_use?: number | null;
-          p_max_uses?: number | null;
-          p_merchant_id?: string | null;
-          p_organization_id: string;
-          p_product_ids?: string[] | null;
-          p_scope_type?: string | null;
-          p_usage_frequency_limit?: APIEnums['usage_frequency'] | null;
-          p_usage_limit_value?: number | null;
-          p_valid_from?: string | null;
-        };
-        Returns: string;
       };
       get_product_prices_api: {
         Args: { p_organization_id: string; p_product_id: string };
@@ -2526,6 +2372,28 @@ export type Database = {
           fee_percentage: number;
           fee_type_id: string;
         }[];
+      };
+      create_discount_coupon: {
+        Args: {
+          p_code: string;
+          p_customer_type?: APIEnums['customer_type'] | null;
+          p_description?: string | null;
+          p_discount_fixed_amount?: number | null;
+          p_discount_percentage?: number | null;
+          p_discount_type?: APIEnums['discount_type'] | null;
+          p_expires_at?: string | null;
+          p_is_active?: boolean | null;
+          p_max_quantity_per_use?: number | null;
+          p_max_uses?: number | null;
+          p_merchant_id?: string | null;
+          p_organization_id: string;
+          p_product_ids?: string[] | null;
+          p_scope_type?: string | null;
+          p_usage_frequency_limit?: APIEnums['usage_frequency'] | null;
+          p_usage_limit_value?: number | null;
+          p_valid_from?: string | null;
+        };
+        Returns: string;
       };
       get_coupon_details_for_management: {
         Args: {
@@ -2557,6 +2425,267 @@ export type Database = {
           valid_from: string;
         }[];
       };
+      get_organization_coupons: {
+        Args: { p_environment?: string; p_organization_id: string };
+        Returns: {
+          applies_to_product_types: APIEnums['product_type'][];
+          code: string;
+          completed_redemptions: number;
+          coupon_id: string;
+          created_at: string;
+          current_uses: number;
+          customer_type: APIEnums['customer_type'];
+          description: string;
+          discount_fixed_amount: number;
+          discount_percentage: number;
+          discount_type: APIEnums['discount_type'];
+          distinct_customers_completed: number;
+          expires_at: string;
+          is_active: boolean;
+          max_quantity_per_use: number;
+          max_uses: number;
+          product_links: Json;
+          scope_type: string;
+          updated_at: string;
+          usage_frequency_limit: APIEnums['usage_frequency'];
+          usage_limit_value: number;
+          valid_from: string;
+        }[];
+      };
+      get_coupon_performance: {
+        Args: { p_coupon_id: string };
+        Returns: {
+          average_discount: number;
+          total_discounts: number;
+          total_revenue: number;
+          total_uses: number;
+          unique_customers: number;
+        }[];
+      };
+      fetch_subscriptions: {
+        Args: {
+          p_environment?: string | null;
+          p_merchant_id?: string | null;
+          p_organization_id: string;
+          p_page?: number | null;
+          p_page_size?: number | null;
+        };
+        Returns: {
+          amount: number;
+          created_at: string;
+          currency_code: APIEnums['currency_code'];
+          customer_id: string;
+          customer_name: string;
+          end_date: string;
+          metadata: Json;
+          next_billing_date: string;
+          product_id: string;
+          product_name: string;
+          start_date: string;
+          status: APIEnums['subscription_status'];
+          subscription_id: string;
+          updated_at: string;
+        }[];
+      };
+      fetch_subscriptions_for_customer: {
+        Args: { p_customer_id: string; p_environment?: string };
+        Returns: {
+          product_description: string;
+          product_id: string;
+          product_name: string;
+          product_type: APIEnums['product_type'];
+          subscription_end_date: string;
+          subscription_id: string;
+          subscription_next_billing_date: string;
+          subscription_status: APIEnums['subscription_status'];
+        }[];
+      };
+      get_customer_subscription: {
+        Args: { p_merchant_id: string; p_subscription_id: string };
+        Returns: {
+          created_at: string;
+          customer_email: string;
+          customer_id: string;
+          customer_name: string;
+          end_date: string;
+          merchant_id: string;
+          metadata: Json;
+          next_billing_date: string;
+          organization_id: string;
+          plan_amount: number;
+          plan_billing_frequency: APIEnums['billing_interval'];
+          plan_currency_code: APIEnums['currency_code'];
+          plan_description: string;
+          plan_name: string;
+          product_id: string;
+          start_date: string;
+          status: APIEnums['subscription_status'];
+          subscription_id: string;
+          updated_at: string;
+        }[];
+      };
+      cancel_customer_subscription: {
+        Args: { p_merchant_id: string; p_subscription_id: string };
+        Returns: boolean;
+      };
+      fetch_transactions: {
+        Args: {
+          p_currency?: APIEnums['currency_code'][] | null;
+          p_display_in_xof?: boolean | null;
+          p_end_date?: string | null;
+          p_environment?: string | null;
+          p_is_pos?: boolean | null;
+          p_organization_id: string;
+          p_page?: number | null;
+          p_page_size?: number | null;
+          p_payment_method?: APIEnums['payment_method_code'][] | null;
+          p_provider_code?: APIEnums['provider_code'] | null;
+          p_search_term?: string | null;
+          p_start_date?: string | null;
+          p_status?: APIEnums['transaction_status'][] | null;
+          p_type?: APIEnums['transaction_type'][] | null;
+        };
+        Returns: {
+          coupon_code: string;
+          coupon_usage_details: Json;
+          created_at: string;
+          currency_code: APIEnums['currency_code'];
+          customer_address: string;
+          customer_city: string;
+          customer_country: string;
+          customer_email: string;
+          customer_id: string;
+          customer_name: string;
+          customer_phone: string;
+          customer_postal_code: string;
+          fee_amount: number;
+          fee_amount_xof: number;
+          fee_category: APIEnums['fee_category'];
+          fee_name: string;
+          fee_structure_id: string;
+          fee_subcategory: APIEnums['fee_subcategory'];
+          gross_amount: number;
+          gross_amount_xof: number;
+          metadata: Json;
+          net_amount: number;
+          net_amount_xof: number;
+          organization_id: string;
+          payment_method_code: APIEnums['payment_method_code'];
+          product_description: string;
+          product_id: string;
+          product_name: string;
+          product_price: number;
+          provider_checkout_id: string;
+          provider_code: APIEnums['provider_code'];
+          provider_transaction_id: string;
+          qr_code_id: string;
+          qr_code_name: string;
+          qr_code_product_id: string;
+          qr_code_type: APIEnums['qr_code_type'];
+          quantity: number;
+          spi_payment_category: APIEnums['spi_payment_category'];
+          spi_rejection_reason: APIEnums['spi_rejection_reason'];
+          status: APIEnums['transaction_status'];
+          subscription_id: string;
+          subscription_next_billing_date: string;
+          subscription_price_billing_interval: string;
+          subscription_product_description: string;
+          subscription_product_name: string;
+          subscription_status: string;
+          transaction_id: string;
+          transaction_type: APIEnums['transaction_type'];
+        }[];
+      };
+      get_transaction: {
+        Args: { p_organization_id?: string; p_transaction_id: string };
+        Returns: {
+          created_at: string;
+          currency_code: APIEnums['currency_code'];
+          customer_id: string;
+          description: string;
+          fee_amount: number;
+          fee_category: APIEnums['fee_category'];
+          fee_name: string;
+          fee_structure_id: string;
+          fee_subcategory: APIEnums['fee_subcategory'];
+          gross_amount: number;
+          metadata: Json;
+          net_amount: number;
+          organization_id: string;
+          payment_method_code: APIEnums['payment_method_code'];
+          product_id: string;
+          provider_code: APIEnums['provider_code'];
+          status: APIEnums['transaction_status'];
+          subscription_id: string;
+          transaction_id: string;
+          transaction_type: APIEnums['transaction_type'];
+          updated_at: string;
+        }[];
+      };
+      create_beneficiary_payout: {
+        Args: {
+          p_amount: number;
+          p_currency_code: APIEnums['currency_code'];
+          p_merchant_id: string;
+          p_metadata?: Json | null;
+          p_payment_method_code?: APIEnums['payment_method_code'] | null;
+          p_payout_method_id?: string | null;
+          p_provider_code?: APIEnums['provider_code'] | null;
+          p_status?: APIEnums['payout_status'] | null;
+        };
+        Returns: {
+          fee_amount: number;
+          message: string;
+          payout_id: string;
+          status: APIEnums['payout_status'];
+          total_deduction: number;
+        }[];
+      };
+      fetch_beneficiary_payouts: {
+        Args: {
+          p_currency_code?: APIEnums['currency_code'] | null;
+          p_end_date?: string | null;
+          p_merchant_id: string;
+          p_organization_id?: string | null;
+          p_page_number?: number | null;
+          p_page_size?: number | null;
+          p_start_date?: string | null;
+          p_statuses?: string[] | null;
+        };
+        Returns: {
+          account_id: string;
+          amount: number;
+          created_at: string;
+          created_by: string;
+          currency_code: APIEnums['currency_code'];
+          metadata: Json;
+          organization_id: string;
+          payment_method_code: APIEnums['payment_method_code'];
+          payout_id: string;
+          payout_method_id: string;
+          provider_code: APIEnums['provider_code'];
+          status: APIEnums['payout_status'];
+          updated_at: string;
+        }[];
+      };
+      get_beneficiary_payout_api: {
+        Args: { p_organization_id: string; p_payout_id: string };
+        Returns: {
+          account_id: string;
+          amount: number;
+          created_at: string;
+          created_by: string;
+          currency_code: APIEnums['currency_code'];
+          metadata: Json;
+          organization_id: string;
+          payment_method_code: APIEnums['payment_method_code'];
+          payout_id: string;
+          payout_method_id: string;
+          provider_code: APIEnums['provider_code'];
+          status: APIEnums['payout_status'];
+          updated_at: string;
+        }[];
+      };
       fetch_wave_provider_settings: {
         Args: { p_organization_id: string };
         Returns: {
@@ -2568,6 +2697,205 @@ export type Database = {
           provider_code: APIEnums['provider_code'];
           provider_merchant_id: string;
         }[];
+      };
+      get_webhook: {
+        Args: { p_merchant_id: string; p_webhook_id: string };
+        Returns: {
+          authorized_events: APIEnums['webhook_event'][];
+          created_at: string;
+          created_by: string | null;
+          deleted_at: string | null;
+          environment: string;
+          is_active: boolean;
+          last_payload: Json | null;
+          last_response_body: string | null;
+          last_response_status: number | null;
+          last_triggered_at: string | null;
+          metadata: Json | null;
+          organization_id: string;
+          retry_count: number | null;
+          spi_event_types: string[] | null;
+          supports_spi: boolean;
+          updated_at: string;
+          url: string;
+          verification_token: string;
+          webhook_id: string;
+        }[];
+        SetofOptions: {
+          from: '*';
+          to: 'webhooks';
+          isOneToOne: false;
+          isSetofReturn: true;
+        };
+      };
+      get_webhook_by_id: {
+        Args: { p_webhook_id: string };
+        Returns: {
+          authorized_events: APIEnums['webhook_event'][];
+          created_at: string;
+          created_by: string | null;
+          deleted_at: string | null;
+          environment: string;
+          is_active: boolean;
+          last_payload: Json | null;
+          last_response_body: string | null;
+          last_response_status: number | null;
+          last_triggered_at: string | null;
+          metadata: Json | null;
+          organization_id: string;
+          retry_count: number | null;
+          spi_event_types: string[] | null;
+          supports_spi: boolean;
+          updated_at: string;
+          url: string;
+          verification_token: string;
+          webhook_id: string;
+        }[];
+        SetofOptions: {
+          from: '*';
+          to: 'webhooks';
+          isOneToOne: false;
+          isSetofReturn: true;
+        };
+      };
+      update_webhook: {
+        Args: {
+          p_authorized_events?: APIEnums['webhook_event'][] | null;
+          p_is_active?: boolean | null;
+          p_merchant_id: string;
+          p_metadata?: Json | null;
+          p_url?: string | null;
+          p_webhook_id: string;
+        };
+        Returns: boolean;
+      };
+      fetch_organization_webhooks: {
+        Args: {
+          p_environment?: string | null;
+          p_event?: APIEnums['webhook_event'] | null;
+          p_is_active?: boolean | null;
+          p_merchant_id: string;
+          p_organization_id?: string | null;
+          p_search_term?: string | null;
+        };
+        Returns: {
+          authorized_events: APIEnums['webhook_event'][];
+          created_at: string;
+          created_by: string | null;
+          deleted_at: string | null;
+          environment: string;
+          is_active: boolean;
+          last_payload: Json | null;
+          last_response_body: string | null;
+          last_response_status: number | null;
+          last_triggered_at: string | null;
+          metadata: Json | null;
+          organization_id: string;
+          retry_count: number | null;
+          spi_event_types: string[] | null;
+          supports_spi: boolean;
+          updated_at: string;
+          url: string;
+          verification_token: string;
+          webhook_id: string;
+        }[];
+        SetofOptions: {
+          from: '*';
+          to: 'webhooks';
+          isOneToOne: false;
+          isSetofReturn: true;
+        };
+      };
+      get_merchant_from_organization: {
+        Args: { p_organization_id: string };
+        Returns: string;
+      };
+      get_webhook_delivery_logs: {
+        Args: {
+          p_failed_only?: boolean | null;
+          p_limit?: number | null;
+          p_merchant_id: string;
+          p_offset?: number | null;
+          p_success_only?: boolean | null;
+          p_webhook_id: string;
+        };
+        Returns: {
+          attempt_number: number;
+          created_at: string;
+          event_type: string;
+          headers: Json;
+          ip_address: string;
+          log_id: string;
+          organization_id: string;
+          payload: Json;
+          request_duration_ms: number;
+          response_body: string;
+          response_status: number;
+          success: boolean;
+          user_agent: string;
+          webhook_id: string;
+        }[];
+      };
+      log_webhook_delivery: {
+        Args: {
+          p_attempt_number?: number | null;
+          p_event_type: string;
+          p_headers?: Json | null;
+          p_ip_address?: string | null;
+          p_merchant_id: string;
+          p_organization_id: string;
+          p_payload: Json;
+          p_request_duration_ms?: number | null;
+          p_response_body: string;
+          p_response_status: number;
+          p_user_agent?: string | null;
+          p_webhook_id: string;
+        };
+        Returns: string;
+      };
+      webhook_outbox_upsert_event: {
+        Args: {
+          p_event_type: APIEnums['webhook_event'];
+          p_idempotency_key: string;
+          p_organization_id: string;
+          p_payload: Json;
+        };
+        Returns: string;
+      };
+      webhook_dispatch_ensure: {
+        Args: { p_outbox_id: string; p_webhook_id: string };
+        Returns: string;
+      };
+      webhook_dispatch_should_process: {
+        Args: { p_dispatch_id: string };
+        Returns: boolean;
+      };
+      record_webhook_delivery_attempt: {
+        Args: {
+          p_attempt_number: number;
+          p_dispatch_id: string;
+          p_error_message: string;
+          p_request_duration_ms: number;
+          p_response_body: string;
+          p_response_status: number;
+        };
+        Returns: string;
+      };
+      mark_webhook_dispatch_delivered: {
+        Args: { p_dispatch_id: string };
+        Returns: undefined;
+      };
+      mark_webhook_dispatch_dead_letter: {
+        Args: { p_dispatch_id: string; p_reason: string };
+        Returns: undefined;
+      };
+      claim_inbound_provider_webhook_event: {
+        Args: {
+          p_metadata?: Json | null;
+          p_provider: APIEnums['provider_code'];
+          p_provider_event_id: string;
+        };
+        Returns: boolean;
       };
       get_wave_transaction_by_checkout_id: {
         Args: { p_provider_checkout_id: string };
@@ -2588,6 +2916,21 @@ export type Database = {
           metadata: Json;
           organization_id: string;
           transaction_id: string;
+        }[];
+      };
+      recover_missing_wave_transaction: {
+        Args: {
+          p_amount?: number | null;
+          p_client_reference: string;
+          p_currency?: string | null;
+          p_wave_session_id: string;
+          p_wave_transaction_id?: string | null;
+        };
+        Returns: {
+          r_organization_id: string;
+          r_status: APIEnums['transaction_status'];
+          r_transaction_id: string;
+          r_was_recovered: boolean;
         }[];
       };
       update_transaction_status: {
@@ -2614,25 +2957,12 @@ export type Database = {
         };
         Returns: Json;
       };
-      handle_stripe_payment_success: {
+      update_transaction_fee_metadata: {
         Args: {
-          p_amount: number;
-          p_checkout_session_id: string;
-          p_currency: string;
-          p_merchant_id?: string | null;
-          p_merchant_net_amount: number;
-          p_organization_id: string;
-          p_payment_intent_id: string;
-          p_platform_fee: number;
-        };
-        Returns: Json;
-      };
-      handle_stripe_payment_failure: {
-        Args: {
-          p_checkout_session_id: string;
-          p_failure_code?: string | null;
-          p_failure_message?: string | null;
-          p_payment_intent_id: string;
+          p_card_details: Json;
+          p_is_international: boolean;
+          p_payment_method_id: string;
+          p_stripe_payment_intent_id: string;
         };
         Returns: Json;
       };
@@ -2685,8 +3015,32 @@ export type Database = {
       customer_type: 'all' | 'new' | 'returning';
       discount_type: 'percentage' | 'fixed';
       failed_payment_action: 'cancel' | 'pause' | 'continue';
+      fee_category: 'payment_processing' | 'payout' | 'other';
+      fee_subcategory:
+        | 'pos'
+        | 'bnpl'
+        | 'cards'
+        | 'mobile_money'
+        | 'bank_transfer_local'
+        | 'bank_transfer_international'
+        | 'bank_transfer_beneficiary'
+        | 'mobile_money_payout'
+        | 'mobile_money_beneficiary'
+        | 'refund'
+        | 'partial_refund'
+        | 'chargeback'
+        | 'currency_conversion'
+        | 'international_cards'
+        | 'subscription_payments';
       first_payment_type: 'initial' | 'non_initial' | 'prorated';
-      integration_source: 'system' | 'shopify' | 'woocommerce' | 'prestashop';
+      integration_source:
+        | 'system'
+        | 'shopify'
+        | 'woocommerce'
+        | 'prestashop'
+        | 'magento'
+        | 'odoo'
+        | 'bubble';
       invoice_status: 'sent' | 'paid' | 'overdue' | 'cancelled' | 'draft';
       link_type: 'instant' | 'product';
       organization_status: 'active' | 'inactive' | 'suspended';
@@ -2699,6 +3053,7 @@ export type Database = {
         | 'FREE';
       payout_status: 'pending' | 'processing' | 'completed' | 'failed';
       pricing_model: 'standard' | 'pay_what_you_want' | 'tiered' | 'volume';
+      pricing_plan_type: 'fixed' | 'volume_tiered' | 'custom';
       product_type: 'one_time' | 'recurring' | 'usage_based';
       provider_code:
         | 'WAVE'
@@ -2839,6 +3194,8 @@ export type CurrencyCode = APIEnums['currency_code'];
 export type CustomerType = APIEnums['customer_type'];
 export type DiscountType = APIEnums['discount_type'];
 export type FailedPaymentAction = APIEnums['failed_payment_action'];
+export type FeeCategory = APIEnums['fee_category'];
+export type FeeSubcategory = APIEnums['fee_subcategory'];
 export type FirstPaymentType = APIEnums['first_payment_type'];
 export type IntegrationSource = APIEnums['integration_source'];
 export type InvoiceStatus = APIEnums['invoice_status'];
@@ -2849,6 +3206,7 @@ export type OrganizationVerificationStatus =
 export type PaymentMethodCode = APIEnums['payment_method_code'];
 export type PayoutStatus = APIEnums['payout_status'];
 export type PricingModel = APIEnums['pricing_model'];
+export type PricingPlanType = APIEnums['pricing_plan_type'];
 export type ProductType = APIEnums['product_type'];
 export type ProviderCode = APIEnums['provider_code'];
 export type ProviderPaymentStatus = APIEnums['provider_payment_status'];

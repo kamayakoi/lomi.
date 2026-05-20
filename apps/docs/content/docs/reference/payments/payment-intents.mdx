@@ -19,7 +19,7 @@ The Payment Intents API is used for **card-form-only** integrations where your a
 
 ## Create a payment intent
 
-`POST /payment-intents`
+`POST /charge/card` (replaces the former `POST /payment-intents`)
 
 ### Authentication
 
@@ -74,7 +74,7 @@ You can authenticate with either:
 <Tabs items={['Node', 'cURL']}>
   <Tab value="Node">
     ```typescript
-    const response = await fetch('https://api.lomi.africa/payment-intents', {
+    const response = await fetch('https://api.lomi.africa/charge/card', {
       method: 'POST',
       headers: {
         'X-API-KEY': process.env.LOMI_API_KEY!,
@@ -97,7 +97,7 @@ You can authenticate with either:
 
   <Tab value="cURL">
     ```bash
-    curl -X POST "https://api.lomi.africa/payment-intents" \
+    curl -X POST "https://api.lomi.africa/charge/card" \
       -H "X-API-KEY: $LOMI_API_KEY" \
       -H "Content-Type: application/json" \
       -d '{

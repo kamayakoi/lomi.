@@ -2902,27 +2902,24 @@
         ]
       }
     },
-    "/payout/wave": {
+    "/payouts": {
       "post": {
-        "description": "Crée un virement via la fonction edge Wave. La forme de la réponse suit le JSON du fournisseur.",
-        "operationId": "PayoutsController_createWavePayout",
+        "description": "Virement vers votre compte enregistré (self) ou vers un tiers sur mobile money / SPI (beneficiary).",
+        "operationId": "PayoutsUnifiedController_create",
         "parameters": [],
         "responses": {
           "201": {
-            "description": "Virement initié (corps JSON de la fonction edge Wave)",
+            "description": "Virement initié",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PayoutResponseDto"
+                  "$ref": "#/components/schemas/CreatePayoutResponseDto"
                 }
               }
             }
           },
           "400": {
-            "description": "Entrée invalide ou erreur fournisseur"
-          },
-          "401": {
-            "description": "Clé API invalide ou manquante"
+            "description": "Entrée invalide ou rail non pris en charge"
           }
         },
         "security": [
@@ -2930,62 +2927,14 @@
             "api-key": []
           }
         ],
-        "summary": "Lancer un virement Wave",
+        "summary": "Créer un virement",
         "tags": [
-          "Virements sortants"
+          "Virements"
         ]
-      }
-    },
-    "/payout/spi": {
-      "post": {
-        "description": "Initie un virement instantané SPI (RPC initiate_spi_payout). Le règlement PI-SPI se poursuit de façon asynchrone.",
-        "operationId": "PayoutsController_createSpiPayout",
-        "parameters": [],
-        "responses": {
-          "201": {
-            "description": "Virement SPI initié",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": true
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "api-key": []
-          }
-        ],
-        "summary": "Lancer un virement SPI",
-        "tags": [
-          "Virements sortants"
-        ]
-      }
-    },
-    "/payouts": {
+      },
       "get": {
-        "description": "Liste les virements du marchand pour l’organisation (RPC fetch_payouts).",
-        "operationId": "PayoutsListController_findAll",
+        "operationId": "PayoutsUnifiedController_findAll",
         "parameters": [
-          {
-            "name": "endDate",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "startDate",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "pageSize",
             "required": false,
@@ -3003,14 +2952,27 @@
             }
           },
           {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "status",
             "required": false,
             "in": "query",
             "schema": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
+              "type": "string"
             }
           }
         ],
@@ -3026,7 +2988,35 @@
         ],
         "summary": "Lister les virements",
         "tags": [
-          "Virements sortants"
+          "Virements"
+        ]
+      }
+    },
+    "/payouts/{id}": {
+      "get": {
+        "operationId": "PayoutsUnifiedController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Payout ID",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Détail du virement"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Obtenir un virement",
+        "tags": [
+          "Virements"
         ]
       }
     },
@@ -3610,6 +3600,107 @@
           }
         ],
         "summary": "Lancer un encaissement direct MTN MoMo",
+        "tags": [
+          "Encaissements"
+        ]
+      }
+    },
+    "/charge/card": {
+      "post": {
+        "description": "Crée un encaissement carte embarqué et renvoie le client_secret pour votre interface de paiement.",
+        "operationId": "ChargesController_createCardCharge",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePaymentIntentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Encaissement carte créé",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentIntentResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Créer un encaissement carte (client_secret)",
+        "tags": [
+          "Encaissements"
+        ]
+      }
+    },
+    "/charge/card/{id}": {
+      "get": {
+        "operationId": "ChargesController_getCardCharge",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Card payment id (pi_...)",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Encaissement carte",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentIntentResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Obtenir un encaissement carte",
+        "tags": [
+          "Encaissements"
+        ]
+      }
+    },
+    "/charge/card/{id}/cancel": {
+      "post": {
+        "operationId": "ChargesController_cancelCardCharge",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Card payment id (pi_...)",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Encaissement carte annulé"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Annuler un encaissement carte",
         "tags": [
           "Encaissements"
         ]
@@ -6083,76 +6174,35 @@
           "url"
         ]
       },
-      "PayoutResponseDto": {
+      "CreatePayoutResponseDto": {
         "type": "object",
         "properties": {
-          "account_id": {
-            "type": "string",
-            "example": "string"
-          },
-          "amount": {
-            "type": "number",
-            "example": 123
-          },
-          "created_at": {
-            "type": "string",
-            "example": "string"
-          },
-          "created_by": {
-            "type": "string",
-            "example": "string"
-          },
-          "currency_code": {
-            "type": "string",
-            "example": "string"
-          },
-          "environment": {
-            "type": "string",
-            "example": "string"
-          },
-          "metadata": {
-            "type": "object",
-            "example": {}
-          },
-          "organization_id": {
-            "type": "string",
-            "example": "string"
+          "success": {
+            "type": "boolean",
+            "example": true
           },
           "payout_id": {
             "type": "string",
-            "example": "string"
+            "example": "payout-uuid"
           },
-          "payout_method_id": {
+          "kind": {
             "type": "string",
-            "example": "string"
-          },
-          "provider_code": {
-            "type": "string",
-            "example": "string"
+            "example": "withdrawal",
+            "enum": [
+              "withdrawal",
+              "beneficiary"
+            ]
           },
           "status": {
             "type": "string",
-            "example": "string"
+            "example": "processing"
           },
-          "updated_at": {
-            "type": "string",
-            "example": "string"
+          "message": {
+            "type": "string"
           }
         },
         "required": [
-          "account_id",
-          "amount",
-          "created_at",
-          "created_by",
-          "currency_code",
-          "environment",
-          "metadata",
-          "organization_id",
-          "payout_id",
-          "payout_method_id",
-          "provider_code",
-          "status",
-          "updated_at"
+          "success"
         ]
       },
       "BeneficiaryPayoutResponseDto": {

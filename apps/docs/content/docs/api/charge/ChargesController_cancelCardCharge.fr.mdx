@@ -1,22 +1,19 @@
 ---
-title: "Lister les virements"
-description: "Lister les virements"
+title: "Annuler un encaissement carte"
+description: "Annuler un encaissement carte"
 full: true
-method: get
-path: /payouts
-operationId: PayoutsListController_findAll
+method: post
+path: /charge/card/{id}/cancel
+operationId: ChargesController_cancelCardCharge
 ---
 
 ## Aperçu
 
-Lister les virements
-
-Liste les virements du marchand pour l’organisation (RPC fetch_payouts).
-
+Annuler un encaissement carte
 
 ### Quand utiliser cet endpoint
 
-Utilisez cet endpoint quand vous devez exécuter `GET /payouts` (Lister les virements).
+Utilisez cet endpoint quand vous devez exécuter `POST /charge/card/&#123;id&#125;/cancel` (Annuler un encaissement carte).
 
 
 ## Authentification
@@ -25,7 +22,7 @@ Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (v
 
 ## Point de terminaison
 
-`GET /payouts`
+`POST /charge/card/{id}/cancel`
 
 URLs de base :
 
@@ -36,26 +33,25 @@ URLs de base :
 
 ### Paramètres de chemin
 
-_Aucun paramètre de chemin au-delà du motif d’URL._
-
+| Nom | Obligatoire | Schéma | Description |
+| --- | --- | --- | --- |
+| `id` | Oui | — | Card payment id (pi_...) |
 
 ### Paramètres de requête
 
-| Nom | Emplacement | Obligatoire | Schéma | Description |
-| --- | --- | --- | --- | --- |
-| `endDate` | query | Non | — |  |
-| `startDate` | query | Non | — |  |
-| `pageSize` | query | Non | — |  |
-| `page` | query | Non | — |  |
-| `status` | query | Non | — |  |
+_Aucun paramètre de requête._
 
+
+### Corps de la requête
+
+_Aucun corps application/json pour cette opération._
 
 
 ## Réponses
 
 | Statut | Description |
 | --- | --- |
-| `200` | Liste des virements |
+| `200` | Encaissement carte annulé |
 
 ## Erreurs
 
@@ -64,13 +60,15 @@ Les erreurs suivent le format JSON standard (code de statut et message lisible p
 ## Exemple
 
 ```bash
-curl -sS -X GET "https://sandbox.api.lomi.africa/payouts?endDate=value&startDate=value" \
-  -H "X-API-KEY: $LOMI_API_KEY"
+curl -sS -X POST "https://sandbox.api.lomi.africa/charge/card/value/cancel" \
+  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{}'
 ```
 
 ## OpenAPI
 
-- **operationId**: `PayoutsListController_findAll`
-- **Operation**: `GET /payouts`
+- **operationId**: `ChargesController_cancelCardCharge`
+- **Operation**: `POST /charge/card/{id}/cancel`
 
 Schémas complets et **Try it** : [référence API](/api/index). Contrat machine : `openapi.json` à la racine des docs.

@@ -1,89 +1,81 @@
 ---
 title: Payouts
-description: Initiate outbound mobile-money payouts on supported rails (provider-specific payloads).
+description: Withdraw to your registered accounts or pay beneficiaries (`POST /payouts`).
 ---
 
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
 import { Callout } from 'fumadocs-ui/components/callout';
 
-Merchant-initiated payouts on supported rails are exposed as **`POST`** routes with provider-specific payloads. There is currently **no** generic `GET /payouts` list API in the public merchant contract—track completion with **webhooks**.
+Use **`POST /payouts`** for all outbound money movement.
 
-<Callout type="warning">
-  Payout initiation is asynchronous. Listen for webhook events (`payout.completed`, `payout.failed`, …) rather than polling a list endpoint that does not exist on the public REST surface yet.
+- **`destination: "self"`** — withdraw to a **registered** payout method on your organization (`payout_method_id` required). Supports `bank`, `spi`, and `wave` (mobile money).
+- **`destination: "beneficiary"`** — pay a third party on **mobile rails** (`wave` today). Requires `recipient.name` and `recipient.phone`. Bank payouts to arbitrary accounts are not supported.
+
+<Callout type="info">
+  MTN payouts return `400` until supported. SPI settlement for self payouts continues asynchronously after the RPC succeeds.
 </Callout>
 
-Lifecycle, limits, fees: **[Payout lifecycle](/reference/payments/payout-lifecycle)**.
+## Create a payout
 
-## Initiate a Wave payout
-
-Maps to `POST /payout/wave`. Request payload matches the Nest DTO (`amount`, `currency`, nested `beneficiary`).
-
-<Tabs items={["TypeScript", "Python", "cURL"]}>
+<Tabs items={["TypeScript", "cURL"]}>
 
 <Tab value="TypeScript">
 ```typescript
 import { LomiSDK } from '@lomi./sdk';
 
-const lomi = new LomiSDK({
-  apiKey: process.env.LOMI_API_KEY!,
-  environment: 'live',
+const lomi = new LomiSDK({ apiKey: process.env.LOMI_API_KEY!, environment: 'live' });
+
+// Withdraw to your registered Wave mobile money method
+await lomi.payouts.create({
+  destination: 'self',
+  rail: 'wave',
+  amount: 50000,
+  currency_code: 'XOF',
+  payout_method_id: '550e8400-e29b-41d4-a716-446655440000',
 });
 
-await lomi.payouts.createWavePayout({
-  amount: 25000,
-  currency: 'XOF',
-  beneficiary: {
-    name: 'Aicha Diallo',
-    phoneNumber: '+221771234567',
-  },
-  reason: 'Weekly settlement',
+// Pay a contractor via Wave
+await lomi.payouts.create({
+  destination: 'beneficiary',
+  rail: 'wave',
+  amount: 10000,
+  currency_code: 'XOF',
+  recipient: { name: 'Ada Lovelace', phone: '+221771234567' },
+  reason: 'Invoice #12',
 });
-```
-</Tab>
-
-<Tab value="Python">
-```python
-# Mirrors the Wave payout edge contract (field names mirror server expectation)
-response = requests.post(
-    "https://api.lomi.africa/payout/wave",
-    headers={"X-API-KEY": os.environ["LOMI_API_KEY"], "Content-Type": "application/json"},
-    json={
-        "amount": 25000,
-        "currency": "XOF",
-        "beneficiary": {"name": "Aicha Diallo", "phoneNumber": "+221771234567"},
-        "reason": "Weekly settlement",
-    },
-)
-print(response.status_code, response.json())
 ```
 </Tab>
 
 <Tab value="cURL">
 ```bash
-curl -X POST "https://api.lomi.africa/payout/wave" \
+curl -X POST "https://api.lomi.africa/payouts" \
   -H "X-API-KEY: $LOMI_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "amount": 25000,
-    "currency": "XOF",
-    "beneficiary": { "name": "Aicha Diallo", "phoneNumber": "+221771234567" },
-    "reason": "Weekly settlement"
+    "destination": "beneficiary",
+    "rail": "wave",
+    "amount": 10000,
+    "currency_code": "XOF",
+    "recipient": { "name": "Ada Lovelace", "phone": "+221771234567" }
   }'
 ```
 </Tab>
 
 </Tabs>
 
-## Field reference (Wave payout)
+## Payload reference
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `amount` | `number` | **Yes** | Amount to send (minimums enforced server-side). |
-| `currency` | `string` | **Yes** | ISO currency (`XOF`, …). |
-| `beneficiary` | `object` | **Yes** | Recipient `name` + `phoneNumber` (mobile-money ID). |
-| `reason` | `string` | No | Ledger / audit memo. |
+| Field | Type | Required |
+| --- | --- | --- |
+| `destination` | `'self'` \| `'beneficiary'` | **Yes** |
+| `rail` | `'wave'` \| `'spi'` \| `'bank'` \| `'mtn'` | **Yes** |
+| `amount` | `number` | **Yes** |
+| `currency_code` | `string` | **Yes** |
+| `payout_method_id` | UUID | **Yes** for `self`; required for beneficiary `spi` |
+| `recipient` | `{ name, phone }` | **Yes** for beneficiary `wave` |
+| `reason` | `string` | No |
 
-## Next steps
+## List and get
 
-- Monitor **[webhooks](/reference/payments/webhooks)** and **[delivery logs](/reference/platform/webhook-delivery-logs)** for payout status transitions.
-- For paying third-parties outside your treasury flows, compare **[Beneficiary payouts](/reference/payments/beneficiary-payouts)**.
+- `GET /payouts` — withdrawals and beneficiary payouts (each row includes `kind`)
+- `GET /payouts/{id}`

@@ -1,0 +1,57 @@
+---
+title: 'Installer les règles agent'
+description: 'Utilisez lomi install-rules pour ajouter la documentation SDK et API lomi. à Cursor, Claude Code, Codex, VS Code et llms.txt.'
+---
+
+La commande `lomi install-rules` installe de la documentation lomi. versionnée dans votre projet pour que les assistants IA comprennent checkout, webhooks, payment intents, abonnements et la référence API.
+
+## Usage
+
+```bash filename="Terminal"
+lomi install-rules
+```
+
+Mode interactif : sélection multiple des cibles.
+
+### Mode non interactif
+
+```bash filename="Terminal"
+lomi install-rules --target cursor --target llms.txt
+lomi install-rules --force
+```
+
+| Option | Description |
+| --- | --- |
+| `--target <nom>` | Répéter pour chaque cible |
+| `--force` | Réinstaller même si à jour |
+
+## Cibles
+
+| Cible | Fichiers |
+| --- | --- |
+| `cursor` | `.cursor/rules/lomi.*.mdc` |
+| `claude-code` | `CLAUDE.md` |
+| `codex` | `AGENTS.md` |
+| `vscode` | `.github/instructions/lomi-*.instructions.md` |
+| `llms.txt` | Briefing à la racine (sync docs.lomi.africa) |
+
+## Sujets couverts
+
+SDK, checkout sessions, webhooks, payment intents, abonnements, référence API (OpenAPI).
+
+## Quand c’est proposé
+
+- `lomi install-rules` directement
+- Premier [`lomi init`](/core/lomi-cli/init) (sauf `--skip-rules-install`)
+- Premier [`lomi dev`](/core/lomi-cli/dev) (sauf `--skip-rules-install`)
+
+## Exemple Cursor
+
+```bash filename="Terminal"
+lomi install-rules --target cursor
+```
+
+## Suite
+
+- [Premiers pas](/core/lomi-cli/overview)
+- [SDK TypeScript](/reference/sdks/typescript)

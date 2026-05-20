@@ -1,0 +1,100 @@
+---
+title: 'Install agent rules'
+description: 'Use lomi install-rules to add lomi. SDK and API documentation for Cursor, Claude Code, Codex, VS Code, and llms.txt.'
+---
+
+The `lomi install-rules` command installs versioned lomi. documentation into your project so AI coding assistants understand checkout sessions, webhooks, payment intents, subscriptions, and the API reference.
+
+Inspired by the agent-rules pattern used by tools like Trigger.dev — your AI reads these files automatically when you work in the repo.
+
+## Usage
+
+```bash filename="Terminal"
+lomi install-rules
+```
+
+Interactive mode shows a multi-select wizard:
+
+- **Cursor** — `.cursor/rules/lomi.*.mdc`
+- **Claude Code** — appends to `CLAUDE.md`
+- **OpenAI Codex** — appends to `AGENTS.md`
+- **VS Code** — `.github/instructions/lomi-*.instructions.md`
+- **llms.txt** — project-root briefing synced from [docs.lomi.africa/llms.txt](https://docs.lomi.africa/llms.txt)
+
+### Non-interactive
+
+```bash filename="Terminal"
+lomi install-rules --target cursor --target llms.txt
+lomi install-rules --target claude-code --target codex --target vscode
+lomi install-rules --force
+```
+
+| Flag | Description |
+| --- | --- |
+| `--target <name>` | Repeat for each target (`cursor`, `claude-code`, `codex`, `vscode`, `llms.txt`) |
+| `--force` | Reinstall even if already up to date |
+
+In CI or non-TTY environments, defaults to **Cursor + llms.txt** when no targets are specified.
+
+## Rule topics
+
+Each target receives bundled rules for:
+
+| Topic | Covers |
+| --- | --- |
+| SDK basics | Client setup, authentication, environment |
+| Checkout sessions | Hosted checkout flow |
+| Webhooks | Signature verification, event handling |
+| Payment intents | Card and Elements-style flows |
+| Subscriptions | Recurring billing |
+| API reference | Generated from OpenAPI |
+
+Cursor rules include YAML frontmatter (`description`, `globs`, `alwaysApply`) so Cursor picks them up automatically.
+
+## When rules are offered
+
+- Running `lomi install-rules` directly
+- First run of [`lomi init`](/core/lomi-cli/init) (unless `--skip-rules-install`)
+- First run of [`lomi dev`](/core/lomi-cli/dev) (unless `--skip-rules-install`)
+
+The CLI tracks the installed rules version in your global config and may prompt again when a new version ships.
+
+## Example: Cursor setup
+
+```bash filename="Terminal"
+cd my-project
+lomi install-rules --target cursor
+```
+
+Creates files like:
+
+```
+.cursor/rules/
+  lomi.sdk-basics.mdc
+  lomi.checkout-sessions.mdc
+  lomi.webhooks.mdc
+  lomi.payment-intents.mdc
+  lomi.subscriptions.mdc
+  lomi.api-reference.mdc
+```
+
+## Example: full AI stack
+
+```bash filename="Terminal"
+lomi install-rules \
+  --target cursor \
+  --target claude-code \
+  --target codex \
+  --target vscode \
+  --target llms.txt
+```
+
+## Related docs
+
+For manual AI setup without the CLI, see [API integration — agent setup](/reference/setup/integration).
+
+## Next steps
+
+- [Getting started](/core/lomi-cli/overview)
+- [Initialize a project](/core/lomi-cli/init)
+- [TypeScript SDK](/reference/sdks/typescript)

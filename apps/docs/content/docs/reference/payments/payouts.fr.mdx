@@ -1,85 +1,48 @@
 ---
 title: Virements
-description: Lancez des virements sortants mobile money avec un corps spécifique au prestataire.
+description: Retraits vers vos comptes enregistrés ou paiements bénéficiaires (`POST /payouts`).
 ---
 
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
 import { Callout } from 'fumadocs-ui/components/callout';
 
-Les virements initiés marchands sur les rails pris en charge sont exposés en **`POST`** avec un corps propre au prestataire. Il **n’y a pas** de liste REST publique générique (`GET /payouts`) dans le contrat marchand suivre l’état via les **webhooks**.
+Utilisez **`POST /payouts`** pour tous les virements sortants.
 
-<Callout type="warning">
-  Le traitement est asynchrone. Écoutez les webhooks (`payout.completed`, `payout.failed`, …) au lieu de poller une liste REST qui n’est pas exposée dans le périmètre public actuel.
+- **`destination: "self"`** — retrait vers un **moyen de paiement enregistré** (`payout_method_id` requis). Rails : `bank`, `spi`, `wave`.
+- **`destination: "beneficiary"`** — paiement à un tiers sur **mobile money** (`wave` aujourd’hui). `recipient.name` et `recipient.phone` requis.
+
+<Callout type="info">
+  Les virements MTN renvoient `400` jusqu’à prise en charge.
 </Callout>
 
-Cycle de vie, limites et frais : **[cycle de vie des virements](/reference/payments/payout-lifecycle.fr)**.
+## Créer un virement
 
-## Lancer un virement Wave
-
-Expose `POST /payout/wave` (`montant`, `devise`, bénéficiaire imbriqué).
-
-<Tabs items={["TypeScript", "Python", "cURL"]}>
+<Tabs items={["TypeScript", "cURL"]}>
 
 <Tab value="TypeScript">
 ```typescript
-import { LomiSDK } from '@lomi./sdk';
-
-const lomi = new LomiSDK({
-  apiKey: process.env.LOMI_API_KEY!,
-  environment: 'live',
+await lomi.payouts.create({
+  destination: 'self',
+  rail: 'wave',
+  amount: 50000,
+  currency_code: 'XOF',
+  payout_method_id: '550e8400-e29b-41d4-a716-446655440000',
 });
-
-await lomi.payouts.createWavePayout({
-  amount: 25000,
-  currency: 'XOF',
-  beneficiary: {
-    name: 'Aicha Diallo',
-    phoneNumber: '+221771234567',
-  },
-  reason: 'Règlement hebdomadaire',
-});
-```
-</Tab>
-
-<Tab value="Python">
-```python
-import requests, os
-
-r = requests.post(
-    "https://api.lomi.africa/payout/wave",
-    headers={"X-API-KEY": os.environ["LOMI_API_KEY"], "Content-Type": "application/json"},
-    json={
-        "amount": 25000,
-        "currency": "XOF",
-        "beneficiary": {"name": "Aicha Diallo", "phoneNumber": "+221771234567"},
-        "reason": "Règlement hebdomadaire",
-    },
-)
-print(r.status_code, r.json())
 ```
 </Tab>
 
 <Tab value="cURL">
 ```bash
-curl -X POST "https://api.lomi.africa/payout/wave" \
+curl -X POST "https://api.lomi.africa/payouts" \
   -H "X-API-KEY: $LOMI_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{
-    "amount": 25000,
-    "currency": "XOF",
-    "beneficiary": { "name": "Aicha Diallo", "phoneNumber": "+221771234567" },
-    "reason": "Règlement hebdomadaire"
-  }'
+  -d '{"destination":"beneficiary","rail":"wave","amount":10000,"currency_code":"XOF","recipient":{"name":"Ada","phone":"+221771234567"}}'
 ```
 </Tab>
 
 </Tabs>
 
-## Champs (virement Wave)
+## Lister et obtenir
 
-| Champ | Type | Obligatoire | Description |
-| --- | --- | --- | --- |
-| `amount` | `number` | Oui | Montant |
-| `currency` | `string` | Oui | Devise |
-| `beneficiary` | `object` | Oui | `name` et `phoneNumber` |
-| `reason` | `string` | Non | Motif / audit |
+- `GET /payouts`
+- `GET /payouts/{id}`

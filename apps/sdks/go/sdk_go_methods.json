@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-20T06:18:00.437Z",
+  "generatedAt": "2026-05-20T10:09:11.501Z",
   "language": "go",
   "sdk": {
     "accounts": [
@@ -9,16 +9,12 @@
       "getBalanceBreakdown",
       "list"
     ],
-    "beneficiaryPayouts": [
-      "create",
-      "get",
-      "list"
-    ],
-    "charge": [
-      "createMtnCharge"
-    ],
     "charges": [
-      "createWaveCharge"
+      "cancelCardCharge",
+      "createCardCharge",
+      "createMtnCharge",
+      "createWaveCharge",
+      "getCardCharge"
     ],
     "checkoutSessions": [
       "create",
@@ -58,11 +54,6 @@
       "getMetrics",
       "list"
     ],
-    "paymentIntents": [
-      "cancel",
-      "create",
-      "get"
-    ],
     "paymentLinks": [
       "create",
       "get",
@@ -73,11 +64,9 @@
       "get",
       "list"
     ],
-    "payout": [
-      "createSpiPayout"
-    ],
     "payouts": [
-      "createWavePayout",
+      "create",
+      "get",
       "list"
     ],
     "products": [

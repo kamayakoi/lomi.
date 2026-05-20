@@ -1,94 +1,64 @@
 ---
 title: 'Initialiser un projet'
-description: 'Intégrez lomi. dans le répertoire de votre projet existant.'
+description: 'Générez une intégration lomi. avec client SDK, exemples checkout/webhook et variables d’environnement.'
 ---
 
-La commande `lomi. init` amorce une intégration dans le répertoire de votre projet existant. Elle configure les fichiers indispensables et du code d’exemple issu du SDK Node.js lomi., pour que votre application communique avec l’API.
+La commande `lomi init` prépare une intégration lomi. dans votre répertoire de projet : client SDK, exemples et fichier `.env`.
 
-## Utilisation
+Nécessite un [`lomi login`](/core/lomi-cli/auth) préalable (ou `LOMI_ACCESS_TOKEN` en CI).
 
-Placez-vous à la racine du projet dans le terminal et exécutez :
+## Usage
 
 ```bash filename="Terminal"
-lomi. init
+cd mon-projet
+lomi init
 ```
 
-## Comportement
+### Options
 
-La commande effectue notamment :
+| Option | Description |
+| --- | --- |
+| `-y, --yes` | Mode non interactif (requiert `--environment`, `--language`, `--api-key`) |
+| `-e, --environment` | `production` ou `sandbox` |
+| `-L, --language` | `ts` ou `js` |
+| `--api-key` | Clé secrète écrite dans `.env` |
+| `--skip-package-install` | Ignorer l’installation npm |
+| `--skip-rules-install` | Ignorer l’invite des règles agent |
 
-<Steps>
+### Exemple CI
 
-### Invite de configuration
-
-Demande interactive des paramètres pour le **SDK** dans votre projet :
-
-- **Clé API (`LOMI_API_KEY`)** : votre **clé API secrète** issue du **portail marchand lomi.**, enregistrée dans `.env` pour authentifier le SDK. **Ce n’est pas le jeton CLI utilisé par `lomi. login`.**
-- **Environnement** : `production` (live) ou `sandbox` (tests) pour les points de terminaison **API lomi.** du SDK.
-- **Secret webhook (`LOMI_WEBHOOK_SECRET`)** : secret de signature webhook du **portail marchand lomi.**, dans `.env` pour que votre _application_ vérifie les webhooks entrants.
-- **Langage** : `TypeScript` ou `JavaScript` pour l’exemple de code généré.
-- **Gestionnaire de paquets** : `npm`, `yarn` ou `pnpm` pour installer le SDK.
-
-### Création du fichier `.env`
-
-Génère un `.env` à la racine avec les identifiants du **SDK Node.js lomi.** :
-
-```dotenv filename=".env"
-# Your lomi. API Key (get it from https://lomi.africa/portal/settings/api-keys)
-LOMI_API_KEY=your_api_key_here
-
-# Your Webhook Signing Secret (get it from https://lomi.africa/portal/webhooks)
-LOMI_WEBHOOK_SECRET=whsec_your_webhook_secret_here
-
-# API URL for the SDK (defaults to production)
-# Use https://sandbox.api.lomi.africa for testing
-LOMI_API_URL=https://api.lomi.africa
+```bash filename="Terminal"
+lomi init --yes \
+  --environment sandbox \
+  --language ts \
+  --api-key lomi_sk_test_xxx \
+  --skip-package-install \
+  --skip-rules-install
 ```
 
-<Callout type="warning" emoji="⚠️" title="Sécurité : ignorer .env">
-  Ajoutez toujours `.env` à `.gitignore` pour éviter de committer des secrets.
+## Fichiers créés
+
+| Fichier | Rôle |
+| --- | --- |
+| `.env` | `LOMI_API_KEY`, placeholder `LOMI_WEBHOOK_SECRET`, `LOMI_API_URL` |
+| `lib/lomi./client.{ts\|js}` | Client SDK initialisé |
+| `examples/create-checkout-session.{ts\|js}` | Exemple checkout |
+| `examples/webhook-handler.{ts\|js}` | Exemple webhook |
+| `lomi.config.ts` | Configuration projet |
+
+<Callout type="warning" emoji="⚠️" title="Secrets hors git">
+  Ajoutez `.env` à votre `.gitignore`.
 </Callout>
 
-### Fichiers d’exemple
+## Après init
 
-Génère du code illustrant le **SDK Node.js lomi.** selon le langage choisi :
-
-- **`lib/lomi./client.{ts|js}`** : clients SDK initialisés, chargement depuis `.env`.
-- **`examples/checkout.{ts|js}`** : création d’une session de paiement.
-- **`examples/webhook.{ts|js}`** : serveur HTTP minimal pour recevoir et vérifier les webhooks avec `LOMI_WEBHOOK_SECRET`.
-
-### Installation des dépendances
-
-Installe les paquets nécessaires (`lomi.`, `dotenv`) avec le gestionnaire choisi.
-
-</Steps>
-
-## Exemple de sortie
-
-À la fin, un résumé s’affiche :
-
-```text filename="Exemple de sortie terminal"
-Project setup complete!
-
-Created Files:
-- .env (Contains SDK API Key & Webhook Secret - KEEP SAFE & add to .gitignore!)
-- lib/lomi./client.ts
-- examples/checkout.ts
-- examples/webhook.ts
-
-Installed Dependencies:
-- lomi.
-- dotenv
-
-Next Steps:
-1. Review the example code in `lib/` and `examples/`.
-2. Load environment variables (from `.env`) in your application before initializing the lomi. SDK client.
-3. Start building your lomi. integration!
-4. Use `lomi. dev` to test webhook events locally during development.
-5. Verify your CLI login status with `lomi. status` if needed.
+```bash filename="Terminal"
+lomi dev      # webhooks en local
+lomi status   # vérifier la CLI
 ```
 
-## Prérequis
+## Suite
 
-- Exécutez de préférence `lomi. login` avant ; `init` se concentre surtout sur le SDK.
-- Ayez sous la main votre **clé API lomi.** et votre **secret webhook** dans le **portail marchand lomi.** (Settings > API Keys et Webhooks).
+- [Serveur de développement](/core/lomi-cli/dev)
+- [Webhooks](/core/advanced-guides/handling-webhooks)
+- [SDK TypeScript](/reference/sdks/typescript)

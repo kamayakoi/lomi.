@@ -1,23 +1,31 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
   ApiResponse,
   ApiSecurity,
+  ApiBody,
+  ApiParam,
 } from '@nestjs/swagger';
 import { ChargesService } from './charges.service';
+import { CardChargeService } from './card-charge.service';
 import { CreateWaveChargeDto } from './dto/create-charge.dto';
 import { CreateMtnChargeDto } from './dto/create-mtn-charge.dto';
 import { ApiKeyGuard } from '../common/guards/api-key.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import type { AuthContext } from '../common/decorators/current-user.decorator';
+import { CreatePaymentIntentDto } from '../payment-intents/dto/create-payment-intent.dto';
+import { PaymentIntentResponseDto } from '../payment-intents/dto/payment-intent-response.dto';
 
 @ApiTags('Encaissements')
 @ApiSecurity('api-key')
 @Controller('charge')
 @UseGuards(ApiKeyGuard)
 export class ChargesController {
-  constructor(private readonly chargesService: ChargesService) {}
+  constructor(
+    private readonly chargesService: ChargesService,
+    private readonly cardChargeService: CardChargeService,
+  ) {}
 
   @Post('wave')
   @ApiOperation({ summary: 'Lancer un encaissement direct Wave' })
@@ -57,5 +65,44 @@ export class ChargesController {
     createChargeDto.organizationId = user.organizationId;
     createChargeDto.merchantId = user.merchantId;
     return this.chargesService.createMtnCharge(createChargeDto, user);
+  }
+
+  @Post('card')
+  @ApiOperation({
+    summary: 'Créer un encaissement carte (client_secret)',
+    description:
+      'Crée un encaissement carte embarqué et renvoie le client_secret pour votre interface de paiement.',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Encaissement carte créé',
+    type: PaymentIntentResponseDto,
+  })
+  @ApiBody({ type: CreatePaymentIntentDto })
+  createCardCharge(
+    @Body() createDto: CreatePaymentIntentDto,
+    @CurrentUser() user: AuthContext,
+  ) {
+    return this.cardChargeService.create(createDto, user);
+  }
+
+  @Get('card/:id')
+  @ApiOperation({ summary: 'Obtenir un encaissement carte' })
+  @ApiParam({ name: 'id', description: 'Card payment id (pi_...)' })
+  @ApiResponse({
+    status: 200,
+    description: 'Encaissement carte',
+    type: PaymentIntentResponseDto,
+  })
+  getCardCharge(@Param('id') id: string, @CurrentUser() user: AuthContext) {
+    return this.cardChargeService.findOne(id, user);
+  }
+
+  @Post('card/:id/cancel')
+  @ApiOperation({ summary: 'Annuler un encaissement carte' })
+  @ApiParam({ name: 'id', description: 'Card payment id (pi_...)' })
+  @ApiResponse({ status: 200, description: 'Encaissement carte annulé' })
+  cancelCardCharge(@Param('id') id: string, @CurrentUser() user: AuthContext) {
+    return this.cardChargeService.cancel(id, user);
   }
 }

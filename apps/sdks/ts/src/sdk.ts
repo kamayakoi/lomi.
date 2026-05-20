@@ -10,8 +10,6 @@ import { OpenAPI } from './generated/index.js';
 // Import all generated services
 import {
   AccountsService,
-  BeneficiaryPayoutsService,
-  ChargeService,
   ChargesService,
   CheckoutSessionsService,
   CustomerSubscriptionsService,
@@ -19,10 +17,8 @@ import {
   DiscountCouponsService,
   MerchantsService,
   OrganizationsService,
-  PaymentIntentsService,
   PaymentLinksService,
   PaymentRequestsService,
-  PayoutService,
   PayoutsService,
   ProductsService,
   ProvidersService,
@@ -35,8 +31,6 @@ import {
 
 export class LomiSDK {
   public readonly accounts: typeof AccountsService;
-  public readonly beneficiaryPayouts: typeof BeneficiaryPayoutsService;
-  public readonly charge: typeof ChargeService;
   public readonly charges: typeof ChargesService;
   public readonly checkoutSessions: typeof CheckoutSessionsService;
   public readonly customerSubscriptions: typeof CustomerSubscriptionsService;
@@ -44,10 +38,8 @@ export class LomiSDK {
   public readonly discountCoupons: typeof DiscountCouponsService;
   public readonly merchants: typeof MerchantsService;
   public readonly organizations: typeof OrganizationsService;
-  public readonly paymentIntents: typeof PaymentIntentsService;
   public readonly paymentLinks: typeof PaymentLinksService;
   public readonly paymentRequests: typeof PaymentRequestsService;
-  public readonly payout: typeof PayoutService;
   public readonly payouts: typeof PayoutsService;
   public readonly products: typeof ProductsService;
   public readonly providers: typeof ProvidersService;
@@ -74,8 +66,6 @@ export class LomiSDK {
 
     // Assign all generated services
     this.accounts = AccountsService;
-    this.beneficiaryPayouts = BeneficiaryPayoutsService;
-    this.charge = ChargeService;
     this.charges = ChargesService;
     this.checkoutSessions = CheckoutSessionsService;
     this.customerSubscriptions = CustomerSubscriptionsService;
@@ -83,10 +73,8 @@ export class LomiSDK {
     this.discountCoupons = DiscountCouponsService;
     this.merchants = MerchantsService;
     this.organizations = OrganizationsService;
-    this.paymentIntents = PaymentIntentsService;
     this.paymentLinks = PaymentLinksService;
     this.paymentRequests = PaymentRequestsService;
-    this.payout = PayoutService;
     this.payouts = PayoutsService;
     this.products = ProductsService;
     this.providers = ProvidersService;

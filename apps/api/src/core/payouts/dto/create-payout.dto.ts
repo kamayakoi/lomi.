@@ -1,54 +1,69 @@
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
+  IsEnum,
   IsNotEmpty,
   IsNumber,
+  IsObject,
   IsOptional,
   IsString,
+  IsUUID,
   Min,
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { ApiProperty } from '@nestjs/swagger';
 
-class BeneficiaryDto {
-  @ApiProperty({ description: 'Full name of the beneficiary' })
+export class PayoutRecipientDto {
+  @ApiProperty({ example: 'Ada Lovelace', type: String })
   @IsString()
   @IsNotEmpty()
   name: string;
 
-  @ApiProperty({ description: 'Mobile money number (e.g. +221...)' })
+  @ApiProperty({ example: '+221771234567', type: String })
   @IsString()
   @IsNotEmpty()
-  phoneNumber: string;
+  phone: string;
 }
 
-export class CreateWavePayoutDto {
-  @ApiProperty({ description: 'Amount to payout' })
+export class CreatePayoutDto {
+  @ApiProperty({ enum: ['self', 'beneficiary'], type: String })
+  @IsEnum(['self', 'beneficiary'])
+  destination: 'self' | 'beneficiary';
+
+  @ApiProperty({ enum: ['wave', 'spi', 'bank', 'mtn'], type: String })
+  @IsEnum(['wave', 'spi', 'bank', 'mtn'])
+  rail: 'wave' | 'spi' | 'bank' | 'mtn';
+
+  @ApiProperty({ example: 5000, type: Number })
   @IsNumber()
-  @Min(100)
-  @IsNotEmpty()
+  @Min(1)
   amount: number;
 
-  @ApiProperty({ description: 'Currency code', default: 'XOF' })
+  @ApiProperty({ example: 'XOF', type: String })
   @IsString()
   @IsNotEmpty()
-  currency: string;
+  currency_code: string;
 
-  @ApiProperty({ description: 'Beneficiary details' })
+  @ApiPropertyOptional({
+    description: 'Required for self payouts and beneficiary SPI',
+    type: String,
+  })
+  @IsUUID()
+  @IsOptional()
+  payout_method_id?: string;
+
+  @ApiPropertyOptional({ type: PayoutRecipientDto })
   @ValidateNested()
-  @Type(() => BeneficiaryDto)
-  @IsNotEmpty()
-  beneficiary: BeneficiaryDto;
+  @Type(() => PayoutRecipientDto)
+  @IsOptional()
+  recipient?: PayoutRecipientDto;
 
-  @ApiProperty({ description: 'Reason for the payout', required: false })
+  @ApiPropertyOptional({ type: String })
   @IsString()
   @IsOptional()
   reason?: string;
 
-  @ApiProperty({ description: 'Organization ID', required: false })
+  @ApiPropertyOptional({ type: Object })
+  @IsObject()
   @IsOptional()
-  organizationId?: string;
-
-  @ApiProperty({ description: 'Merchant ID', required: false })
-  @IsOptional()
-  merchantId?: string;
+  metadata?: Record<string, unknown>;
 }

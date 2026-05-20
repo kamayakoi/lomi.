@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "apiVersion": "1.1.0",
   "apiTitle": "API lomi.",
-  "toolCount": 73,
+  "toolCount": 70,
   "tools": [
     {
       "name": "lomi_delete_customer_subscriptions_subscription_id",
@@ -250,84 +250,27 @@
       }
     },
     {
-      "name": "lomi_get_beneficiary_payouts",
-      "operationKey": "GET /beneficiary-payouts",
+      "name": "lomi_get_charge_card_id",
+      "operationKey": "GET /charge/card/{id}",
       "method": "get",
-      "pathTemplate": "/beneficiary-payouts",
-      "pathParamNames": [],
-      "queryParamNames": [
-        "offset",
-        "limit",
-        "currencyCode",
-        "endDate",
-        "startDate",
-        "statuses"
-      ],
-      "title": "Lister les paiements vers bénéficiaires",
-      "description": "Lister les paiements vers bénéficiaires\n\nRenvoie les paiements de l'organisation avec pagination et filtres optionnels (statuts, plage de dates, devise).\n\nREST: GET /beneficiary-payouts",
-      "tags": [
-        "Paiements vers bénéficiaires"
-      ],
-      "operationId": "BeneficiaryPayoutsController_findAll",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "currencyCode": {
-            "example": "XOF",
-            "type": "string",
-            "description": "Code devise"
-          },
-          "endDate": {
-            "type": "string",
-            "description": "Date de fin (ISO 8601)"
-          },
-          "limit": {
-            "example": 50,
-            "type": "number",
-            "description": "Nombre maximal de résultats"
-          },
-          "offset": {
-            "example": 0,
-            "type": "number",
-            "description": "Décalage pour la pagination"
-          },
-          "startDate": {
-            "type": "string",
-            "description": "Date de début (ISO 8601)"
-          },
-          "statuses": {
-            "example": "pending,completed,failed",
-            "type": "string",
-            "description": "Statuts (séparés par des virgules)"
-          }
-        }
-      }
-    },
-    {
-      "name": "lomi_get_beneficiary_payouts_id",
-      "operationKey": "GET /beneficiary-payouts/{id}",
-      "method": "get",
-      "pathTemplate": "/beneficiary-payouts/{id}",
+      "pathTemplate": "/charge/card/{id}",
       "pathParamNames": [
         "id"
       ],
       "queryParamNames": [],
-      "title": "Obtenir un paiement bénéficiaire par ID",
-      "description": "Obtenir un paiement bénéficiaire par ID\n\nRenvoie le détail d’un paiement (statut actuel et informations fournisseur).\n\nREST: GET /beneficiary-payouts/{id}",
+      "title": "Obtenir un encaissement carte",
+      "description": "Obtenir un encaissement carte\n\nREST: GET /charge/card/{id}",
       "tags": [
-        "Paiements vers bénéficiaires"
+        "Encaissements"
       ],
-      "operationId": "BeneficiaryPayoutsController_findOne",
+      "operationId": "ChargesController_getCardCharge",
       "write": false,
       "wantsBody": false,
       "inputSchema": {
         "type": "object",
         "properties": {
           "id": {
-            "type": "string",
-            "description": "UUID du paiement"
+            "description": "Card payment id (pi_...)"
           }
         },
         "required": [
@@ -915,35 +858,6 @@
       }
     },
     {
-      "name": "lomi_get_payment_intents_id",
-      "operationKey": "GET /payment-intents/{id}",
-      "method": "get",
-      "pathTemplate": "/payment-intents/{id}",
-      "pathParamNames": [
-        "id"
-      ],
-      "queryParamNames": [],
-      "title": "Récupérer un intent de paiement carte",
-      "description": "Récupérer un intent de paiement carte\n\nRécupère l’intent de paiement carte et la transaction associée si elle existe.\n\nREST: GET /payment-intents/{id}",
-      "tags": [
-        "Intents de paiement"
-      ],
-      "operationId": "PaymentIntentsController_findOne",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "description": "Identifiant de l’intent de paiement (pi_...)"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      }
-    },
-    {
       "name": "lomi_get_payment_links",
       "operationKey": "GET /payment-links",
       "method": "get",
@@ -1108,18 +1022,18 @@
       "pathTemplate": "/payouts",
       "pathParamNames": [],
       "queryParamNames": [
-        "endDate",
-        "startDate",
         "pageSize",
         "page",
+        "endDate",
+        "startDate",
         "status"
       ],
       "title": "Lister les virements",
-      "description": "Lister les virements\n\nListe les virements du marchand pour l’organisation (RPC fetch_payouts).\n\nREST: GET /payouts",
+      "description": "Lister les virements\n\nREST: GET /payouts",
       "tags": [
-        "Virements sortants"
+        "Virements"
       ],
-      "operationId": "PayoutsListController_findAll",
+      "operationId": "PayoutsUnifiedController_findAll",
       "write": false,
       "wantsBody": false,
       "inputSchema": {
@@ -1138,12 +1052,38 @@
             "type": "string"
           },
           "status": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+            "type": "string"
           }
         }
+      }
+    },
+    {
+      "name": "lomi_get_payouts_id",
+      "operationKey": "GET /payouts/{id}",
+      "method": "get",
+      "pathTemplate": "/payouts/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Obtenir un virement",
+      "description": "Obtenir un virement\n\nREST: GET /payouts/{id}",
+      "tags": [
+        "Virements"
+      ],
+      "operationId": "PayoutsUnifiedController_findOne",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Payout ID"
+          }
+        },
+        "required": [
+          "id"
+        ]
       }
     },
     {
@@ -1857,29 +1797,176 @@
       }
     },
     {
-      "name": "lomi_post_beneficiary_payouts",
-      "operationKey": "POST /beneficiary-payouts",
+      "name": "lomi_post_charge_card",
+      "operationKey": "POST /charge/card",
       "method": "post",
-      "pathTemplate": "/beneficiary-payouts",
+      "pathTemplate": "/charge/card",
       "pathParamNames": [],
       "queryParamNames": [],
-      "title": "Lancer un paiement vers un bénéficiaire",
-      "description": "Lancer un paiement vers un bénéficiaire\n\nInitie un paiement vers un bénéficiaire (prestataire, fournisseur, salarié, etc.). Réponse immédiate en statut en attente ; le traitement est asynchrone côté fournisseur (Wave, SPI). Les mises à jour arrivent via webhooks. Sert à payer des tiers depuis le solde du compte.\n\nREST: POST /beneficiary-payouts",
+      "title": "Créer un encaissement carte (client_secret)",
+      "description": "Créer un encaissement carte (client_secret)\n\nCrée un encaissement carte embarqué et renvoie le client_secret pour votre interface de paiement.\n\nREST: POST /charge/card",
       "tags": [
-        "Paiements vers bénéficiaires"
+        "Encaissements"
       ],
-      "operationId": "BeneficiaryPayoutsController_create",
+      "operationId": "ChargesController_createCardCharge",
       "write": true,
-      "wantsBody": false,
+      "wantsBody": true,
       "inputSchema": {
         "type": "object",
         "properties": {
+          "body": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "type": "number",
+                "example": 10000,
+                "description": "Amount to charge in the original currency"
+              },
+              "appearance_billing_address": {
+                "type": "string",
+                "example": "never",
+                "enum": [
+                  "auto",
+                  "never"
+                ],
+                "description": "Optional Payment Element billing address collection mode. Use `never` to hide country/address selector in Payment Element UI."
+              },
+              "appearance_border_radius": {
+                "type": "number",
+                "example": 6,
+                "description": "Optional Payment Element border radius (px) returned for client-side rendering."
+              },
+              "appearance_theme": {
+                "type": "string",
+                "example": "light",
+                "enum": [
+                  "light",
+                  "dark",
+                  "flat"
+                ],
+                "description": "Optional Payment Element theme for client-side card UI: `light`, `dark`, or `flat`."
+              },
+              "currency": {
+                "type": "string",
+                "example": "XOF",
+                "description": "Backward-compatible alias for currency_code. Use currency_code in new integrations.",
+                "enum": [
+                  "XOF",
+                  "USD",
+                  "EUR"
+                ]
+              },
+              "currency_code": {
+                "type": "string",
+                "example": "XOF",
+                "description": "Currency code",
+                "enum": [
+                  "XOF",
+                  "USD",
+                  "EUR"
+                ]
+              },
+              "customer_email": {
+                "type": "string",
+                "example": "john@example.com",
+                "description": "Customer email — required together with customer_name when customer_id is omitted."
+              },
+              "customer_id": {
+                "type": "string",
+                "example": "550e8400-e29b-41d4-a716-446655440000",
+                "description": "Internal customer UUID (v4). Alternative: send customer_email + customer_name to create/find a customer."
+              },
+              "customer_name": {
+                "type": "string",
+                "example": "John Doe",
+                "description": "Customer display name — required together with customer_email when customer_id is omitted."
+              },
+              "customer_phone": {
+                "type": "string",
+                "example": "+221771234567",
+                "description": "Customer phone number"
+              },
+              "description": {
+                "type": "string",
+                "example": "Invoice #INV-2026-001",
+                "description": "Description shown in payment providers and logs"
+              },
+              "metadata": {
+                "type": "object",
+                "additionalProperties": true,
+                "example": {
+                  "order_id": "ORD-12345"
+                },
+                "description": "Custom metadata merged into provider metadata"
+              },
+              "payment_reference": {
+                "type": "string",
+                "example": "INV-2026-001",
+                "description": "Reference included in metadata for reconciliation"
+              },
+              "product_id": {
+                "type": "string",
+                "example": "550e8400-e29b-41d4-a716-446655440002",
+                "description": "Optional product UUID for metadata and reconciliation"
+              },
+              "quantity": {
+                "type": "number",
+                "example": 1,
+                "description": "Optional quantity for internal reconciliation",
+                "default": 1
+              },
+              "subscription_id": {
+                "type": "string",
+                "example": "550e8400-e29b-41d4-a716-446655440003",
+                "description": "Optional subscription UUID for metadata and reconciliation"
+              }
+            },
+            "required": [
+              "amount"
+            ],
+            "description": "JSON request body for this operation."
+          },
           "idempotency_key": {
             "type": "string",
             "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
           }
         },
-        "required": []
+        "required": [
+          "body"
+        ]
+      }
+    },
+    {
+      "name": "lomi_post_charge_card_id_cancel",
+      "operationKey": "POST /charge/card/{id}/cancel",
+      "method": "post",
+      "pathTemplate": "/charge/card/{id}/cancel",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Annuler un encaissement carte",
+      "description": "Annuler un encaissement carte\n\nREST: POST /charge/card/{id}/cancel",
+      "tags": [
+        "Encaissements"
+      ],
+      "operationId": "ChargesController_cancelCardCharge",
+      "write": true,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Card payment id (pi_...)"
+          },
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": [
+          "id"
+        ]
       }
     },
     {
@@ -2236,179 +2323,6 @@
       }
     },
     {
-      "name": "lomi_post_payment_intents",
-      "operationKey": "POST /payment-intents",
-      "method": "post",
-      "pathTemplate": "/payment-intents",
-      "pathParamNames": [],
-      "queryParamNames": [],
-      "title": "Créer un intent de paiement carte (client_secret)",
-      "description": "Créer un intent de paiement carte (client_secret)\n\nCrée un intent de paiement carte pour une intégration embarquée et renvoie le client_secret.\n\nREST: POST /payment-intents",
-      "tags": [
-        "Intents de paiement"
-      ],
-      "operationId": "PaymentIntentsController_create",
-      "write": true,
-      "wantsBody": true,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "body": {
-            "type": "object",
-            "properties": {
-              "amount": {
-                "type": "number",
-                "example": 10000,
-                "description": "Amount to charge in the original currency"
-              },
-              "appearance_billing_address": {
-                "type": "string",
-                "example": "never",
-                "enum": [
-                  "auto",
-                  "never"
-                ],
-                "description": "Optional Payment Element billing address collection mode. Use `never` to hide country/address selector in Payment Element UI."
-              },
-              "appearance_border_radius": {
-                "type": "number",
-                "example": 6,
-                "description": "Optional Payment Element border radius (px) returned for client-side rendering."
-              },
-              "appearance_theme": {
-                "type": "string",
-                "example": "light",
-                "enum": [
-                  "light",
-                  "dark",
-                  "flat"
-                ],
-                "description": "Optional Payment Element theme for client-side card UI: `light`, `dark`, or `flat`."
-              },
-              "currency": {
-                "type": "string",
-                "example": "XOF",
-                "description": "Backward-compatible alias for currency_code. Use currency_code in new integrations.",
-                "enum": [
-                  "XOF",
-                  "USD",
-                  "EUR"
-                ]
-              },
-              "currency_code": {
-                "type": "string",
-                "example": "XOF",
-                "description": "Currency code",
-                "enum": [
-                  "XOF",
-                  "USD",
-                  "EUR"
-                ]
-              },
-              "customer_email": {
-                "type": "string",
-                "example": "john@example.com",
-                "description": "Customer email — required together with customer_name when customer_id is omitted."
-              },
-              "customer_id": {
-                "type": "string",
-                "example": "550e8400-e29b-41d4-a716-446655440000",
-                "description": "Internal customer UUID (v4). Alternative: send customer_email + customer_name to create/find a customer."
-              },
-              "customer_name": {
-                "type": "string",
-                "example": "John Doe",
-                "description": "Customer display name — required together with customer_email when customer_id is omitted."
-              },
-              "customer_phone": {
-                "type": "string",
-                "example": "+221771234567",
-                "description": "Customer phone number"
-              },
-              "description": {
-                "type": "string",
-                "example": "Invoice #INV-2026-001",
-                "description": "Description shown in payment providers and logs"
-              },
-              "metadata": {
-                "type": "object",
-                "additionalProperties": true,
-                "example": {
-                  "order_id": "ORD-12345"
-                },
-                "description": "Custom metadata merged into provider metadata"
-              },
-              "payment_reference": {
-                "type": "string",
-                "example": "INV-2026-001",
-                "description": "Reference included in metadata for reconciliation"
-              },
-              "product_id": {
-                "type": "string",
-                "example": "550e8400-e29b-41d4-a716-446655440002",
-                "description": "Optional product UUID for metadata and reconciliation"
-              },
-              "quantity": {
-                "type": "number",
-                "example": 1,
-                "description": "Optional quantity for internal reconciliation",
-                "default": 1
-              },
-              "subscription_id": {
-                "type": "string",
-                "example": "550e8400-e29b-41d4-a716-446655440003",
-                "description": "Optional subscription UUID for metadata and reconciliation"
-              }
-            },
-            "required": [
-              "amount"
-            ],
-            "description": "JSON request body for this operation."
-          },
-          "idempotency_key": {
-            "type": "string",
-            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
-          }
-        },
-        "required": [
-          "body"
-        ]
-      }
-    },
-    {
-      "name": "lomi_post_payment_intents_id_cancel",
-      "operationKey": "POST /payment-intents/{id}/cancel",
-      "method": "post",
-      "pathTemplate": "/payment-intents/{id}/cancel",
-      "pathParamNames": [
-        "id"
-      ],
-      "queryParamNames": [],
-      "title": "Annuler un intent de paiement carte",
-      "description": "Annuler un intent de paiement carte\n\nREST: POST /payment-intents/{id}/cancel",
-      "tags": [
-        "Intents de paiement"
-      ],
-      "operationId": "PaymentIntentsController_cancel",
-      "write": true,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "description": "Identifiant de l’intent de paiement (pi_...)"
-          },
-          "idempotency_key": {
-            "type": "string",
-            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
-          }
-        },
-        "required": [
-          "id"
-        ]
-      }
-    },
-    {
       "name": "lomi_post_payment_links",
       "operationKey": "POST /payment-links",
       "method": "post",
@@ -2573,44 +2487,18 @@
       }
     },
     {
-      "name": "lomi_post_payout_spi",
-      "operationKey": "POST /payout/spi",
+      "name": "lomi_post_payouts",
+      "operationKey": "POST /payouts",
       "method": "post",
-      "pathTemplate": "/payout/spi",
+      "pathTemplate": "/payouts",
       "pathParamNames": [],
       "queryParamNames": [],
-      "title": "Lancer un virement SPI",
-      "description": "Lancer un virement SPI\n\nInitie un virement instantané SPI (RPC initiate_spi_payout). Le règlement PI-SPI se poursuit de façon asynchrone.\n\nREST: POST /payout/spi",
+      "title": "Créer un virement",
+      "description": "Créer un virement\n\nVirement vers votre compte enregistré (self) ou vers un tiers sur mobile money / SPI (beneficiary).\n\nREST: POST /payouts",
       "tags": [
-        "Virements sortants"
+        "Virements"
       ],
-      "operationId": "PayoutsController_createSpiPayout",
-      "write": true,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "idempotency_key": {
-            "type": "string",
-            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
-          }
-        },
-        "required": []
-      }
-    },
-    {
-      "name": "lomi_post_payout_wave",
-      "operationKey": "POST /payout/wave",
-      "method": "post",
-      "pathTemplate": "/payout/wave",
-      "pathParamNames": [],
-      "queryParamNames": [],
-      "title": "Lancer un virement Wave",
-      "description": "Lancer un virement Wave\n\nCrée un virement via la fonction edge Wave. La forme de la réponse suit le JSON du fournisseur.\n\nREST: POST /payout/wave",
-      "tags": [
-        "Virements sortants"
-      ],
-      "operationId": "PayoutsController_createWavePayout",
+      "operationId": "PayoutsUnifiedController_create",
       "write": true,
       "wantsBody": false,
       "inputSchema": {

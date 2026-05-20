@@ -21,9 +21,9 @@ Base URLs:
 - `POST /agent/workflows` — Démarrer un workflow multi-étapes (MVP, idempotence sur idempotency_key)
 - `GET /agent/workflows/{runId}` — Obtenir l'état d'une exécution de workflow
 - `PATCH /agent/workflows/{runId}/steps/{stepId}` — Faire avancer une étape du workflow (primitive d'orchestration)
-- `GET /beneficiary-payouts` — Lister les paiements vers bénéficiaires
-- `POST /beneficiary-payouts` — Lancer un paiement vers un bénéficiaire
-- `GET /beneficiary-payouts/{id}` — Obtenir un paiement bénéficiaire par ID
+- `POST /payouts` — Créer un virement (self ou beneficiary)
+- `GET /payouts` — Lister les virements
+- `GET /payouts/{id}` — Obtenir un virement
 - `POST /charge/mtn` — Lancer un encaissement direct MTN MoMo
 - `POST /charge/wave` — Lancer un encaissement direct Wave
 - `GET /checkout-sessions` — Lister les sessions de paiement
@@ -52,9 +52,9 @@ Base URLs:
 - `GET /organizations` — Détails de l'organisation
 - `GET /organizations/metrics` — Indicateurs de l'organisation
 - `GET /organizations/{id}` — Organisation par ID
-- `POST /payment-intents` — Créer un Payment Intent carte (client_secret)
-- `GET /payment-intents/{id}` — Récupérer un Payment Intent
-- `POST /payment-intents/{id}/cancel` — Annuler un Payment Intent
+- `POST /charge/card` — Encaissement carte embarqué (client_secret)
+- `GET /charge/card/{id}` — Récupérer un encaissement carte
+- `POST /charge/card/{id}/cancel` — Annuler un encaissement carte
 - `GET /payment-links` — Lister les liens de paiement
 - `POST /payment-links` — Créer un lien de paiement
 - `GET /payment-links/{id}` — Obtenir un lien de paiement par ID
@@ -62,7 +62,6 @@ Base URLs:
 - `POST /payment-requests` — Créer une demande de paiement
 - `GET /payment-requests/{id}` — Obtenir une demande de paiement par ID
 - `POST /payout/spi` — Lancer un virement SPI
-- `POST /payout/wave` — Lancer un virement Wave
 - `GET /payouts` — Lister les virements
 - `GET /products` — Lister les produits
 - `POST /products` — Créer un produit

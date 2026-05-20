@@ -1,42 +1,18 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-export class PayoutResponseDto {
-  @ApiProperty({ example: 'string', type: String })
-  account_id: string;
+export class CreatePayoutResponseDto {
+  @ApiProperty({ example: true, type: Boolean })
+  success: boolean;
 
-  @ApiProperty({ example: 123, type: Number })
-  amount: number;
+  @ApiPropertyOptional({ example: 'payout-uuid', type: String })
+  payout_id?: string;
 
-  @ApiProperty({ example: 'string', type: String })
-  created_at: string;
+  @ApiPropertyOptional({ example: 'withdrawal', enum: ['withdrawal', 'beneficiary'], type: String })
+  kind?: 'withdrawal' | 'beneficiary';
 
-  @ApiProperty({ example: 'string', type: String })
-  created_by: string;
+  @ApiPropertyOptional({ example: 'processing', type: String })
+  status?: string;
 
-  @ApiProperty({ example: 'string', type: String })
-  currency_code: string;
-
-  @ApiProperty({ example: 'string', type: String })
-  environment: string;
-
-  @ApiProperty({ example: {}, type: Object })
-  metadata: any;
-
-  @ApiProperty({ example: 'string', type: String })
-  organization_id: string;
-
-  @ApiProperty({ example: 'string', type: String })
-  payout_id: string;
-
-  @ApiProperty({ example: 'string', type: String })
-  payout_method_id: string;
-
-  @ApiProperty({ example: 'string', type: String })
-  provider_code: string;
-
-  @ApiProperty({ example: 'string', type: String })
-  status: string;
-
-  @ApiProperty({ example: 'string', type: String })
-  updated_at: string;
+  @ApiPropertyOptional({ type: String })
+  message?: string;
 }

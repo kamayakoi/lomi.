@@ -27,7 +27,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     whenToUse:
       'Call before initiating a payout, beneficiary payout, or any flow where you must guarantee spendable balance.',
     related:
-      '[Account balances](/api/accounts/AccountsController_getBalance) · [Payouts](/api/payout/PayoutsController_createWavePayout)',
+      '[Account balances](/api/accounts/AccountsController_getBalance) · [Payouts](/api/payouts/PayoutsUnifiedController_create)',
   },
   AccountsController_findAll: {
     summary: 'List accounts',
@@ -200,15 +200,27 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
       'Use for home screens and executive summaries rather than low-level transaction drill-down.',
     related: '[Transactions](/api/transactions/TransactionsController_findAll)',
   },
-  PaymentIntentsController_create: {
-    summary: 'Create card PaymentIntent',
-    body: 'Creates a card PaymentIntent for Elements-style integrations and returns `client_secret` for client-side confirmation.',
+  ChargesController_createCardCharge: {
+    summary: 'Create embedded card charge',
+    body: 'Creates a card charge for embedded checkout and returns `client_secret` for client-side confirmation.',
     whenToUse:
-      "Use for in-app card entry where you own the product UI and tokenization flow against lomi.'s card stack.",
+      "Use for in-app card entry where you own the product UI and tokenization flow.",
     caveats:
       'Never log or expose `client_secret` publicly; treat it like a short-lived capability for the client SDK.',
     related:
       '[Create checkout session](/api/checkout-sessions/CheckoutSessionsController_create) if you prefer hosted card collection.',
+  },
+  ChargesController_getCardCharge: {
+    summary: 'Get embedded card charge',
+    body: 'Retrieves card charge status and linked transaction when present.',
+    whenToUse: 'Use after client confirmation to poll status.',
+    related: '[Create card charge](/api/charge/ChargesController_createCardCharge)',
+  },
+  ChargesController_cancelCardCharge: {
+    summary: 'Cancel embedded card charge',
+    body: 'Cancels a card charge before completion.',
+    whenToUse: 'Use when the buyer abandons checkout.',
+    related: '[Create card charge](/api/charge/ChargesController_createCardCharge)',
   },
   PaymentLinksController_create: {
     summary: 'Create payment link',
@@ -247,15 +259,27 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     body: 'Returns the latest state, amounts, and payer reference data for one request.',
     whenToUse: 'Use on status pages and after callbacks keyed by request ID.',
   },
-  PayoutsController_createWavePayout: {
-    summary: 'Initiate mobile-money payout',
-    body: 'Initiates an organization payout to a configured mobile-money destination on supported rails.',
+  PayoutsUnifiedController_create: {
+    summary: 'Create payout',
+    body: 'Withdraw to a registered payout method (self) or pay a beneficiary on mobile rails (wave/SPI).',
     whenToUse:
-      'Use to settle funds from your lomi. balance to your wallet when beneficiary APIs are not involved.',
+      'Use for treasury movements from your lomi. balance.',
     caveats:
-      'Rail availability and provider payloads vary; always reconcile using transaction and balance APIs.',
+      'Self payouts require payout_method_id; beneficiary wave requires recipient phone. MTN returns 400 until supported.',
     related:
-      '[Check available balance](/api/accounts/AccountsController_checkAvailableBalance) · [Transactions](/api/transactions/TransactionsController_findAll)',
+      '[List payouts](/api/payouts/PayoutsUnifiedController_findAll) · [Check available balance](/api/accounts/AccountsController_checkAvailableBalance)',
+  },
+  PayoutsUnifiedController_findAll: {
+    summary: 'List payouts',
+    body: 'Returns withdrawals and beneficiary payouts with a kind discriminator.',
+    whenToUse: 'Use for reconciliation and support.',
+    related: '[Get payout](/api/payouts/PayoutsUnifiedController_findOne)',
+  },
+  PayoutsUnifiedController_findOne: {
+    summary: 'Get payout',
+    body: 'Returns a single payout by ID scoped to your organization.',
+    whenToUse: 'Use after create or from webhooks.',
+    related: '[Create payout](/api/payouts/PayoutsUnifiedController_create)',
   },
   ProductsController_addPrice: {
     summary: 'Add product price',

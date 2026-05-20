@@ -30,8 +30,6 @@ export const METHOD_NAME_BY_OP = {
   'GET /accounts/balance/breakdown': 'getBalanceBreakdown',
   'GET /accounts/balance/check/{currency}': 'checkBalance',
   'GET /accounts/{id}': 'get',
-  'GET /beneficiary-payouts': 'list',
-  'GET /beneficiary-payouts/{id}': 'get',
   'GET /checkout-sessions': 'list',
   'GET /checkout-sessions/{id}': 'get',
   'GET /customers': 'list',
@@ -76,20 +74,19 @@ export const METHOD_NAME_BY_OP = {
   'PATCH /customer-subscriptions/{subscription_id}': 'update',
   'DELETE /customer-subscriptions/{subscription_id}': 'delete',
   'PATCH /subscriptions/{id}': 'update',
-  'POST /beneficiary-payouts': 'create',
   'POST /charge/wave': 'createWaveCharge',
   'POST /charge/mtn': 'createMtnCharge',
+  'POST /charge/card': 'createCardCharge',
+  'GET /charge/card/{id}': 'getCardCharge',
+  'POST /charge/card/{id}/cancel': 'cancelCardCharge',
+  'POST /payouts': 'create',
   'GET /payouts': 'list',
-  'POST /payout/spi': 'createSpiPayout',
-  'GET /payment-intents/{id}': 'get',
-  'POST /payment-intents/{id}/cancel': 'cancel',
+  'GET /payouts/{id}': 'get',
   'POST /checkout-sessions': 'create',
   'POST /customers': 'create',
   'POST /discount-coupons': 'create',
-  'POST /payment-intents': 'create',
   'POST /payment-links': 'create',
   'POST /payment-requests': 'create',
-  'POST /payout/wave': 'createWavePayout',
   'POST /products': 'create',
   'POST /products/{id}/prices': 'addPrice',
   'POST /products/{id}/prices/{priceId}/set-default': 'setDefaultPrice',
@@ -113,9 +110,8 @@ export function serviceClassForPath(pathTpl) {
   const segs = pathTpl.split('/').filter(Boolean);
   const a = segs[0];
   const b = segs[1];
-  if (a === 'charge' && b === 'wave') return 'ChargesService';
-  if (a === 'payout' && b === 'wave') return 'PayoutsService';
-  if (a === 'refund' && b === 'wave') return 'RefundsService';
+  if (a === 'charge') return 'ChargesService';
+  if (a === 'payouts') return 'PayoutsService';
   return `${hyphenSegmentsToPascal(a)}Service`;
 }
 

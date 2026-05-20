@@ -1,26 +1,19 @@
 ---
-title: "Get refund"
-description: "Get refund"
+title: "Lister les virements"
+description: "Lister les virements"
 full: true
 method: get
-path: /refunds/{id}
-operationId: RefundsController_findOne
+path: /payouts
+operationId: PayoutsUnifiedController_findAll
 ---
 
 ## Overview
 
-Get refund
-
-Returns a single refund by ID scoped to your organization.
-
+Lister les virements
 
 ### When to use this
 
-Use after create or from webhook-driven flows to confirm refund details.
-
-### See also
-
-[Create refund](/api/refunds/RefundsController_create)
+Use this endpoint when your flow needs `GET /payouts` (Lister les virements).
 
 
 ## Authentication
@@ -29,7 +22,7 @@ Merchant routes require an API key in the `X-API-KEY` header (see [Integration o
 
 ## Endpoint
 
-`GET /refunds/{id}`
+`GET /payouts`
 
 Base URLs:
 
@@ -40,14 +33,18 @@ Base URLs:
 
 ### Path parameters
 
-| Name | Required | Schema | Description |
-| --- | --- | --- | --- |
-| `id` | Yes | — | Refund ID |
+_No path parameters beyond the URL pattern._
+
 
 ### Query parameters
 
-_No query parameters._
-
+| Name | In | Required | Schema | Description |
+| --- | --- | --- | --- | --- |
+| `pageSize` | query | No | — |  |
+| `page` | query | No | — |  |
+| `endDate` | query | No | — |  |
+| `startDate` | query | No | — |  |
+| `status` | query | No | — |  |
 
 
 
@@ -55,7 +52,7 @@ _No query parameters._
 
 | Status | Description |
 | --- | --- |
-| `200` | Détail du remboursement |
+| `200` | Liste des virements |
 
 ## Errors
 
@@ -64,13 +61,13 @@ Errors follow the standard JSON error format (status code and machine-readable m
 ## Example
 
 ```bash
-curl -sS -X GET "https://sandbox.api.lomi.africa/refunds/value" \
+curl -sS -X GET "https://sandbox.api.lomi.africa/payouts?pageSize=1&page=1" \
   -H "X-API-KEY: $LOMI_API_KEY"
 ```
 
 ## OpenAPI
 
-- **operationId**: `RefundsController_findOne`
-- **Operation**: `GET /refunds/{id}`
+- **operationId**: `PayoutsUnifiedController_findAll`
+- **Operation**: `GET /payouts`
 
 Full schemas and **Try it**: [API reference](/api/index). Machine-readable contract: repo `apps/docs/openapi.json`.
