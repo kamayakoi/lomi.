@@ -51,10 +51,7 @@ Schéma: `object`
 | --- | --- | --- | --- |
 | `url` | Non | `string` | — |
 | `is_active` | Non | `boolean` | — |
-| `authorized_events` | Non | `string` | — |
-| `spi_event_types` | Non | `string` | — |
-| `supports_spi` | Non | `boolean` | — |
-| `verification_token` | Non | `string` | — |
+| `authorized_events` | Non | `array<string>` | — |
 | `metadata` | Non | `object` | — |
 
 Exemple de corps :
@@ -63,7 +60,9 @@ Exemple de corps :
 {
   "url": "string",
   "is_active": true,
-  "authorized_events": "string"
+  "authorized_events": [
+    "string"
+  ]
 }
 ```
 
@@ -84,7 +83,7 @@ Les erreurs suivent le format JSON standard (code de statut et message lisible p
 curl -sS -X PATCH "https://sandbox.api.lomi.africa/webhooks/id_value" \
   -H "X-API-KEY: $LOMI_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"url":"string","is_active":true,"authorized_events":"string"}'
+  -d '{"url":"string","is_active":true,"authorized_events":["string"]}'
 ```
 
 ## OpenAPI

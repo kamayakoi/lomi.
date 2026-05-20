@@ -1,30 +1,29 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpdateSubscriptionDto {
-  @ApiProperty({ required: false, example: 'string' })
-  customer_id?: string;
+  @ApiPropertyOptional({
+    example: 'paused',
+    enum: [
+      'pending',
+      'active',
+      'paused',
+      'cancelled',
+      'expired',
+      'past_due',
+      'trial',
+    ],
+  })
+  status?: string;
 
-  @ApiProperty({ required: false, example: 'string' })
-  end_date?: string;
-
-  @ApiProperty({ required: false, example: 'string' })
-  environment?: string;
-
-  @ApiProperty({ required: false, example: {} })
-  metadata?: any;
-
-  @ApiProperty({ required: false, example: 'string' })
-  next_billing_date?: string;
-
-  @ApiProperty({ required: false, example: 'string' })
-  price_id?: string;
-
-  @ApiProperty({ required: false, example: 'string' })
-  product_id?: string;
-
-  @ApiProperty({ required: false, example: 'string' })
+  @ApiPropertyOptional({ type: String })
   start_date?: string;
 
-  @ApiProperty({ required: false, example: 'string' })
-  status?: string;
+  @ApiPropertyOptional({ type: String })
+  end_date?: string;
+
+  @ApiPropertyOptional({ type: String })
+  next_billing_date?: string;
+
+  @ApiPropertyOptional({ type: Object })
+  metadata?: Record<string, unknown>;
 }

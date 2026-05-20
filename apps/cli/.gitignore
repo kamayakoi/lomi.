@@ -1,12 +1,17 @@
-# Build files
-dist/
+# Dependencies (legacy TS CLI artifacts)
 node_modules/
-test/
 
-# Environment variables
+# Rust build output
+/target/
+
+# OS / editor
+.DS_Store
+
+# Environment
 .env
+.env.*
 
-# Logs & config
-logs/
-*.log
-.cursor
+# Legacy TS build output
+dist/
+
+# rules/api-reference.md is committed for offline builds (refresh via scripts/generate-rules.sh)

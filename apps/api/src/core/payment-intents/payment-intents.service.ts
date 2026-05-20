@@ -1,4 +1,10 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import type Stripe from 'stripe';
 import { SupabaseService } from '../../utils/supabase/supabase.service';
 import { normalizePaymentEnvironment } from '../../utils/payment-environment';
@@ -172,6 +178,87 @@ export class PaymentIntentsService {
                 billing_address: createDto.appearance_billing_address,
               }
             : undefined,
+      },
+    };
+  }
+
+  async findOne(paymentIntentId: string, user: AuthContext) {
+    const stripe = this.stripeClients.getClient(user.environment);
+
+    let paymentIntent;
+    try {
+      paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : 'Payment intent not found';
+      throw new NotFoundException(message);
+    }
+
+    const { data: txJson, error: txError } = await this.supabase
+      .getClient()
+      .rpc('get_transaction_by_stripe_intent' as never, {
+        p_payment_intent_id: paymentIntentId,
+      } as never);
+
+    if (txError) {
+      this.logger.warn({
+        message: 'get_transaction_by_stripe_intent_failed',
+        payment_intent_id: paymentIntentId,
+        error: txError.message,
+      });
+    }
+
+    const transaction =
+      txJson && typeof txJson === 'object'
+        ? (txJson as Record<string, unknown>)
+        : null;
+
+    if (transaction) {
+      const orgId = transaction.organization_id as string | undefined;
+      const merchantId = transaction.merchant_id as string | undefined;
+      if (
+        (orgId && orgId !== user.organizationId) ||
+        (merchantId && merchantId !== user.merchantId)
+      ) {
+        throw new ForbiddenException('Access denied to this payment intent');
+      }
+    }
+
+    const meta = paymentIntent.metadata ?? {};
+    const originalAmount = meta.original_amount
+      ? Number(meta.original_amount)
+      : undefined;
+    const originalCurrency = meta.original_currency;
+
+    return {
+      success: true,
+      data: {
+        id: paymentIntent.id,
+        client_secret: paymentIntent.client_secret,
+        amount: paymentIntent.amount,
+        currency: paymentIntent.currency,
+        original_amount: originalAmount,
+        original_currency: originalCurrency,
+        status: paymentIntent.status,
+        transaction: transaction
+          ? {
+              transaction_id: transaction.transaction_id,
+              status: transaction.status,
+            }
+          : null,
+      },
+    };
+  }
+
+  async cancel(paymentIntentId: string, user: AuthContext) {
+    await this.findOne(paymentIntentId, user);
+    const stripe = this.stripeClients.getClient(user.environment);
+    const canceled = await stripe.paymentIntents.cancel(paymentIntentId);
+    return {
+      success: true,
+      data: {
+        id: canceled.id,
+        status: canceled.status,
       },
     };
   }

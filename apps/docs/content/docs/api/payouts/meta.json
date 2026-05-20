@@ -1,0 +1,6 @@
+{
+  "title": "Payouts",
+  "pages": [
+    "PayoutsListController_findAll"
+  ]
+}

@@ -17,7 +17,7 @@ export const REST_API_SECTION_ORDER = [
   'payment-requests',
   'payout',
   'products',
-  'refund',
+  'refunds',
   'subscriptions',
   'transactions',
   'webhook-delivery-logs',

@@ -12,6 +12,7 @@ import {
 } from '../common/decorators/current-user.decorator';
 import { PayoutsService } from './payouts.service';
 import { CreateWavePayoutDto } from './dto/create-payout.dto';
+import { CreateSpiPayoutDto } from './dto/create-spi-payout.dto';
 import { PayoutResponseDto } from './dto/payout-response.dto';
 
 @ApiTags('Virements sortants')
@@ -47,5 +48,25 @@ export class PayoutsController {
     createPayoutDto.organizationId = user.organizationId;
     createPayoutDto.merchantId = user.merchantId;
     return this.payoutsService.createWavePayout(createPayoutDto);
+  }
+
+  @Post('spi')
+  @ApiOperation({
+    summary: 'Lancer un virement SPI',
+    description:
+      'Initie un virement instantané SPI (RPC initiate_spi_payout). Le règlement PI-SPI se poursuit de façon asynchrone.',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Virement SPI initié',
+    schema: { type: 'object', additionalProperties: true },
+  })
+  async createSpiPayout(
+    @Body() createPayoutDto: CreateSpiPayoutDto,
+    @CurrentUser() user: AuthContext,
+  ) {
+    createPayoutDto.organizationId = user.organizationId;
+    createPayoutDto.merchantId = user.merchantId;
+    return this.payoutsService.createSpiPayout(createPayoutDto);
   }
 }

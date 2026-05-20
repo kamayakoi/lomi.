@@ -1,51 +1,53 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-export class RefundResponseDto {
-  @ApiProperty({ example: 123, type: Number })
-  amount: number;
+export class CreateRefundResponseDto {
+  @ApiProperty({ example: true, type: Boolean })
+  success: boolean;
 
-  @ApiProperty({ example: 'string', type: String })
-  created_at: string;
-
-  @ApiProperty({ example: 'string', type: String })
-  environment: string;
-
-  @ApiProperty({ example: 123, type: Number })
-  fee_amount: number;
-
-  @ApiProperty({ example: {}, type: Object })
-  metadata: any;
-
-  @ApiProperty({ example: 'string', type: String })
-  reason: string;
-
-  @ApiProperty({ example: 'string', type: String })
+  @ApiProperty({ example: 'refund-uuid', type: String })
   refund_id: string;
 
-  @ApiProperty({ example: 123, type: Number })
-  refunded_amount: number;
-
-  @ApiProperty({ example: 'string', type: String })
-  spi_account_number: string;
-
-  @ApiProperty({ example: 'string', type: String })
-  spi_end2end_id: string;
-
-  @ApiProperty({ example: 'string', type: String })
-  spi_retour_date_demande: string;
-
-  @ApiProperty({ example: 'string', type: String })
-  spi_retour_date_irrevocabilite: string;
-
-  @ApiProperty({ example: 'string', type: String })
-  spi_tx_id: string;
-
-  @ApiProperty({ example: 'string', type: String })
-  status: string;
-
-  @ApiProperty({ example: 'string', type: String })
+  @ApiProperty({ example: 'transaction-uuid', type: String })
   transaction_id: string;
 
-  @ApiProperty({ example: 'string', type: String })
+  @ApiProperty({ example: 5000, type: Number })
+  refunded_amount: number;
+
+  @ApiProperty({ example: 'completed', type: String })
+  status: string;
+
+  @ApiPropertyOptional({
+    example: 'Refund recorded. Customer credit is processed by our team.',
+    type: String,
+  })
+  message?: string;
+}
+
+export class RefundListItemDto {
+  @ApiProperty({ example: 'refund-uuid', type: String })
+  refund_id: string;
+
+  @ApiProperty({ example: 'transaction-uuid', type: String })
+  transaction_id: string;
+
+  @ApiProperty({ example: 5000, type: Number })
+  amount: number;
+
+  @ApiProperty({ example: 5000, type: Number })
+  refunded_amount: number;
+
+  @ApiProperty({ example: 100, type: Number })
+  fee_amount: number;
+
+  @ApiPropertyOptional({ type: String })
+  reason?: string;
+
+  @ApiProperty({ example: 'completed', type: String })
+  status: string;
+
+  @ApiProperty({ example: '2025-01-01T00:00:00.000Z', type: String })
+  created_at: string;
+
+  @ApiProperty({ example: '2025-01-01T00:00:00.000Z', type: String })
   updated_at: string;
 }

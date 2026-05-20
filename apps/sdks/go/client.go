@@ -15,16 +15,21 @@ type Client struct {
 	HTTPClient *http.Client
 	Accounts *AccountsService
 	BeneficiaryPayouts *BeneficiaryPayoutsService
+	Charge *ChargeService
 	Charges *ChargesService
 	CheckoutSessions *CheckoutSessionsService
 	Customers *CustomersService
+	CustomerSubscriptions *CustomerSubscriptionsService
 	DiscountCoupons *DiscountCouponsService
+	Merchants *MerchantsService
 	Organizations *OrganizationsService
 	PaymentIntents *PaymentIntentsService
 	PaymentLinks *PaymentLinksService
 	PaymentRequests *PaymentRequestsService
+	Payout *PayoutService
 	Payouts *PayoutsService
 	Products *ProductsService
+	Providers *ProvidersService
 	Refunds *RefundsService
 	Subscriptions *SubscriptionsService
 	Transactions *TransactionsService
@@ -43,16 +48,21 @@ func NewClient(apiKey string, opts ...ClientOption) *Client {
 	}
 	c.Accounts = &AccountsService{client: c}
 	c.BeneficiaryPayouts = &BeneficiaryPayoutsService{client: c}
+	c.Charge = &ChargeService{client: c}
 	c.Charges = &ChargesService{client: c}
 	c.CheckoutSessions = &CheckoutSessionsService{client: c}
 	c.Customers = &CustomersService{client: c}
+	c.CustomerSubscriptions = &CustomerSubscriptionsService{client: c}
 	c.DiscountCoupons = &DiscountCouponsService{client: c}
+	c.Merchants = &MerchantsService{client: c}
 	c.Organizations = &OrganizationsService{client: c}
 	c.PaymentIntents = &PaymentIntentsService{client: c}
 	c.PaymentLinks = &PaymentLinksService{client: c}
 	c.PaymentRequests = &PaymentRequestsService{client: c}
+	c.Payout = &PayoutService{client: c}
 	c.Payouts = &PayoutsService{client: c}
 	c.Products = &ProductsService{client: c}
+	c.Providers = &ProvidersService{client: c}
 	c.Refunds = &RefundsService{client: c}
 	c.Subscriptions = &SubscriptionsService{client: c}
 	c.Transactions = &TransactionsService{client: c}

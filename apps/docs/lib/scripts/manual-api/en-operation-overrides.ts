@@ -291,15 +291,27 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
       'Use after adding multiple prices so checkout and links have a clear fallback.',
     related: '[Add product price](/api/products/ProductsController_addPrice)',
   },
-  RefundsController_createWaveRefund: {
-    summary: 'Initiate refund',
-    body: 'Initiates a refund on supported rails; final status follows provider rules.',
+  RefundsController_create: {
+    summary: 'Create refund',
+    body: 'Refunds a completed transaction (card or mobile money). Merchant balance updates immediately.',
     whenToUse:
-      'Use for buyer reversals tied to an eligible capture on mobile money or compatible methods.',
+      'Use for buyer reversals on eligible completed transactions; supports full and partial amounts.',
     caveats:
-      'Refunds may be asynchronous; confirm completion via [transactions](/api/transactions/TransactionsController_findOne) or webhooks.',
+      'Card customer credit is completed separately by operations. Mobile money partial refunds require a customer phone on file.',
     related:
-      '[Retrieve transaction](/api/transactions/TransactionsController_findOne)',
+      '[List refunds](/api/refunds/RefundsController_findAll) · [Retrieve transaction](/api/transactions/TransactionsController_findOne)',
+  },
+  RefundsController_findAll: {
+    summary: 'List refunds',
+    body: 'Returns refunds for your organization with optional status and date filters.',
+    whenToUse: 'Use for reconciliation, support, and dashboards.',
+    related: '[Get refund](/api/refunds/RefundsController_findOne)',
+  },
+  RefundsController_findOne: {
+    summary: 'Get refund',
+    body: 'Returns a single refund by ID scoped to your organization.',
+    whenToUse: 'Use after create or from webhook-driven flows to confirm refund details.',
+    related: '[Create refund](/api/refunds/RefundsController_create)',
   },
   SubscriptionsController_cancel: {
     summary: 'Cancel subscription',

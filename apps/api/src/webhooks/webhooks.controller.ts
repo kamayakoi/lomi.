@@ -1,12 +1,25 @@
-import { Controller, UseGuards, Get, Param, Patch, Body } from '@nestjs/common';
+import {
+  Controller,
+  UseGuards,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Param,
+  Body,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
   ApiResponse,
   ApiSecurity,
   ApiBody,
+  ApiParam,
 } from '@nestjs/swagger';
 import { WebhooksService } from './webhooks.service';
+import { CreateWebhookBodyDto } from './dto/create-webhook-body.dto';
 import { UpdateWebhookDto } from './dto/update-webhook.dto';
 import { WebhookResponseDto } from './dto/webhook-response.dto';
 import { ApiKeyGuard } from '../core/common/guards/api-key.guard';
@@ -22,6 +35,16 @@ import {
 export class WebhooksController {
   constructor(private readonly service: WebhooksService) {}
 
+  @Post()
+  @ApiOperation({ summary: 'Créer un webhook' })
+  @ApiResponse({ status: 201, description: 'Webhook créé' })
+  create(
+    @Body() createDto: CreateWebhookBodyDto,
+    @CurrentUser() user: AuthContext,
+  ) {
+    return this.service.create(createDto, user);
+  }
+
   @Get()
   @ApiOperation({ summary: 'Lister les webhooks' })
   @ApiResponse({
@@ -34,6 +57,27 @@ export class WebhooksController {
     return this.service.findAll(user);
   }
 
+  @Post(':id/test')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Envoyer un événement test au webhook' })
+  @ApiParam({ name: 'id', description: 'Webhook UUID' })
+  test(@Param('id') id: string, @CurrentUser() user: AuthContext) {
+    return this.service.test(id, user);
+  }
+
+  @Post(':webhookId/logs/:logId/retry')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Relancer une livraison webhook' })
+  @ApiParam({ name: 'webhookId', description: 'Webhook UUID' })
+  @ApiParam({ name: 'logId', description: 'Delivery log UUID' })
+  retryDelivery(
+    @Param('webhookId') webhookId: string,
+    @Param('logId') logId: string,
+    @CurrentUser() user: AuthContext,
+  ) {
+    return this.service.retryDelivery(webhookId, logId, user);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Obtenir un webhook par ID' })
   @ApiResponse({
@@ -42,7 +86,7 @@ export class WebhooksController {
     type: WebhookResponseDto,
   })
   findOne(@Param('id') id: string, @CurrentUser() user: AuthContext) {
-    return this.service.findOne(id, user);
+    return this.service.findOneForApi(id, user);
   }
 
   @Patch(':id')
@@ -58,20 +102,8 @@ export class WebhooksController {
       properties: {
         url: { type: 'string', format: 'uri' },
         is_active: { type: 'boolean' },
-        authorized_events: { type: 'string' },
-        spi_event_types: { type: 'string' },
-        supports_spi: { type: 'boolean' },
-        verification_token: { type: 'string' },
+        authorized_events: { type: 'array', items: { type: 'string' } },
         metadata: { type: 'object', additionalProperties: true },
-      },
-    },
-    examples: {
-      rotateUrl: {
-        summary: "Mettre à jour l'URL de livraison",
-        value: {
-          url: 'https://example.com/webhooks/lomi',
-          is_active: true,
-        },
       },
     },
   })
@@ -81,5 +113,13 @@ export class WebhooksController {
     @CurrentUser() user: AuthContext,
   ) {
     return this.service.update(id, updateDto, user);
+  }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Supprimer un webhook' })
+  @ApiParam({ name: 'id', description: 'Webhook UUID' })
+  remove(@Param('id') id: string, @CurrentUser() user: AuthContext) {
+    return this.service.remove(id, user);
   }
 }

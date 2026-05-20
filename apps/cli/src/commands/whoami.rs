@@ -1,0 +1,65 @@
+use anyhow::Result;
+use clap::Args;
+use colored::Colorize;
+
+use crate::auth::session::try_authenticated;
+use crate::cli::{self, CommonOptions};
+use crate::config::global::config_path;
+
+#[derive(Args, Debug)]
+pub struct WhoamiArgs {}
+
+pub async fn run(common: &CommonOptions, _args: WhoamiArgs) -> Result<()> {
+    cli::banner::print_intro(&format!(
+        "Displaying your account details [{}]",
+        common.profile
+    ));
+
+    let spinner = indicatif::ProgressBar::new_spinner();
+    spinner.set_style(
+        indicatif::ProgressStyle::default_spinner()
+            .template("{spinner} {msg}")
+            .unwrap(),
+    );
+    spinner.set_message("Checking your account details...");
+    spinner.enable_steady_tick(std::time::Duration::from_millis(100));
+
+    let auth = match try_authenticated(common).await {
+        crate::auth::AuthResult::Authenticated(auth) => auth,
+        crate::auth::AuthResult::Failed(message) => {
+            spinner.finish_and_clear();
+            cli::output::print_error(&format!(
+                "You must login first. Use `lomi login --profile {}`.",
+                common.profile
+            ));
+            anyhow::bail!(message);
+        }
+    };
+
+    spinner.finish_and_clear();
+
+    let token_preview = if auth.cli_token.len() > 8 {
+        format!("{}…", &auth.cli_token[..8])
+    } else {
+        "hidden".to_string()
+    };
+
+    cli::output::print_note(
+        &format!("Account details [{}]", common.profile),
+        &format!(
+            "Profile:  {}\nToken:    {}\nAPI URL:  {}",
+            auth.profile, token_preview, auth.api_url
+        ),
+    );
+
+    if let Ok(path) = config_path() {
+        println!(
+            "{}  Config:   {}",
+            "│".bright_black(),
+            path.display().to_string().bright_black()
+        );
+    }
+
+    cli::banner::print_outro("Account details retrieved");
+    Ok(())
+}

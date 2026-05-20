@@ -1,116 +1,82 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { ConfigService } from '@nestjs/config';
 import { WebhooksService } from './webhooks.service';
 import { SupabaseService } from '../utils/supabase/supabase.service';
-import { CreateWebhookDto } from './dto/create-webhook.dto';
 import { AuthContext } from '../core/common/decorators/current-user.decorator';
 
 describe('WebhooksService', () => {
   let service: WebhooksService;
-  let supabaseService: SupabaseService;
 
-  const mockSupabaseClient = {
-    from: jest.fn().mockReturnThis(),
-    insert: jest.fn().mockReturnThis(),
-    select: jest.fn().mockReturnThis(),
-    eq: jest.fn().mockReturnThis(),
-    single: jest.fn(),
+  const mockRpc = jest.fn();
+  const mockSupabaseService = {
+    getClient: jest.fn(() => ({ rpc: mockRpc })),
+    rpc: mockRpc,
   };
 
-  const mockSupabaseService = {
-    getClient: jest.fn(() => mockSupabaseClient),
-    rpc: jest.fn(),
+  const user: AuthContext = {
+    merchantId: 'merch-1',
+    organizationId: 'org-1',
+    environment: 'live',
   };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         WebhooksService,
+        { provide: SupabaseService, useValue: mockSupabaseService },
         {
-          provide: SupabaseService,
-          useValue: mockSupabaseService,
+          provide: ConfigService,
+          useValue: { get: jest.fn() },
         },
       ],
     }).compile();
 
-    service = module.get<WebhooksService>(WebhooksService);
-    supabaseService = module.get<SupabaseService>(SupabaseService);
-  });
-
-  afterEach(() => {
+    service = module.get(WebhooksService);
     jest.clearAllMocks();
   });
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
-  });
-
-  describe('create', () => {
-    it('should create a webhook', async () => {
-      const createDto: CreateWebhookDto = {
-        url: 'https://example.com/webhook',
-        authorized_events: 'PAYMENT_SUCCEEDED',
-      } as any;
-      const user: AuthContext = { organizationId: 'org_123' } as any;
-      const expectedResult = { id: 'wh_123', ...createDto };
-
-      mockSupabaseClient.single.mockResolvedValue({
-        data: expectedResult,
+  it('creates webhook via RPC and returns secret once', async () => {
+    mockRpc
+      .mockResolvedValueOnce({ data: 'wh-uuid', error: null })
+      .mockResolvedValueOnce({
+        data: [
+          {
+            webhook_id: 'wh-uuid',
+            url: 'https://example.com/hook',
+            authorized_events: ['PAYMENT_SUCCEEDED'],
+            is_active: true,
+            verification_token: 'whsec_test',
+          },
+        ],
         error: null,
       });
 
-      const result = await service.create(createDto, user);
+    const result = await service.create(
+      {
+        url: 'https://example.com/hook',
+        authorized_events: ['PAYMENT_SUCCEEDED'],
+      },
+      user,
+    );
 
-      expect(supabaseService.getClient).toHaveBeenCalled();
-      expect(mockSupabaseClient.from).toHaveBeenCalledWith('webhooks');
-      expect(mockSupabaseClient.insert).toHaveBeenCalledWith(
-        expect.objectContaining({
-          url: createDto.url,
-          authorized_events: [createDto.authorized_events],
-          organization_id: user.organizationId,
-          is_active: true,
-          environment: 'live',
-          supports_spi: false,
-          metadata: null,
-          spi_event_types: null,
-        }),
-      );
-      expect(result).toEqual(expectedResult);
-    });
-
-    it('should throw error if creation fails', async () => {
-      const createDto: CreateWebhookDto = { url: 'https://example.com' } as any;
-      const user: AuthContext = { organizationId: 'org_123' } as any;
-      const error = { message: 'DB Error' };
-
-      mockSupabaseClient.single.mockResolvedValue({ data: null, error });
-
-      await expect(service.create(createDto, user)).rejects.toThrow('DB Error');
-    });
+    expect(mockRpc).toHaveBeenCalledWith(
+      'create_webhook',
+      expect.objectContaining({
+        p_organization_id: 'org-1',
+        p_environment: 'live',
+      }),
+    );
+    expect(result.secret).toBe('whsec_test');
+    expect(result.data).not.toHaveProperty('verification_token');
   });
 
-  describe('findAll', () => {
-    it('should return all webhooks for organization', async () => {
-      const user: AuthContext = {
-        organizationId: 'org_123',
-        merchantId: 'merch_123',
-      } as any;
-      const expectedResult = [{ id: 'wh_123' }];
-
-      mockSupabaseService.rpc.mockResolvedValue({
-        data: expectedResult,
-        error: null,
-      });
-
-      const result = await service.findAll(user);
-
-      expect(mockSupabaseService.rpc).toHaveBeenCalledWith(
-        'fetch_organization_webhooks',
-        expect.objectContaining({
-          p_merchant_id: user.merchantId,
-          p_organization_id: user.organizationId,
-        }),
-      );
-      expect(result).toEqual(expectedResult);
+  it('lists webhooks without verification_token', async () => {
+    mockRpc.mockResolvedValue({
+      data: [{ webhook_id: 'wh-1', verification_token: 'whsec_x' }],
+      error: null,
     });
+
+    const rows = await service.findAll(user);
+    expect(rows[0]).not.toHaveProperty('verification_token');
   });
 });

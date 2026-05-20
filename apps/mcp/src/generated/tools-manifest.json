@@ -2,8 +2,42 @@
   "manifestVersion": 1,
   "apiVersion": "1.1.0",
   "apiTitle": "API lomi.",
-  "toolCount": 50,
+  "toolCount": 73,
   "tools": [
+    {
+      "name": "lomi_delete_customer_subscriptions_subscription_id",
+      "operationKey": "DELETE /customer-subscriptions/{subscription_id}",
+      "method": "delete",
+      "pathTemplate": "/customer-subscriptions/{subscription_id}",
+      "pathParamNames": [
+        "subscription_id"
+      ],
+      "queryParamNames": [],
+      "title": "Cancel customer subscription",
+      "description": "Cancel customer subscription\n\nREST: DELETE /customer-subscriptions/{subscription_id}",
+      "tags": [
+        "Customer subscriptions"
+      ],
+      "operationId": "CustomerSubscriptionsController_remove",
+      "write": true,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          },
+          "subscription_id": {
+            "type": "string",
+            "description": "Path parameter \"subscription_id\" for `/customer-subscriptions/{subscription_id}`."
+          }
+        },
+        "required": [
+          "subscription_id"
+        ]
+      }
+    },
     {
       "name": "lomi_delete_customers_id",
       "operationKey": "DELETE /customers/{id}",
@@ -27,6 +61,39 @@
           "id": {
             "type": "string",
             "description": "UUID du client"
+          },
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "lomi_delete_webhooks_id",
+      "operationKey": "DELETE /webhooks/{id}",
+      "method": "delete",
+      "pathTemplate": "/webhooks/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Supprimer un webhook",
+      "description": "Supprimer un webhook\n\nREST: DELETE /webhooks/{id}",
+      "tags": [
+        "Webhooks"
+      ],
+      "operationId": "WebhooksController_remove",
+      "write": true,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Webhook UUID"
           },
           "idempotency_key": {
             "type": "string",
@@ -343,6 +410,69 @@
       }
     },
     {
+      "name": "lomi_get_customer_subscriptions",
+      "operationKey": "GET /customer-subscriptions",
+      "method": "get",
+      "pathTemplate": "/customer-subscriptions",
+      "pathParamNames": [],
+      "queryParamNames": [
+        "offset",
+        "limit",
+        "status",
+        "customer_id"
+      ],
+      "title": "List customer subscriptions",
+      "description": "List customer subscriptions\n\nREST: GET /customer-subscriptions",
+      "tags": [
+        "Customer subscriptions"
+      ],
+      "operationId": "CustomerSubscriptionsController_findAll",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "customer_id": {},
+          "limit": {
+            "type": "number"
+          },
+          "offset": {
+            "type": "number"
+          },
+          "status": {}
+        }
+      }
+    },
+    {
+      "name": "lomi_get_customer_subscriptions_subscription_id",
+      "operationKey": "GET /customer-subscriptions/{subscription_id}",
+      "method": "get",
+      "pathTemplate": "/customer-subscriptions/{subscription_id}",
+      "pathParamNames": [
+        "subscription_id"
+      ],
+      "queryParamNames": [],
+      "title": "Get customer subscription",
+      "description": "Get customer subscription\n\nREST: GET /customer-subscriptions/{subscription_id}",
+      "tags": [
+        "Customer subscriptions"
+      ],
+      "operationId": "CustomerSubscriptionsController_findOne",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "subscription_id": {
+            "description": "Subscription UUID"
+          }
+        },
+        "required": [
+          "subscription_id"
+        ]
+      }
+    },
+    {
       "name": "lomi_get_customers",
       "operationKey": "GET /customers",
       "method": "get",
@@ -424,6 +554,52 @@
           "id": {
             "type": "string",
             "description": "UUID du client"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "lomi_get_customers_id_portal_audit",
+      "operationKey": "GET /customers/{id}/portal-audit",
+      "method": "get",
+      "pathTemplate": "/customers/{id}/portal-audit",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [
+        "eventType",
+        "pageSize",
+        "page"
+      ],
+      "title": "Hosted customer portal audit",
+      "description": "Hosted customer portal audit\n\nListe les évènements portal (sessions, OTP, souscriptions self-service) pour ce client.\n\nREST: GET /customers/{id}/portal-audit",
+      "tags": [
+        "Clients"
+      ],
+      "operationId": "CustomersController_getPortalAudit",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "eventType": {
+            "type": "string",
+            "description": "Filtre sur customer_portal_audit_events.event_type"
+          },
+          "id": {
+            "type": "string",
+            "description": "UUID du client"
+          },
+          "page": {
+            "example": 1,
+            "type": "number"
+          },
+          "pageSize": {
+            "example": 50,
+            "type": "number"
           }
         },
         "required": [
@@ -542,6 +718,133 @@
       }
     },
     {
+      "name": "lomi_get_merchants_id",
+      "operationKey": "GET /merchants/{id}",
+      "method": "get",
+      "pathTemplate": "/merchants/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Get merchant details",
+      "description": "Get merchant details\n\nReturns merchant profile and organization metrics (MRR, ARR, LTV). Metrics are refreshed daily and on subscription changes.\n\nREST: GET /merchants/{id}",
+      "tags": [
+        "Merchants"
+      ],
+      "operationId": "MerchantsController_getDetails",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Merchant UUID"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "lomi_get_merchants_id_arr",
+      "operationKey": "GET /merchants/{id}/arr",
+      "method": "get",
+      "pathTemplate": "/merchants/{id}/arr",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Get merchant ARR",
+      "description": "Get merchant ARR\n\nREST: GET /merchants/{id}/arr",
+      "tags": [
+        "Merchants"
+      ],
+      "operationId": "MerchantsController_getArr",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Merchant UUID"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "lomi_get_merchants_id_balance",
+      "operationKey": "GET /merchants/{id}/balance",
+      "method": "get",
+      "pathTemplate": "/merchants/{id}/balance",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [
+        "currency_code"
+      ],
+      "title": "Get merchant account balance for a currency",
+      "description": "Get merchant account balance for a currency\n\nREST: GET /merchants/{id}/balance",
+      "tags": [
+        "Merchants"
+      ],
+      "operationId": "MerchantsController_getBalance",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "currency_code": {
+            "enum": [
+              "XOF",
+              "USD",
+              "EUR"
+            ],
+            "type": "string"
+          },
+          "id": {
+            "description": "Merchant UUID"
+          }
+        },
+        "required": [
+          "currency_code",
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "lomi_get_merchants_id_mrr",
+      "operationKey": "GET /merchants/{id}/mrr",
+      "method": "get",
+      "pathTemplate": "/merchants/{id}/mrr",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Get merchant MRR",
+      "description": "Get merchant MRR\n\nREST: GET /merchants/{id}/mrr",
+      "tags": [
+        "Merchants"
+      ],
+      "operationId": "MerchantsController_getMrr",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Merchant UUID"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
       "name": "lomi_get_organizations",
       "operationKey": "GET /organizations",
       "method": "get",
@@ -609,6 +912,35 @@
       "inputSchema": {
         "type": "object",
         "properties": {}
+      }
+    },
+    {
+      "name": "lomi_get_payment_intents_id",
+      "operationKey": "GET /payment-intents/{id}",
+      "method": "get",
+      "pathTemplate": "/payment-intents/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Récupérer un intent de paiement carte",
+      "description": "Récupérer un intent de paiement carte\n\nRécupère l’intent de paiement carte et la transaction associée si elle existe.\n\nREST: GET /payment-intents/{id}",
+      "tags": [
+        "Intents de paiement"
+      ],
+      "operationId": "PaymentIntentsController_findOne",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Identifiant de l’intent de paiement (pi_...)"
+          }
+        },
+        "required": [
+          "id"
+        ]
       }
     },
     {
@@ -770,6 +1102,51 @@
       }
     },
     {
+      "name": "lomi_get_payouts",
+      "operationKey": "GET /payouts",
+      "method": "get",
+      "pathTemplate": "/payouts",
+      "pathParamNames": [],
+      "queryParamNames": [
+        "endDate",
+        "startDate",
+        "pageSize",
+        "page",
+        "status"
+      ],
+      "title": "Lister les virements",
+      "description": "Lister les virements\n\nListe les virements du marchand pour l’organisation (RPC fetch_payouts).\n\nREST: GET /payouts",
+      "tags": [
+        "Virements sortants"
+      ],
+      "operationId": "PayoutsListController_findAll",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "endDate": {
+            "type": "string"
+          },
+          "page": {
+            "type": "number"
+          },
+          "pageSize": {
+            "type": "number"
+          },
+          "startDate": {
+            "type": "string"
+          },
+          "status": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    {
       "name": "lomi_get_products",
       "operationKey": "GET /products",
       "method": "get",
@@ -831,6 +1208,109 @@
           "id": {
             "type": "string",
             "description": "UUID du produit"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "lomi_get_providers",
+      "operationKey": "GET /providers",
+      "method": "get",
+      "pathTemplate": "/providers",
+      "pathParamNames": [],
+      "queryParamNames": [
+        "provider_code"
+      ],
+      "title": "List payment providers",
+      "description": "List payment providers\n\nReturns connection status for payment providers configured for your organization.\n\nREST: GET /providers",
+      "tags": [
+        "Providers"
+      ],
+      "operationId": "ProvidersController_findAll",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "provider_code": {
+            "enum": [
+              "STRIPE",
+              "WAVE",
+              "MTN",
+              "SPI"
+            ],
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "name": "lomi_get_refunds",
+      "operationKey": "GET /refunds",
+      "method": "get",
+      "pathTemplate": "/refunds",
+      "pathParamNames": [],
+      "queryParamNames": [
+        "offset",
+        "limit",
+        "endDate",
+        "startDate",
+        "status"
+      ],
+      "title": "Lister les remboursements",
+      "description": "Lister les remboursements\n\nREST: GET /refunds",
+      "tags": [
+        "Remboursements"
+      ],
+      "operationId": "RefundsController_findAll",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "endDate": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "offset": {
+            "type": "number"
+          },
+          "startDate": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "name": "lomi_get_refunds_id",
+      "operationKey": "GET /refunds/{id}",
+      "method": "get",
+      "pathTemplate": "/refunds/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Obtenir un remboursement",
+      "description": "Obtenir un remboursement\n\nREST: GET /refunds/{id}",
+      "tags": [
+        "Remboursements"
+      ],
+      "operationId": "RefundsController_findOne",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Refund ID"
           }
         },
         "required": [
@@ -1179,6 +1659,40 @@
       }
     },
     {
+      "name": "lomi_patch_customer_subscriptions_subscription_id",
+      "operationKey": "PATCH /customer-subscriptions/{subscription_id}",
+      "method": "patch",
+      "pathTemplate": "/customer-subscriptions/{subscription_id}",
+      "pathParamNames": [
+        "subscription_id"
+      ],
+      "queryParamNames": [],
+      "title": "Update customer subscription",
+      "description": "Update customer subscription\n\nREST: PATCH /customer-subscriptions/{subscription_id}",
+      "tags": [
+        "Customer subscriptions"
+      ],
+      "operationId": "CustomerSubscriptionsController_update",
+      "write": true,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          },
+          "subscription_id": {
+            "type": "string",
+            "description": "Path parameter \"subscription_id\" for `/customer-subscriptions/{subscription_id}`."
+          }
+        },
+        "required": [
+          "subscription_id"
+        ]
+      }
+    },
+    {
       "name": "lomi_patch_customers_id",
       "operationKey": "PATCH /customers/{id}",
       "method": "patch",
@@ -1252,6 +1766,39 @@
       }
     },
     {
+      "name": "lomi_patch_subscriptions_id",
+      "operationKey": "PATCH /subscriptions/{id}",
+      "method": "patch",
+      "pathTemplate": "/subscriptions/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Mettre à jour un abonnement",
+      "description": "Mettre à jour un abonnement\n\nMet à jour le statut ou les métadonnées (ex. pause). Les champs tarifaires restent gérés par le système.\n\nREST: PATCH /subscriptions/{id}",
+      "tags": [
+        "Abonnements"
+      ],
+      "operationId": "SubscriptionsController_update",
+      "write": true,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "UUID de l’abonnement"
+          },
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
       "name": "lomi_patch_webhooks_id",
       "operationKey": "PATCH /webhooks/{id}",
       "method": "patch",
@@ -1275,7 +1822,10 @@
             "type": "object",
             "properties": {
               "authorized_events": {
-                "type": "string"
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
               },
               "is_active": {
                 "type": "boolean"
@@ -1284,18 +1834,9 @@
                 "type": "object",
                 "additionalProperties": true
               },
-              "spi_event_types": {
-                "type": "string"
-              },
-              "supports_spi": {
-                "type": "boolean"
-              },
               "url": {
                 "type": "string",
                 "format": "uri"
-              },
-              "verification_token": {
-                "type": "string"
               }
             },
             "description": "JSON request body for this operation."
@@ -1328,6 +1869,32 @@
         "Paiements vers bénéficiaires"
       ],
       "operationId": "BeneficiaryPayoutsController_create",
+      "write": true,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "lomi_post_charge_mtn",
+      "operationKey": "POST /charge/mtn",
+      "method": "post",
+      "pathTemplate": "/charge/mtn",
+      "pathParamNames": [],
+      "queryParamNames": [],
+      "title": "Lancer un encaissement direct MTN MoMo",
+      "description": "Lancer un encaissement direct MTN MoMo\n\nREST: POST /charge/mtn",
+      "tags": [
+        "Encaissements"
+      ],
+      "operationId": "ChargesController_createMtnCharge",
       "write": true,
       "wantsBody": false,
       "inputSchema": {
@@ -1582,6 +2149,67 @@
       }
     },
     {
+      "name": "lomi_post_customers_id_portal_launch_session",
+      "operationKey": "POST /customers/{id}/portal-launch-session",
+      "method": "post",
+      "pathTemplate": "/customers/{id}/portal-launch-session",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Créer une session de lancement du portail client",
+      "description": "Créer une session de lancement du portail client\n\nGénère un lien hébergé à usage unique vers le portail client pour un client de votre organisation. Destiné aux applications marchandes (backend) via clé API.\n\nREST: POST /customers/{id}/portal-launch-session",
+      "tags": [
+        "Clients"
+      ],
+      "operationId": "CustomersController_createPortalLaunchSession",
+      "write": true,
+      "wantsBody": true,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "object",
+            "properties": {
+              "flow_after_completion_url": {
+                "type": "string",
+                "format": "uri"
+              },
+              "flow_subscription_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "flow_type": {
+                "type": "string",
+                "enum": [
+                  "portal_home",
+                  "subscription_cancel",
+                  "subscription_manage"
+                ]
+              },
+              "return_url": {
+                "type": "string",
+                "format": "uri"
+              }
+            },
+            "description": "JSON request body for this operation."
+          },
+          "id": {
+            "type": "string",
+            "description": "UUID du client"
+          },
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": [
+          "body",
+          "id"
+        ]
+      }
+    },
+    {
       "name": "lomi_post_discount_coupons",
       "operationKey": "POST /discount-coupons",
       "method": "post",
@@ -1614,8 +2242,8 @@
       "pathTemplate": "/payment-intents",
       "pathParamNames": [],
       "queryParamNames": [],
-      "title": "Créer un Payment Intent carte (client_secret)",
-      "description": "Créer un Payment Intent carte (client_secret)\n\nCrée un Payment Intent carte pour une intégration via Payment Element et renvoie le client_secret.\n\nREST: POST /payment-intents",
+      "title": "Créer un intent de paiement carte (client_secret)",
+      "description": "Créer un intent de paiement carte (client_secret)\n\nCrée un intent de paiement carte pour une intégration embarquée et renvoie le client_secret.\n\nREST: POST /payment-intents",
       "tags": [
         "Intents de paiement"
       ],
@@ -1649,15 +2277,13 @@
               },
               "appearance_theme": {
                 "type": "string",
-                "example": "stripe",
+                "example": "light",
                 "enum": [
                   "light",
                   "dark",
-                  "flat",
-                  "stripe",
-                  "night"
+                  "flat"
                 ],
-                "description": "Optional Payment Element theme hint returned for client-side rendering. `light|dark|flat` are preferred aliases; `stripe|night` remain for backward compatibility."
+                "description": "Optional Payment Element theme for client-side card UI: `light`, `dark`, or `flat`."
               },
               "currency": {
                 "type": "string",
@@ -1746,6 +2372,39 @@
         },
         "required": [
           "body"
+        ]
+      }
+    },
+    {
+      "name": "lomi_post_payment_intents_id_cancel",
+      "operationKey": "POST /payment-intents/{id}/cancel",
+      "method": "post",
+      "pathTemplate": "/payment-intents/{id}/cancel",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Annuler un intent de paiement carte",
+      "description": "Annuler un intent de paiement carte\n\nREST: POST /payment-intents/{id}/cancel",
+      "tags": [
+        "Intents de paiement"
+      ],
+      "operationId": "PaymentIntentsController_cancel",
+      "write": true,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Identifiant de l’intent de paiement (pi_...)"
+          },
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": [
+          "id"
         ]
       }
     },
@@ -1914,6 +2573,32 @@
       }
     },
     {
+      "name": "lomi_post_payout_spi",
+      "operationKey": "POST /payout/spi",
+      "method": "post",
+      "pathTemplate": "/payout/spi",
+      "pathParamNames": [],
+      "queryParamNames": [],
+      "title": "Lancer un virement SPI",
+      "description": "Lancer un virement SPI\n\nInitie un virement instantané SPI (RPC initiate_spi_payout). Le règlement PI-SPI se poursuit de façon asynchrone.\n\nREST: POST /payout/spi",
+      "tags": [
+        "Virements sortants"
+      ],
+      "operationId": "PayoutsController_createSpiPayout",
+      "write": true,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
       "name": "lomi_post_payout_wave",
       "operationKey": "POST /payout/wave",
       "method": "post",
@@ -2040,18 +2725,18 @@
       }
     },
     {
-      "name": "lomi_post_refund_wave",
-      "operationKey": "POST /refund/wave",
+      "name": "lomi_post_refunds",
+      "operationKey": "POST /refunds",
       "method": "post",
-      "pathTemplate": "/refund/wave",
+      "pathTemplate": "/refunds",
       "pathParamNames": [],
       "queryParamNames": [],
-      "title": "Lancer un remboursement Wave",
-      "description": "Lancer un remboursement Wave\n\nCrée un remboursement via la fonction edge Wave. La forme de la réponse suit le JSON du fournisseur.\n\nREST: POST /refund/wave",
+      "title": "Créer un remboursement",
+      "description": "Créer un remboursement\n\nRembourse une transaction terminée (carte ou mobile money). Le solde marchand est mis à jour immédiatement. Prise en charge des remboursements totaux et partiels.\n\nREST: POST /refunds",
       "tags": [
         "Remboursements"
       ],
-      "operationId": "RefundsController_createWaveRefund",
+      "operationId": "RefundsController_create",
       "write": true,
       "wantsBody": false,
       "inputSchema": {
@@ -2106,6 +2791,103 @@
         "required": [
           "body",
           "id"
+        ]
+      }
+    },
+    {
+      "name": "lomi_post_webhooks",
+      "operationKey": "POST /webhooks",
+      "method": "post",
+      "pathTemplate": "/webhooks",
+      "pathParamNames": [],
+      "queryParamNames": [],
+      "title": "Créer un webhook",
+      "description": "Créer un webhook\n\nREST: POST /webhooks",
+      "tags": [
+        "Webhooks"
+      ],
+      "operationId": "WebhooksController_create",
+      "write": true,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "lomi_post_webhooks_id_test",
+      "operationKey": "POST /webhooks/{id}/test",
+      "method": "post",
+      "pathTemplate": "/webhooks/{id}/test",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Envoyer un événement test au webhook",
+      "description": "Envoyer un événement test au webhook\n\nREST: POST /webhooks/{id}/test",
+      "tags": [
+        "Webhooks"
+      ],
+      "operationId": "WebhooksController_test",
+      "write": true,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Webhook UUID"
+          },
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "lomi_post_webhooks_webhookId_logs_logId_retry",
+      "operationKey": "POST /webhooks/{webhookId}/logs/{logId}/retry",
+      "method": "post",
+      "pathTemplate": "/webhooks/{webhookId}/logs/{logId}/retry",
+      "pathParamNames": [
+        "webhookId",
+        "logId"
+      ],
+      "queryParamNames": [],
+      "title": "Relancer une livraison webhook",
+      "description": "Relancer une livraison webhook\n\nREST: POST /webhooks/{webhookId}/logs/{logId}/retry",
+      "tags": [
+        "Webhooks"
+      ],
+      "operationId": "WebhooksController_retryDelivery",
+      "write": true,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          },
+          "logId": {
+            "description": "Delivery log UUID"
+          },
+          "webhookId": {
+            "description": "Webhook UUID"
+          }
+        },
+        "required": [
+          "logId",
+          "webhookId"
         ]
       }
     }

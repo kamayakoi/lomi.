@@ -1,0 +1,75 @@
+---
+title: "Hosted customer portal audit"
+description: "Hosted customer portal audit"
+full: true
+method: get
+path: /customers/{id}/portal-audit
+operationId: CustomersController_getPortalAudit
+---
+
+## Aperçu
+
+Hosted customer portal audit
+
+Liste les évènements portal (sessions, OTP, souscriptions self-service) pour ce client.
+
+
+### Quand utiliser cet endpoint
+
+Utilisez cet endpoint quand vous devez exécuter `GET /customers/&#123;id&#125;/portal-audit` (Hosted customer portal audit).
+
+
+## Authentification
+
+Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (voir [Aperçu de l’intégration](/reference/setup/overview)). Utilisez une clé **test** avec `https://sandbox.api.lomi.africa` et une clé **live** avec `https://api.lomi.africa`.
+
+## Point de terminaison
+
+`GET /customers/{id}/portal-audit`
+
+URLs de base :
+
+- `https://sandbox.api.lomi.africa`
+- `https://api.lomi.africa`
+
+## Requête
+
+### Paramètres de chemin
+
+| Nom | Obligatoire | Schéma | Description |
+| --- | --- | --- | --- |
+| `id` | Oui | — | UUID du client |
+
+### Paramètres de requête
+
+| Nom | Emplacement | Obligatoire | Schéma | Description |
+| --- | --- | --- | --- | --- |
+| `eventType` | query | Non | — | Filtre sur customer_portal_audit_events.event_type |
+| `pageSize` | query | Non | — |  |
+| `page` | query | Non | — |  |
+
+
+
+## Réponses
+
+| Statut | Description |
+| --- | --- |
+| `200` | Chronologie paginée des évènements portal |
+
+## Erreurs
+
+Les erreurs suivent le format JSON standard (code de statut et message lisible par machine). Validez les entrées avant appel ; **401** indique une clé manquante/invalide, **404** une ressource introuvable pour cette organisation, **429** une limitation de débit. Pour les retries sûrs sur les créations, envoyez une clé d’idempotence quand votre flux le permet.
+
+## Exemple
+
+```bash
+curl -sS -X GET "https://sandbox.api.lomi.africa/customers/value/portal-audit?eventType=value&pageSize=1" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+
+## OpenAPI
+
+- **operationId**: `CustomersController_getPortalAudit`
+- **Operation**: `GET /customers/{id}/portal-audit`
+
+Schémas complets et **Try it** : [référence API](/api/index). Contrat machine : `openapi.json` à la racine des docs.

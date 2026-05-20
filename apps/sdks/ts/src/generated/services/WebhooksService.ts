@@ -7,6 +7,29 @@ import { request } from '../core/request.js';
 
 export class WebhooksService {
     /**
+     * OpenAPI operationId: `WebhooksController_create`.
+     * Créer un webhook
+     */
+    public static async create(): Promise<any> {
+        return await request<any>({
+            method: 'POST',
+            url: '/webhooks',
+        });
+    }
+
+    /**
+     * OpenAPI operationId: `WebhooksController_remove`.
+     * Supprimer un webhook
+     */
+    public static async delete(id: string): Promise<any> {
+        return await request<any>({
+            method: 'DELETE',
+            url: '/webhooks/{id}',
+            path: { id: id },
+        });
+    }
+
+    /**
      * OpenAPI operationId: `WebhooksController_findOne`.
      * Obtenir un webhook par ID
      */
@@ -26,6 +49,30 @@ export class WebhooksService {
         return await request<any>({
             method: 'GET',
             url: '/webhooks',
+        });
+    }
+
+    /**
+     * OpenAPI operationId: `WebhooksController_retryDelivery`.
+     * Relancer une livraison webhook
+     */
+    public static async retryDelivery(webhookId: string, logId: string): Promise<any> {
+        return await request<any>({
+            method: 'POST',
+            url: '/webhooks/{webhookId}/logs/{logId}/retry',
+            path: { webhookId: webhookId, logId: logId },
+        });
+    }
+
+    /**
+     * OpenAPI operationId: `WebhooksController_test`.
+     * Envoyer un événement test au webhook
+     */
+    public static async test(id: string): Promise<any> {
+        return await request<any>({
+            method: 'POST',
+            url: '/webhooks/{id}/test',
+            path: { id: id },
         });
     }
 

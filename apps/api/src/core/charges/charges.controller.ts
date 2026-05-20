@@ -7,6 +7,7 @@ import {
 } from '@nestjs/swagger';
 import { ChargesService } from './charges.service';
 import { CreateWaveChargeDto } from './dto/create-charge.dto';
+import { CreateMtnChargeDto } from './dto/create-mtn-charge.dto';
 import { ApiKeyGuard } from '../common/guards/api-key.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import type { AuthContext } from '../common/decorators/current-user.decorator';
@@ -40,5 +41,21 @@ export class ChargesController {
     createChargeDto.organizationId = user.organizationId;
     createChargeDto.merchantId = user.merchantId;
     return this.chargesService.createWaveCharge(createChargeDto, user);
+  }
+
+  @Post('mtn')
+  @ApiOperation({ summary: 'Lancer un encaissement direct MTN MoMo' })
+  @ApiResponse({
+    status: 201,
+    description: 'Encaissement MTN initié (RequestToPay)',
+    schema: { type: 'object', additionalProperties: true },
+  })
+  async createMtnCharge(
+    @Body() createChargeDto: CreateMtnChargeDto,
+    @CurrentUser() user: AuthContext,
+  ) {
+    createChargeDto.organizationId = user.organizationId;
+    createChargeDto.merchantId = user.merchantId;
+    return this.chargesService.createMtnCharge(createChargeDto, user);
   }
 }

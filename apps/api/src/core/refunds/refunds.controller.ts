@@ -1,39 +1,95 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+  ParseIntPipe,
+  DefaultValuePipe,
+} from '@nestjs/common';
 import {
   ApiTags,
   ApiSecurity,
   ApiOperation,
   ApiResponse,
+  ApiQuery,
+  ApiParam,
 } from '@nestjs/swagger';
 import { ApiKeyGuard } from '../common/guards/api-key.guard';
+import {
+  CurrentUser,
+  type AuthContext,
+} from '../common/decorators/current-user.decorator';
 import { RefundsService } from './refunds.service';
-import { CreateWaveRefundDto } from './dto/create-refund.dto';
-import { RefundResponseDto } from './dto/refund-response.dto';
+import { CreateRefundDto } from './dto/create-refund.dto';
+import {
+  CreateRefundResponseDto,
+  RefundListItemDto,
+} from './dto/refund-response.dto';
 
 @ApiTags('Remboursements')
 @ApiSecurity('api-key')
 @UseGuards(ApiKeyGuard)
-@Controller('refund')
+@Controller('refunds')
 export class RefundsController {
   constructor(private readonly refundsService: RefundsService) {}
 
-  @Post('wave')
+  @Post()
   @ApiOperation({
-    summary: 'Lancer un remboursement Wave',
+    summary: 'Créer un remboursement',
     description:
-      'Crée un remboursement via la fonction edge Wave. La forme de la réponse suit le JSON du fournisseur.',
+      'Rembourse une transaction terminée (carte ou mobile money). Le solde marchand est mis à jour immédiatement. Prise en charge des remboursements totaux et partiels.',
   })
   @ApiResponse({
     status: 201,
-    description: 'Résultat du remboursement (corps JSON de la fonction edge)',
-    type: RefundResponseDto,
+    description: 'Remboursement enregistré',
+    type: CreateRefundResponseDto,
   })
-  @ApiResponse({ status: 400, description: 'Entrée invalide' })
+  @ApiResponse({ status: 400, description: 'Entrée invalide ou type non pris en charge' })
+  async create(
+    @Body() createRefundDto: CreateRefundDto,
+    @CurrentUser() user: AuthContext,
+  ) {
+    return this.refundsService.create(createRefundDto, user);
+  }
+
+  @Get()
+  @ApiOperation({ summary: 'Lister les remboursements' })
+  @ApiQuery({ name: 'status', required: false, type: String })
+  @ApiQuery({ name: 'startDate', required: false, type: String })
+  @ApiQuery({ name: 'endDate', required: false, type: String })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiQuery({ name: 'offset', required: false, type: Number })
+  @ApiResponse({ status: 200, description: 'Liste des remboursements' })
+  async findAll(
+    @CurrentUser() user: AuthContext,
+    @Query('status') status?: string,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+    @Query('limit', new DefaultValuePipe(50), ParseIntPipe) limit = 50,
+    @Query('offset', new DefaultValuePipe(0), ParseIntPipe) offset = 0,
+  ) {
+    return this.refundsService.findAll(
+      user,
+      status,
+      startDate,
+      endDate,
+      limit,
+      offset,
+    );
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Obtenir un remboursement' })
+  @ApiParam({ name: 'id', description: 'Refund ID' })
   @ApiResponse({
-    status: 500,
-    description: 'Échec du traitement du remboursement',
+    status: 200,
+    description: 'Détail du remboursement',
+    type: RefundListItemDto,
   })
-  async createWaveRefund(@Body() createRefundDto: CreateWaveRefundDto) {
-    return this.refundsService.createWaveRefund(createRefundDto);
+  async findOne(@Param('id') id: string, @CurrentUser() user: AuthContext) {
+    return this.refundsService.findOne(id, user);
   }
 }

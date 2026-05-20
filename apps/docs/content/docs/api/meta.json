@@ -16,7 +16,7 @@
     "payment-requests",
     "payout",
     "products",
-    "refund",
+    "refunds",
     "subscriptions",
     "transactions",
     "webhook-delivery-logs",

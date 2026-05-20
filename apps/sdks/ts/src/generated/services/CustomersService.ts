@@ -19,6 +19,19 @@ export class CustomersService {
     }
 
     /**
+     * OpenAPI operationId: `CustomersController_createPortalLaunchSession`.
+     * Créer une session de lancement du portail client
+     */
+    public static async createPortalLaunchSession(id: string, body?: unknown): Promise<any> {
+        return await request<any>({
+            method: 'POST',
+            url: '/customers/{id}/portal-launch-session',
+            path: { id: id },
+            body,
+        });
+    }
+
+    /**
      * OpenAPI operationId: `CustomersController_remove`.
      * Supprimer un client
      */
@@ -39,6 +52,19 @@ export class CustomersService {
             method: 'GET',
             url: '/customers/{id}',
             path: { id: id },
+        });
+    }
+
+    /**
+     * OpenAPI operationId: `CustomersController_getPortalAudit`.
+     * Hosted customer portal audit
+     */
+    public static async getPortalAudit(id: string, options?: Record<string, unknown>): Promise<any> {
+        return await request<any>({
+            method: 'GET',
+            url: '/customers/{id}/portal-audit',
+            path: { id: id },
+            query: options,
         });
     }
 

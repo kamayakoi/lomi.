@@ -1,6 +1,7 @@
 {
   "title": "Charge",
   "pages": [
+    "ChargesController_createMtnCharge",
     "ChargesController_createWaveCharge"
   ]
 }

@@ -1,8 +1,12 @@
 {
   "title": "Webhooks",
   "pages": [
+    "WebhooksController_create",
     "WebhooksController_findAll",
     "WebhooksController_findOne",
+    "WebhooksController_remove",
+    "WebhooksController_retryDelivery",
+    "WebhooksController_test",
     "WebhooksController_update"
   ]
 }

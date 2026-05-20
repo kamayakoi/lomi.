@@ -7,6 +7,9 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { SupabaseService } from '../../utils/supabase/supabase.service';
 import { CreateWavePayoutDto } from './dto/create-payout.dto';
+import { CreateSpiPayoutDto } from './dto/create-spi-payout.dto';
+import { AuthContext } from '../common/decorators/current-user.decorator';
+import { environmentFromAuth } from '../common/auth-environment';
 import { randomUUID } from 'crypto';
 
 @Injectable()
@@ -99,5 +102,91 @@ export class PayoutsService {
       }
       throw new InternalServerErrorException('Payout processing failed');
     }
+  }
+
+  async findAll(
+    user: AuthContext,
+    statuses?: string[],
+    page = 1,
+    pageSize = 50,
+    startDate?: string,
+    endDate?: string,
+  ) {
+    const paymentEnvironment = environmentFromAuth(user);
+    const { data, error } = await this.supabaseService.rpc(
+      'fetch_payouts' as never,
+      {
+        p_merchant_id: user.merchantId,
+        p_statuses: statuses?.length ? statuses : null,
+        p_page_number: page,
+        p_page_size: pageSize,
+        p_start_date: startDate ?? null,
+        p_end_date: endDate ?? null,
+        p_organization_id: user.organizationId,
+        p_environment: paymentEnvironment,
+      } as never,
+    );
+
+    if (error) {
+      throw new BadRequestException(error.message);
+    }
+
+    return { success: true, data: data ?? [] };
+  }
+
+  async createSpiPayout(dto: CreateSpiPayoutDto) {
+    const { amount, currency, payoutMethodId, organizationId, merchantId } = dto;
+
+    const { data: initiated, error: initError } = await this.supabaseService
+      .getClient()
+      .rpc('initiate_spi_payout' as never, {
+        p_organization_id: organizationId,
+        p_merchant_id: merchantId,
+        p_payout_method_id: payoutMethodId,
+        p_amount: amount,
+        p_currency_code: currency,
+      } as never);
+
+    if (initError) {
+      throw new BadRequestException(
+        initError.message ?? 'Failed to initiate SPI payout',
+      );
+    }
+
+    const row = Array.isArray(initiated) ? initiated[0] : initiated;
+    if (!row) {
+      throw new BadRequestException('Failed to initiate SPI payout');
+    }
+
+    const { payout_id: payoutId, spi_tx_id: spiTxId } = row as {
+      payout_id: string;
+      spi_tx_id: string;
+      status: string;
+      message: string;
+    };
+
+    const { error: updateError } = await this.supabaseService
+      .getClient()
+      .rpc('update_spi_payout_status' as never, {
+        p_payout_id: payoutId,
+        p_status: 'processing',
+        p_spi_tx_id: spiTxId,
+      } as never);
+
+    if (updateError) {
+      this.logger.warn(
+        `update_spi_payout_status failed for ${payoutId}: ${updateError.message}`,
+      );
+    }
+
+    return {
+      success: true,
+      data: {
+        payout_id: payoutId,
+        spi_tx_id: spiTxId,
+        status: 'processing',
+        message: 'SPI payout initiated; settlement continues asynchronously.',
+      },
+    };
   }
 }

@@ -1,6 +1,6 @@
 ---
-title: "Créer un Payment Intent carte (client_secret)"
-description: "Créer un Payment Intent carte (client_secret)"
+title: "Créer un intent de paiement carte (client_secret)"
+description: "Créer un intent de paiement carte (client_secret)"
 full: true
 method: post
 path: /payment-intents
@@ -9,14 +9,14 @@ operationId: PaymentIntentsController_create
 
 ## Aperçu
 
-Créer un Payment Intent carte (client_secret)
+Créer un intent de paiement carte (client_secret)
 
-Crée un Payment Intent carte pour une intégration via Payment Element et renvoie le client_secret.
+Crée un intent de paiement carte pour une intégration embarquée et renvoie le client_secret.
 
 
 ### Quand utiliser cet endpoint
 
-Utilisez cet endpoint quand vous devez exécuter `POST /payment-intents` (Créer un Payment Intent carte (client_secret)).
+Utilisez cet endpoint quand vous devez exécuter `POST /payment-intents` (Créer un intent de paiement carte (client_secret)).
 
 
 ## Authentification
@@ -65,7 +65,7 @@ Schéma: `CreatePaymentIntentDto`
 | `subscription_id` | Non | `string` | Optional subscription UUID for metadata and reconciliation |
 | `quantity` | Non | `number` | Optional quantity for internal reconciliation |
 | `metadata` | Non | `object` | Custom metadata merged into provider metadata |
-| `appearance_theme` | Non | `enum ("light", "dark", "flat")` | Thème optionnel de l’interface carte côté client : `light`, `dark` ou `flat`. |
+| `appearance_theme` | Non | `enum ("light", "dark", "flat")` | Optional Payment Element theme for client-side card UI: `light`, `dark`, or `flat`. |
 | `appearance_border_radius` | Non | `number` | Optional Payment Element border radius (px) returned for client-side rendering. |
 | `appearance_billing_address` | Non | `enum ("auto", "never")` | Optional Payment Element billing address collection mode. Use `never` to hide country/address selector in Payment Element UI. |
 
@@ -82,7 +82,7 @@ Exemple de corps :
 
 | Statut | Description |
 | --- | --- |
-| `201` | Payment Intent créé avec succès |
+| `201` | Intent de paiement créé avec succès |
 | `400` | Entrée invalide ou erreur de préparation du montant |
 | `401` | Clé API invalide ou manquante |
 | `503` | Le processeur de paiement carte n’est pas configuré sur cette instance API |

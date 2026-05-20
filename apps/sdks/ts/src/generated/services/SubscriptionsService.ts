@@ -54,4 +54,16 @@ export class SubscriptionsService {
             query: options,
         });
     }
+
+    /**
+     * OpenAPI operationId: `SubscriptionsController_update`.
+     * Mettre à jour un abonnement
+     */
+    public static async update(id: string): Promise<any> {
+        return await request<any>({
+            method: 'PATCH',
+            url: '/subscriptions/{id}',
+            path: { id: id },
+        });
+    }
 }

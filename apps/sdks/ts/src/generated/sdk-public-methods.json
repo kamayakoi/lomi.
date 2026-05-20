@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-08T14:16:39.067Z",
+  "generatedAt": "2026-05-20T06:17:11.714Z",
   "sdk": {
     "accounts": [
       "checkBalance",
@@ -13,6 +13,9 @@
       "get",
       "list"
     ],
+    "charge": [
+      "createMtnCharge"
+    ],
     "charges": [
       "createWaveCharge"
     ],
@@ -23,9 +26,17 @@
     ],
     "customers": [
       "create",
+      "createPortalLaunchSession",
       "delete",
       "get",
+      "getPortalAudit",
       "getTransactions",
+      "list",
+      "update"
+    ],
+    "customerSubscriptions": [
+      "delete",
+      "get",
       "list",
       "update"
     ],
@@ -35,13 +46,21 @@
       "getPerformance",
       "list"
     ],
+    "merchants": [
+      "get",
+      "getArr",
+      "getBalance",
+      "getMrr"
+    ],
     "organizations": [
       "get",
       "getMetrics",
       "list"
     ],
     "paymentIntents": [
-      "create"
+      "cancel",
+      "create",
+      "get"
     ],
     "paymentLinks": [
       "create",
@@ -53,8 +72,12 @@
       "get",
       "list"
     ],
+    "payout": [
+      "createSpiPayout"
+    ],
     "payouts": [
-      "createWavePayout"
+      "createWavePayout",
+      "list"
     ],
     "products": [
       "addPrice",
@@ -63,14 +86,20 @@
       "list",
       "setDefaultPrice"
     ],
+    "providers": [
+      "list"
+    ],
     "refunds": [
-      "createWaveRefund"
+      "create",
+      "get",
+      "list"
     ],
     "subscriptions": [
       "cancel",
       "findByCustomer",
       "get",
-      "list"
+      "list",
+      "update"
     ],
     "transactions": [
       "get",
@@ -81,8 +110,12 @@
       "list"
     ],
     "webhooks": [
+      "create",
+      "delete",
       "get",
       "list",
+      "retryDelivery",
+      "test",
       "update"
     ]
   }

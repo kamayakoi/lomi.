@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Patch,
   Param,
   Query,
   Body,
@@ -20,6 +21,7 @@ import {
 } from '@nestjs/swagger';
 import { SubscriptionsService } from './subscriptions.service';
 import { CancelSubscriptionDto } from './dto/cancel-subscription.dto';
+import { UpdateSubscriptionDto } from './dto/update-subscription.dto';
 import { SubscriptionResponseDto } from './dto/subscription-response.dto';
 import { ApiKeyGuard } from '../common/guards/api-key.guard';
 import {
@@ -131,6 +133,26 @@ export class SubscriptionsController {
   })
   findOne(@Param('id') id: string, @CurrentUser() user: AuthContext) {
     return this.subscriptionsService.findOne(id, user);
+  }
+
+  @Patch(':id')
+  @ApiOperation({
+    summary: 'Mettre à jour un abonnement',
+    description:
+      'Met à jour le statut ou les métadonnées (ex. pause). Les champs tarifaires restent gérés par le système.',
+  })
+  @ApiParam({ name: 'id', description: 'UUID de l’abonnement' })
+  @ApiResponse({
+    status: 200,
+    description: 'Abonnement mis à jour',
+    type: SubscriptionResponseDto,
+  })
+  update(
+    @Param('id') id: string,
+    @Body() updateDto: UpdateSubscriptionDto,
+    @CurrentUser() user: AuthContext,
+  ) {
+    return this.subscriptionsService.update(id, updateDto, user);
   }
 
   @Post(':id/cancel')

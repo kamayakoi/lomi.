@@ -1,0 +1,113 @@
+name: CLI Release
+
+on:
+  push:
+    tags:
+      - 'cli-v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - target: x86_64-apple-darwin
+            os: macos-latest
+            asset: lomi-x86_64-apple-darwin
+          - target: aarch64-apple-darwin
+            os: macos-latest
+            asset: lomi-aarch64-apple-darwin
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+            asset: lomi-x86_64-unknown-linux-gnu
+          - target: x86_64-pc-windows-msvc
+            os: windows-latest
+            asset: lomi-x86_64-pc-windows-msvc.exe
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Generate rules (OpenAPI + llms.txt)
+        working-directory: apps/cli
+        run: ./scripts/generate-rules.sh
+
+      - name: Build
+        working-directory: apps/cli
+        run: cargo build --release --target ${{ matrix.target }}
+
+      - name: Stage release binary
+        shell: bash
+        run: |
+          mkdir -p dist
+          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            cp "apps/cli/target/${{ matrix.target }}/release/lomi.exe" "dist/${{ matrix.asset }}"
+          else
+            cp "apps/cli/target/${{ matrix.target }}/release/lomi" "dist/${{ matrix.asset }}"
+          fi
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.asset }}
+          path: dist/${{ matrix.asset }}
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/cli-v')
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/*
+          generate_release_notes: true
+
+  publish-npm:
+    needs: release
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/cli-v')
+    defaults:
+      run:
+        working-directory: apps/cli/npm
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Sync npm version with tag
+        run: |
+          VERSION="${GITHUB_REF_NAME#cli-v}"
+          npm pkg set version="$VERSION"
+
+      - name: Verify release binaries exist on GitHub
+        run: |
+          VERSION="${GITHUB_REF_NAME#cli-v}"
+          TAG="${GITHUB_REF_NAME}"
+          BASE="https://github.com/${{ github.repository }}/releases/download/${TAG}"
+          for asset in lomi-x86_64-apple-darwin lomi-aarch64-apple-darwin lomi-x86_64-unknown-linux-gnu lomi-x86_64-pc-windows-msvc.exe; do
+            echo "Checking ${BASE}/${asset}"
+            curl -sfI "${BASE}/${asset}" | head -1
+          done
+
+      - name: Publish to npm
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

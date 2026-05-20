@@ -1,7 +1,8 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import {
   ApiBody,
   ApiOperation,
+  ApiParam,
   ApiResponse,
   ApiSecurity,
   ApiTags,
@@ -24,13 +25,13 @@ export class PaymentIntentsController {
 
   @Post()
   @ApiOperation({
-    summary: 'Créer un Payment Intent carte (client_secret)',
+    summary: 'Créer un intent de paiement carte (client_secret)',
     description:
-      'Crée un Payment Intent carte pour une intégration via Payment Element et renvoie le client_secret.',
+      'Crée un intent de paiement carte pour une intégration embarquée et renvoie le client_secret.',
   })
   @ApiResponse({
     status: 201,
-    description: 'Payment Intent créé avec succès',
+    description: 'Intent de paiement créé avec succès',
     type: PaymentIntentResponseDto,
   })
   @ApiResponse({
@@ -81,5 +82,29 @@ export class PaymentIntentsController {
     @CurrentUser() user: AuthContext,
   ) {
     return this.service.create(createDto, user);
+  }
+
+  @Get(':id')
+  @ApiOperation({
+    summary: 'Récupérer un intent de paiement carte',
+    description:
+      'Récupère l’intent de paiement carte et la transaction associée si elle existe.',
+  })
+  @ApiParam({ name: 'id', description: 'Identifiant de l’intent de paiement (pi_...)' })
+  @ApiResponse({
+    status: 200,
+    description: 'Payment Intent',
+    type: PaymentIntentResponseDto,
+  })
+  findOne(@Param('id') id: string, @CurrentUser() user: AuthContext) {
+    return this.service.findOne(id, user);
+  }
+
+  @Post(':id/cancel')
+  @ApiOperation({ summary: 'Annuler un intent de paiement carte' })
+  @ApiParam({ name: 'id', description: 'Identifiant de l’intent de paiement (pi_...)' })
+  @ApiResponse({ status: 200, description: 'Intent de paiement annulé' })
+  cancel(@Param('id') id: string, @CurrentUser() user: AuthContext) {
+    return this.service.cancel(id, user);
   }
 }

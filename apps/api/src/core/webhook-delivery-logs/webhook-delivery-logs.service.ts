@@ -41,39 +41,36 @@ export class WebhookDeliveryLogsService {
 
   /**
    * Get single webhook delivery log by ID
-   * Uses direct query with organization filtering
+   * Uses RPC: get_webhook_delivery_log
    */
   async findOne(id: string, user: AuthContext) {
-    const { data, error } = (await this.supabase
-      .getClient()
-      .from('webhook_delivery_logs')
-      .select('*')
-      .eq('log_id', id)
-      .eq('organization_id', user.organizationId)
-      .single()) as { data: WebhookDeliveryLog | null; error: any };
+    const { data, error } = await this.supabase.rpc(
+      'get_webhook_delivery_log' as never,
+      {
+        p_log_id: id,
+        p_merchant_id: user.merchantId,
+      } as never,
+    );
 
     if (error) {
-      if (error.code === 'PGRST116') {
-        throw new NotFoundException(
-          `Webhook delivery log with ID ${id} not found or access denied`,
-        );
-      }
       throw new Error(error.message);
     }
 
-    if (!data) {
+    const rows = Array.isArray(data) ? data : [];
+    const row = rows[0] as WebhookDeliveryLog | undefined;
+
+    if (!row) {
       throw new NotFoundException(
         `Webhook delivery log with ID ${id} not found or access denied`,
       );
     }
 
-    // Validate ownership
-    if (data.organization_id !== user.organizationId) {
+    if (row.organization_id !== user.organizationId) {
       throw new NotFoundException(
         `Webhook delivery log with ID ${id} not found or access denied`,
       );
     }
 
-    return data;
+    return row;
   }
 }

@@ -170,6 +170,8 @@ Retrieves the current account balance for a merchant in a specific currency.
 
 ## Implementation notes
 
-- All monetary values (`` `mrr` ``, `` `arr` ``, `` `merchant_lifetime_value` ``, `` `balance` ``) are returned in the smallest currency unit (e.g., cents for USD, XOF represents the base unit directly).
+- Cached organization metrics (`` `mrr` ``, `` `arr` ``, `` `merchant_lifetime_value` ``, transaction and customer counts) are **refreshed daily at 03:00 UTC** for live data, and **again when subscriptions change**. `` `as_of_date` `` on MRR/ARR responses reflects the last refresh; balance `` `as_of_date` `` is the account `` `updated_at` ``.
+- `` `merchant_lifetime_value` `` is computed as **average customer LTV × total customers** for the linked organization (live environment).
+- All monetary values are returned in the smallest currency unit (e.g., cents for USD, XOF represents the base unit directly).
 - Dates and times are returned in ISO 8601 format (`` `YYYY-MM-DDTHH:mm:ssZ` ``).
 - See the [Errors](/reference/reference/errors) guide for general error handling information.

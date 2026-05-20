@@ -1,4 +1,5 @@
 import {
+  IsEnum,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -6,22 +7,34 @@ import {
   IsUUID,
   Min,
 } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-export class CreateWaveRefundDto {
-  @ApiProperty({ description: 'The transaction ID to refund' })
+export class CreateRefundDto {
+  @ApiProperty({ description: 'Transaction ID to refund', type: String })
   @IsUUID()
   @IsNotEmpty()
-  transactionId: string;
+  transaction_id: string;
 
-  @ApiProperty({ description: 'Amount to refund' })
+  @ApiProperty({
+    description: 'Amount to refund (same currency as the transaction)',
+    type: Number,
+  })
   @IsNumber()
-  @Min(1)
+  @Min(0.01)
   @IsNotEmpty()
   amount: number;
 
-  @ApiProperty({ description: 'Reason for the refund', required: false })
+  @ApiPropertyOptional({ description: 'Reason for the refund', type: String })
   @IsString()
   @IsOptional()
   reason?: string;
+
+  @ApiPropertyOptional({
+    description:
+      'Full or partial refund. If omitted, full when amount equals transaction gross amount.',
+    enum: ['full', 'partial'],
+  })
+  @IsEnum(['full', 'partial'])
+  @IsOptional()
+  refund_type?: 'full' | 'partial';
 }

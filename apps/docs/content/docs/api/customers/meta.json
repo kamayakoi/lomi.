@@ -2,8 +2,10 @@
   "title": "Customers",
   "pages": [
     "CustomersController_create",
+    "CustomersController_createPortalLaunchSession",
     "CustomersController_findAll",
     "CustomersController_findOne",
+    "CustomersController_getPortalAudit",
     "CustomersController_getTransactions",
     "CustomersController_remove",
     "CustomersController_update"

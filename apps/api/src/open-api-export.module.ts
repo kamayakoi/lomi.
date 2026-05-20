@@ -15,6 +15,9 @@ import { SupabaseModule } from './utils/supabase/supabase.module';
 import { TransactionsModule } from './core/transactions/transactions.module';
 import { AccountsModule } from './core/accounts/accounts.module';
 import { OrganizationsModule } from './core/organizations/organizations.module';
+import { MerchantsModule } from './core/merchants/merchants.module';
+import { ProvidersModule } from './core/providers/providers.module';
+import { CustomerSubscriptionsModule } from './core/customer-subscriptions/customer-subscriptions.module';
 import { CustomersModule } from './core/customers/customers.module';
 import { PaymentRequestsModule } from './core/payment-requests/payment-requests.module';
 import { RefundsModule } from './core/refunds/refunds.module';
@@ -50,6 +53,9 @@ import { AgentModule } from './agent/agent.module';
     SupabaseModule,
     AccountsModule,
     OrganizationsModule,
+    MerchantsModule,
+    ProvidersModule,
+    CustomerSubscriptionsModule,
     TransactionsModule,
     CustomersModule,
     PaymentRequestsModule,

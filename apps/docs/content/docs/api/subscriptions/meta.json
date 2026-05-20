@@ -4,6 +4,7 @@
     "SubscriptionsController_cancel",
     "SubscriptionsController_findAll",
     "SubscriptionsController_findByCustomer",
-    "SubscriptionsController_findOne"
+    "SubscriptionsController_findOne",
+    "SubscriptionsController_update"
   ]
 }

@@ -1,8 +1,13 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { SupabaseService } from '../../utils/supabase/supabase.service';
 import { AuthContext } from '../common/decorators/current-user.decorator';
 import { environmentFromAuth } from '../common/auth-environment';
 import { CancelSubscriptionDto } from './dto/cancel-subscription.dto';
+import { UpdateSubscriptionDto } from './dto/update-subscription.dto';
 
 @Injectable()
 export class SubscriptionsService {
@@ -72,6 +77,34 @@ export class SubscriptionsService {
    * Note: cancellation_reason is accepted but currently only logged.
    * Future enhancement: Store in audit log or metadata table.
    */
+  async update(id: string, updateDto: UpdateSubscriptionDto, user: AuthContext) {
+    await this.findOne(id, user);
+
+    const { data: updated, error } = await this.supabase.getClient().rpc(
+      'update_customer_subscription' as never,
+      {
+        p_subscription_id: id,
+        p_merchant_id: user.merchantId,
+        p_status: updateDto.status ?? null,
+        p_start_date: updateDto.start_date ?? null,
+        p_end_date: updateDto.end_date ?? null,
+        p_next_billing_date: updateDto.next_billing_date ?? null,
+        p_metadata: updateDto.metadata ?? null,
+      } as never,
+    );
+
+    if (error) {
+      throw new BadRequestException(error.message);
+    }
+    if (!updated) {
+      throw new NotFoundException(
+        `Subscription with ID ${id} not found or update failed`,
+      );
+    }
+
+    return this.findOne(id, user);
+  }
+
   async cancel(
     id: string,
     cancelDto: CancelSubscriptionDto,

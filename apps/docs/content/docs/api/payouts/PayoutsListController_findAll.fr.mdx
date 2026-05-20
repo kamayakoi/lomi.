@@ -1,0 +1,76 @@
+---
+title: "Lister les virements"
+description: "Lister les virements"
+full: true
+method: get
+path: /payouts
+operationId: PayoutsListController_findAll
+---
+
+## Aperçu
+
+Lister les virements
+
+Liste les virements du marchand pour l’organisation (RPC fetch_payouts).
+
+
+### Quand utiliser cet endpoint
+
+Utilisez cet endpoint quand vous devez exécuter `GET /payouts` (Lister les virements).
+
+
+## Authentification
+
+Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (voir [Aperçu de l’intégration](/reference/setup/overview)). Utilisez une clé **test** avec `https://sandbox.api.lomi.africa` et une clé **live** avec `https://api.lomi.africa`.
+
+## Point de terminaison
+
+`GET /payouts`
+
+URLs de base :
+
+- `https://sandbox.api.lomi.africa`
+- `https://api.lomi.africa`
+
+## Requête
+
+### Paramètres de chemin
+
+_Aucun paramètre de chemin au-delà du motif d’URL._
+
+
+### Paramètres de requête
+
+| Nom | Emplacement | Obligatoire | Schéma | Description |
+| --- | --- | --- | --- | --- |
+| `endDate` | query | Non | — |  |
+| `startDate` | query | Non | — |  |
+| `pageSize` | query | Non | — |  |
+| `page` | query | Non | — |  |
+| `status` | query | Non | — |  |
+
+
+
+## Réponses
+
+| Statut | Description |
+| --- | --- |
+| `200` | Liste des virements |
+
+## Erreurs
+
+Les erreurs suivent le format JSON standard (code de statut et message lisible par machine). Validez les entrées avant appel ; **401** indique une clé manquante/invalide, **404** une ressource introuvable pour cette organisation, **429** une limitation de débit. Pour les retries sûrs sur les créations, envoyez une clé d’idempotence quand votre flux le permet.
+
+## Exemple
+
+```bash
+curl -sS -X GET "https://sandbox.api.lomi.africa/payouts?endDate=value&startDate=value" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+
+## OpenAPI
+
+- **operationId**: `PayoutsListController_findAll`
+- **Operation**: `GET /payouts`
+
+Schémas complets et **Try it** : [référence API](/api/index). Contrat machine : `openapi.json` à la racine des docs.

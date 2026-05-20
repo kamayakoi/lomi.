@@ -29,7 +29,7 @@ async function bootstrap() {
     beneficiary: { name: 'Test User', phoneNumber: '+221771234567' },
   });
 
-  console.log(await lomi.refunds.createWaveRefund({
+  console.log(await lomi.refunds.create({
     transactionId: '123e4567-e89b-12d3-a456-426614174000',
     amount: 1000,
     reason: 'duplicate_charge',

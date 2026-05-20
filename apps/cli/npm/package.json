@@ -1,0 +1,57 @@
+{
+  "name": "lomi.cli",
+  "version": "3.0.0",
+  "description": "Command line interface for lomi.'s payment infrastructure",
+  "bin": {
+    "lomi": "bin/lomi.js",
+    "lomi.": "bin/lomi.js"
+  },
+  "scripts": {
+    "postinstall": "node install.js"
+  },
+  "files": [
+    "bin",
+    "install.js",
+    "README.md"
+  ],
+  "keywords": [
+    "lomi.",
+    "lomi.cli",
+    "cli",
+    "payments",
+    "africa",
+    "west-africa",
+    "mobile money",
+    "payment service provider",
+    "payment stack",
+    "unified api",
+    "cards",
+    "payment infrastructure",
+    "api",
+    "typescript",
+    "payment",
+    "orange",
+    "wave",
+    "products",
+    "subscriptions",
+    "payment-gateway",
+    "mtn",
+    "digital-products",
+    "payment-orchestration",
+    "merchant-of-record"
+  ],
+  "author": "lomi. <hello@lomi.africa> (https://lomi.africa)",
+  "license": "MIT",
+  "homepage": "https://lomi.africa",
+  "bugs": {
+    "url": "https://github.com/lomiafrica/lomi./issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lomiafrica/lomi..git",
+    "directory": "apps/cli/npm"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

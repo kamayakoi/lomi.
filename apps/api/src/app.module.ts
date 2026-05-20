@@ -29,6 +29,9 @@ import { WebhooksModule } from './webhooks/webhooks.module';
 import { ApiLoggingInterceptor } from './core/interceptors/api-logging.interceptor';
 import { ChargesModule } from './core/charges/charges.module';
 import { PaymentIntentsModule } from './core/payment-intents/payment-intents.module';
+import { MerchantsModule } from './core/merchants/merchants.module';
+import { ProvidersModule } from './core/providers/providers.module';
+import { CustomerSubscriptionsModule } from './core/customer-subscriptions/customer-subscriptions.module';
 
 const logger = new Logger('RedisConfig');
 
@@ -134,6 +137,9 @@ const logger = new Logger('RedisConfig');
     WebhooksModule,
     ChargesModule,
     PaymentIntentsModule,
+    MerchantsModule,
+    ProvidersModule,
+    CustomerSubscriptionsModule,
     AgentModule,
   ],
 

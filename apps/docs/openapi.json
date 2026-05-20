@@ -26,7 +26,9 @@
           }
         ],
         "summary": "Lister les comptes",
-        "tags": ["Comptes"]
+        "tags": [
+          "Comptes"
+        ]
       }
     },
     "/accounts/balance": {
@@ -40,7 +42,11 @@
             "in": "query",
             "description": "Filtrer par code devise (XOF, USD, EUR)",
             "schema": {
-              "enum": ["XOF", "USD", "EUR"],
+              "enum": [
+                "XOF",
+                "USD",
+                "EUR"
+              ],
               "type": "string"
             }
           }
@@ -66,7 +72,9 @@
           }
         ],
         "summary": "Solde du compte",
-        "tags": ["Comptes"]
+        "tags": [
+          "Comptes"
+        ]
       }
     },
     "/accounts/balance/breakdown": {
@@ -80,7 +88,11 @@
             "in": "query",
             "description": "Devise cible pour la conversion (XOF, USD, EUR)",
             "schema": {
-              "enum": ["XOF", "USD", "EUR"],
+              "enum": [
+                "XOF",
+                "USD",
+                "EUR"
+              ],
               "type": "string"
             }
           }
@@ -106,7 +118,9 @@
           }
         ],
         "summary": "Détail du solde",
-        "tags": ["Comptes"]
+        "tags": [
+          "Comptes"
+        ]
       }
     },
     "/accounts/balance/check/{currency}": {
@@ -142,7 +156,9 @@
           }
         ],
         "summary": "Vérifier le solde disponible",
-        "tags": ["Comptes"]
+        "tags": [
+          "Comptes"
+        ]
       }
     },
     "/accounts/{id}": {
@@ -170,7 +186,9 @@
           }
         ],
         "summary": "Obtenir un compte par ID",
-        "tags": ["Comptes"]
+        "tags": [
+          "Comptes"
+        ]
       }
     },
     "/organizations": {
@@ -199,7 +217,9 @@
           }
         ],
         "summary": "Détails de l'organisation",
-        "tags": ["Organisations"]
+        "tags": [
+          "Organisations"
+        ]
       }
     },
     "/organizations/metrics": {
@@ -225,7 +245,9 @@
           }
         ],
         "summary": "Indicateurs de l'organisation",
-        "tags": ["Organisations"]
+        "tags": [
+          "Organisations"
+        ]
       }
     },
     "/organizations/{id}": {
@@ -254,7 +276,568 @@
           }
         ],
         "summary": "Organisation par ID",
-        "tags": ["Organisations"]
+        "tags": [
+          "Organisations"
+        ]
+      }
+    },
+    "/merchants/{id}": {
+      "get": {
+        "description": "Returns merchant profile and organization metrics (MRR, ARR, LTV). Metrics are refreshed daily and on subscription changes.",
+        "operationId": "MerchantsController_getDetails",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Merchant UUID",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MerchantResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Merchant ID mismatch"
+          },
+          "404": {
+            "description": "Merchant not found"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Get merchant details",
+        "tags": [
+          "Merchants"
+        ]
+      }
+    },
+    "/merchants/{id}/mrr": {
+      "get": {
+        "operationId": "MerchantsController_getMrr",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Merchant UUID",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MerchantMrrResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Get merchant MRR",
+        "tags": [
+          "Merchants"
+        ]
+      }
+    },
+    "/merchants/{id}/arr": {
+      "get": {
+        "operationId": "MerchantsController_getArr",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Merchant UUID",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MerchantArrResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Get merchant ARR",
+        "tags": [
+          "Merchants"
+        ]
+      }
+    },
+    "/merchants/{id}/balance": {
+      "get": {
+        "operationId": "MerchantsController_getBalance",
+        "parameters": [
+          {
+            "name": "currency_code",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "XOF",
+                "USD",
+                "EUR"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Merchant UUID",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MerchantBalanceResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing currency_code"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Get merchant account balance for a currency",
+        "tags": [
+          "Merchants"
+        ]
+      }
+    },
+    "/providers": {
+      "get": {
+        "description": "Returns connection status for payment providers configured for your organization.",
+        "operationId": "ProvidersController_findAll",
+        "parameters": [
+          {
+            "name": "provider_code",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "STRIPE",
+                "WAVE",
+                "MTN",
+                "SPI"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Provider settings"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "List payment providers",
+        "tags": [
+          "Providers"
+        ]
+      }
+    },
+    "/customer-subscriptions": {
+      "get": {
+        "operationId": "CustomerSubscriptionsController_findAll",
+        "parameters": [
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {}
+          },
+          {
+            "name": "customer_id",
+            "required": false,
+            "in": "query",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "List customer subscriptions",
+        "tags": [
+          "Customer subscriptions"
+        ]
+      }
+    },
+    "/customer-subscriptions/{subscription_id}": {
+      "get": {
+        "operationId": "CustomerSubscriptionsController_findOne",
+        "parameters": [
+          {
+            "name": "subscription_id",
+            "required": true,
+            "in": "path",
+            "description": "Subscription UUID",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Get customer subscription",
+        "tags": [
+          "Customer subscriptions"
+        ]
+      },
+      "patch": {
+        "operationId": "CustomerSubscriptionsController_update",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Update customer subscription",
+        "tags": [
+          "Customer subscriptions"
+        ]
+      },
+      "delete": {
+        "operationId": "CustomerSubscriptionsController_remove",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Cancel customer subscription",
+        "tags": [
+          "Customer subscriptions"
+        ]
+      }
+    },
+    "/subscriptions": {
+      "get": {
+        "description": "Renvoie tous les abonnements de l'organisation du marchand authentifié. Les abonnements sont créés automatiquement lorsque les clients effectuent des paiements récurrents.",
+        "operationId": "SubscriptionsController_findAll",
+        "parameters": [
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "Nombre d'éléments par page",
+            "schema": {
+              "example": 50,
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Numéro de page",
+            "schema": {
+              "example": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des abonnements",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SubscriptionResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Clé API invalide ou manquante"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Lister les abonnements",
+        "tags": [
+          "Abonnements"
+        ]
+      }
+    },
+    "/subscriptions/customer/{customerId}": {
+      "get": {
+        "description": "Renvoie les abonnements d'un client. Réponse 404 si le client n'existe pas ou n'est pas accessible avec cette clé API.",
+        "operationId": "SubscriptionsController_findByCustomer",
+        "parameters": [
+          {
+            "name": "customerId",
+            "required": true,
+            "in": "path",
+            "description": "UUID du client",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des abonnements du client",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SubscriptionResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Clé API invalide ou manquante"
+          },
+          "404": {
+            "description": "Client introuvable ou accès refusé"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Abonnements d’un client",
+        "tags": [
+          "Abonnements"
+        ]
+      }
+    },
+    "/subscriptions/{id}": {
+      "get": {
+        "description": "Renvoie un abonnement. Réponse 404 s'il n'existe pas ou n'est pas accessible avec cette clé API.",
+        "operationId": "SubscriptionsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "UUID de l’abonnement",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Détails de l’abonnement",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Clé API invalide ou manquante"
+          },
+          "404": {
+            "description": "Abonnement introuvable ou accès refusé"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Obtenir un abonnement par ID",
+        "tags": [
+          "Abonnements"
+        ]
+      },
+      "patch": {
+        "description": "Met à jour le statut ou les métadonnées (ex. pause). Les champs tarifaires restent gérés par le système.",
+        "operationId": "SubscriptionsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "UUID de l’abonnement",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Abonnement mis à jour",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Mettre à jour un abonnement",
+        "tags": [
+          "Abonnements"
+        ]
+      }
+    },
+    "/subscriptions/{id}/cancel": {
+      "post": {
+        "description": "Résilie un abonnement actif. C'est la seule modification autorisée sur un abonnement. Prix, dates de facturation et autres champs sont gérés par le système.",
+        "operationId": "SubscriptionsController_cancel",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "UUID de l’abonnement",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "cancellation_reason": {
+                    "type": "string"
+                  }
+                }
+              },
+              "examples": {
+                "withReason": {
+                  "summary": "Résiliation avec motif",
+                  "value": {
+                    "cancellation_reason": "Demande du client"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Abonnement résilié avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Clé API invalide ou manquante"
+          },
+          "404": {
+            "description": "Abonnement introuvable ou accès refusé"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Résilier un abonnement",
+        "tags": [
+          "Abonnements"
+        ]
       }
     },
     "/transactions": {
@@ -387,7 +970,9 @@
           }
         ],
         "summary": "Lister les transactions",
-        "tags": ["Transactions"]
+        "tags": [
+          "Transactions"
+        ]
       }
     },
     "/transactions/{id}": {
@@ -429,7 +1014,9 @@
           }
         ],
         "summary": "Obtenir une transaction par ID",
-        "tags": ["Transactions"]
+        "tags": [
+          "Transactions"
+        ]
       }
     },
     "/customers": {
@@ -463,7 +1050,11 @@
             "in": "query",
             "description": "Filtrer par activité (active = au moins une transaction, inactive = aucune transaction)",
             "schema": {
-              "enum": ["active", "inactive", "all"],
+              "enum": [
+                "active",
+                "inactive",
+                "all"
+              ],
               "type": "string"
             }
           },
@@ -473,7 +1064,11 @@
             "in": "query",
             "description": "Filtrer par type de client",
             "schema": {
-              "enum": ["business", "individual", "all"],
+              "enum": [
+                "business",
+                "individual",
+                "all"
+              ],
               "type": "string"
             }
           },
@@ -536,7 +1131,9 @@
           }
         ],
         "summary": "Lister les clients",
-        "tags": ["Clients"]
+        "tags": [
+          "Clients"
+        ]
       },
       "post": {
         "description": "Crée un client dans votre organisation. Il est automatiquement rattaché à votre organisation.",
@@ -548,7 +1145,9 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["name"],
+                "required": [
+                  "name"
+                ],
                 "properties": {
                   "name": {
                     "type": "string",
@@ -621,7 +1220,9 @@
           }
         ],
         "summary": "Créer un client",
-        "tags": ["Clients"]
+        "tags": [
+          "Clients"
+        ]
       }
     },
     "/customers/{id}": {
@@ -663,7 +1264,9 @@
           }
         ],
         "summary": "Obtenir un client par ID",
-        "tags": ["Clients"]
+        "tags": [
+          "Clients"
+        ]
       },
       "patch": {
         "description": "Met à jour un client. N'envoyez que les champs à modifier. Réponse 404 si le client n'existe pas ou n'est pas accessible avec cette clé API.",
@@ -750,7 +1353,9 @@
           }
         ],
         "summary": "Mettre à jour un client",
-        "tags": ["Clients"]
+        "tags": [
+          "Clients"
+        ]
       },
       "delete": {
         "description": "Retire un client de l'usage actif : il n'apparaît plus dans les listes ni les réponses de détail. Réponse 404 si le client n'existe pas ou n'est pas accessible avec cette clé API.",
@@ -795,7 +1400,67 @@
           }
         ],
         "summary": "Supprimer un client",
-        "tags": ["Clients"]
+        "tags": [
+          "Clients"
+        ]
+      }
+    },
+    "/customers/{id}/portal-audit": {
+      "get": {
+        "description": "Liste les évènements portal (sessions, OTP, souscriptions self-service) pour ce client.",
+        "operationId": "CustomersController_getPortalAudit",
+        "parameters": [
+          {
+            "name": "eventType",
+            "required": false,
+            "in": "query",
+            "description": "Filtre sur customer_portal_audit_events.event_type",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": 50,
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "UUID du client",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Chronologie paginée des évènements portal"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Hosted customer portal audit",
+        "tags": [
+          "Clients"
+        ]
       }
     },
     "/customers/{id}/transactions": {
@@ -840,7 +1505,85 @@
           }
         ],
         "summary": "Transactions du client",
-        "tags": ["Clients"]
+        "tags": [
+          "Clients"
+        ]
+      }
+    },
+    "/customers/{id}/portal-launch-session": {
+      "post": {
+        "description": "Génère un lien hébergé à usage unique vers le portail client pour un client de votre organisation. Destiné aux applications marchandes (backend) via clé API.",
+        "operationId": "CustomersController_createPortalLaunchSession",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "UUID du client",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "return_url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "flow_type": {
+                    "type": "string",
+                    "enum": [
+                      "portal_home",
+                      "subscription_cancel",
+                      "subscription_manage"
+                    ]
+                  },
+                  "flow_subscription_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "flow_after_completion_url": {
+                    "type": "string",
+                    "format": "uri"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Session de lancement créée",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortalLaunchSessionResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Clé API invalide ou manquante"
+          },
+          "404": {
+            "description": "Client introuvable ou accès refusé"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Créer une session de lancement du portail client",
+        "tags": [
+          "Clients"
+        ]
       }
     },
     "/payment-requests": {
@@ -854,14 +1597,22 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["amount", "currency_code", "expiry_date"],
+                "required": [
+                  "amount",
+                  "currency_code",
+                  "expiry_date"
+                ],
                 "properties": {
                   "amount": {
                     "type": "number"
                   },
                   "currency_code": {
                     "type": "string",
-                    "enum": ["XOF", "USD", "EUR"]
+                    "enum": [
+                      "XOF",
+                      "USD",
+                      "EUR"
+                    ]
                   },
                   "description": {
                     "type": "string"
@@ -922,7 +1673,9 @@
           }
         ],
         "summary": "Créer une demande de paiement",
-        "tags": ["Demandes de paiement"]
+        "tags": [
+          "Demandes de paiement"
+        ]
       },
       "get": {
         "description": "Renvoie toutes les demandes de l'organisation avec pagination et filtres optionnels (statut, client).",
@@ -963,7 +1716,12 @@
             "in": "query",
             "description": "Filtrer par statut",
             "schema": {
-              "enum": ["pending", "completed", "failed", "expired"],
+              "enum": [
+                "pending",
+                "completed",
+                "failed",
+                "expired"
+              ],
               "type": "string"
             }
           }
@@ -1006,7 +1764,9 @@
           }
         ],
         "summary": "Lister les demandes de paiement",
-        "tags": ["Demandes de paiement"]
+        "tags": [
+          "Demandes de paiement"
+        ]
       }
     },
     "/payment-requests/{id}": {
@@ -1048,30 +1808,29 @@
           }
         ],
         "summary": "Obtenir une demande de paiement par ID",
-        "tags": ["Demandes de paiement"]
+        "tags": [
+          "Demandes de paiement"
+        ]
       }
     },
-    "/refund/wave": {
+    "/refunds": {
       "post": {
-        "description": "Crée un remboursement via la fonction edge Wave. La forme de la réponse suit le JSON du fournisseur.",
-        "operationId": "RefundsController_createWaveRefund",
+        "description": "Rembourse une transaction terminée (carte ou mobile money). Le solde marchand est mis à jour immédiatement. Prise en charge des remboursements totaux et partiels.",
+        "operationId": "RefundsController_create",
         "parameters": [],
         "responses": {
           "201": {
-            "description": "Résultat du remboursement (corps JSON de la fonction edge)",
+            "description": "Remboursement enregistré",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RefundResponseDto"
+                  "$ref": "#/components/schemas/CreateRefundResponseDto"
                 }
               }
             }
           },
           "400": {
-            "description": "Entrée invalide"
-          },
-          "500": {
-            "description": "Échec du traitement du remboursement"
+            "description": "Entrée invalide ou type non pris en charge"
           }
         },
         "security": [
@@ -1079,8 +1838,104 @@
             "api-key": []
           }
         ],
-        "summary": "Lancer un remboursement Wave",
-        "tags": ["Remboursements"]
+        "summary": "Créer un remboursement",
+        "tags": [
+          "Remboursements"
+        ]
+      },
+      "get": {
+        "operationId": "RefundsController_findAll",
+        "parameters": [
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des remboursements"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Lister les remboursements",
+        "tags": [
+          "Remboursements"
+        ]
+      }
+    },
+    "/refunds/{id}": {
+      "get": {
+        "operationId": "RefundsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Refund ID",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Détail du remboursement",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefundListItemDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Obtenir un remboursement",
+        "tags": [
+          "Remboursements"
+        ]
       }
     },
     "/products": {
@@ -1142,7 +1997,9 @@
           }
         ],
         "summary": "Lister les produits",
-        "tags": ["Produits"]
+        "tags": [
+          "Produits"
+        ]
       },
       "post": {
         "description": "Crée un produit avec un ou plusieurs tarifs en une seule requête. Au moins un prix est requis. Le premier prix, ou celui avec `is_default`, est utilisé lorsque aucun prix n'est précisé au paiement.",
@@ -1172,7 +2029,9 @@
           }
         ],
         "summary": "Créer un produit",
-        "tags": ["Produits"]
+        "tags": [
+          "Produits"
+        ]
       }
     },
     "/products/{id}": {
@@ -1214,7 +2073,9 @@
           }
         ],
         "summary": "Obtenir un produit par ID",
-        "tags": ["Produits"]
+        "tags": [
+          "Produits"
+        ]
       }
     },
     "/products/{id}/prices": {
@@ -1259,7 +2120,9 @@
           }
         ],
         "summary": "Ajouter un prix à un produit",
-        "tags": ["Produits"]
+        "tags": [
+          "Produits"
+        ]
       }
     },
     "/products/{id}/prices/{priceId}/set-default": {
@@ -1310,212 +2173,9 @@
           }
         ],
         "summary": "Définir le prix par défaut",
-        "tags": ["Produits"]
-      }
-    },
-    "/subscriptions": {
-      "get": {
-        "description": "Renvoie tous les abonnements de l'organisation du marchand authentifié. Les abonnements sont créés automatiquement lorsque les clients effectuent des paiements récurrents.",
-        "operationId": "SubscriptionsController_findAll",
-        "parameters": [
-          {
-            "name": "pageSize",
-            "required": false,
-            "in": "query",
-            "description": "Nombre d'éléments par page",
-            "schema": {
-              "example": 50,
-              "type": "number"
-            }
-          },
-          {
-            "name": "page",
-            "required": false,
-            "in": "query",
-            "description": "Numéro de page",
-            "schema": {
-              "example": 1,
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Liste des abonnements",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/SubscriptionResponseDto"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Clé API invalide ou manquante"
-          }
-        },
-        "security": [
-          {
-            "api-key": []
-          }
-        ],
-        "summary": "Lister les abonnements",
-        "tags": ["Abonnements"]
-      }
-    },
-    "/subscriptions/customer/{customerId}": {
-      "get": {
-        "description": "Renvoie les abonnements d'un client. Réponse 404 si le client n'existe pas ou n'est pas accessible avec cette clé API.",
-        "operationId": "SubscriptionsController_findByCustomer",
-        "parameters": [
-          {
-            "name": "customerId",
-            "required": true,
-            "in": "path",
-            "description": "UUID du client",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Liste des abonnements du client",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/SubscriptionResponseDto"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Clé API invalide ou manquante"
-          },
-          "404": {
-            "description": "Client introuvable ou accès refusé"
-          }
-        },
-        "security": [
-          {
-            "api-key": []
-          }
-        ],
-        "summary": "Abonnements d’un client",
-        "tags": ["Abonnements"]
-      }
-    },
-    "/subscriptions/{id}": {
-      "get": {
-        "description": "Renvoie un abonnement. Réponse 404 s'il n'existe pas ou n'est pas accessible avec cette clé API.",
-        "operationId": "SubscriptionsController_findOne",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "description": "UUID de l’abonnement",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Détails de l’abonnement",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SubscriptionResponseDto"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Clé API invalide ou manquante"
-          },
-          "404": {
-            "description": "Abonnement introuvable ou accès refusé"
-          }
-        },
-        "security": [
-          {
-            "api-key": []
-          }
-        ],
-        "summary": "Obtenir un abonnement par ID",
-        "tags": ["Abonnements"]
-      }
-    },
-    "/subscriptions/{id}/cancel": {
-      "post": {
-        "description": "Résilie un abonnement actif. C'est la seule modification autorisée sur un abonnement. Prix, dates de facturation et autres champs sont gérés par le système.",
-        "operationId": "SubscriptionsController_cancel",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "description": "UUID de l’abonnement",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "cancellation_reason": {
-                    "type": "string"
-                  }
-                }
-              },
-              "examples": {
-                "withReason": {
-                  "summary": "Résiliation avec motif",
-                  "value": {
-                    "cancellation_reason": "Demande du client"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Abonnement résilié avec succès",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SubscriptionResponseDto"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Clé API invalide ou manquante"
-          },
-          "404": {
-            "description": "Abonnement introuvable ou accès refusé"
-          }
-        },
-        "security": [
-          {
-            "api-key": []
-          }
-        ],
-        "summary": "Résilier un abonnement",
-        "tags": ["Abonnements"]
+        "tags": [
+          "Produits"
+        ]
       }
     },
     "/discount-coupons": {
@@ -1547,7 +2207,9 @@
           }
         ],
         "summary": "Lister les coupons",
-        "tags": ["Coupons de réduction"]
+        "tags": [
+          "Coupons de réduction"
+        ]
       },
       "post": {
         "description": "Crée un coupon dans votre organisation. Le code sera automatiquement mis en majuscules.",
@@ -1577,7 +2239,9 @@
           }
         ],
         "summary": "Créer un coupon",
-        "tags": ["Coupons de réduction"]
+        "tags": [
+          "Coupons de réduction"
+        ]
       }
     },
     "/discount-coupons/{id}/performance": {
@@ -1636,7 +2300,9 @@
           }
         ],
         "summary": "Indicateurs de performance du coupon",
-        "tags": ["Coupons de réduction"]
+        "tags": [
+          "Coupons de réduction"
+        ]
       }
     },
     "/discount-coupons/{id}": {
@@ -1678,7 +2344,9 @@
           }
         ],
         "summary": "Obtenir un coupon par ID",
-        "tags": ["Coupons de réduction"]
+        "tags": [
+          "Coupons de réduction"
+        ]
       }
     },
     "/checkout-sessions": {
@@ -1693,7 +2361,9 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["currency_code"],
+                "required": [
+                  "currency_code"
+                ],
                 "properties": {
                   "amount": {
                     "type": "number",
@@ -1701,7 +2371,11 @@
                   },
                   "currency_code": {
                     "type": "string",
-                    "enum": ["XOF", "USD", "EUR"],
+                    "enum": [
+                      "XOF",
+                      "USD",
+                      "EUR"
+                    ],
                     "example": "XOF"
                   },
                   "title": {
@@ -1780,7 +2454,9 @@
                     "type": "array",
                     "items": {
                       "type": "object",
-                      "required": ["price_id"],
+                      "required": [
+                        "price_id"
+                      ],
                       "properties": {
                         "price_id": {
                           "type": "string",
@@ -1849,7 +2525,9 @@
           }
         ],
         "summary": "Créer une session de paiement",
-        "tags": ["Sessions de paiement"]
+        "tags": [
+          "Sessions de paiement"
+        ]
       },
       "get": {
         "description": "Renvoie les sessions de l'organisation avec pagination et filtre de statut optionnel.",
@@ -1881,7 +2559,11 @@
             "in": "query",
             "description": "Filtrer par statut de session (valeur checkout_session_status)",
             "schema": {
-              "enum": ["open", "completed", "expired"],
+              "enum": [
+                "open",
+                "completed",
+                "expired"
+              ],
               "type": "string"
             }
           }
@@ -1910,7 +2592,9 @@
           }
         ],
         "summary": "Lister les sessions de paiement",
-        "tags": ["Sessions de paiement"]
+        "tags": [
+          "Sessions de paiement"
+        ]
       }
     },
     "/checkout-sessions/{id}": {
@@ -1952,7 +2636,9 @@
           }
         ],
         "summary": "Obtenir une session de paiement par ID",
-        "tags": ["Sessions de paiement"]
+        "tags": [
+          "Sessions de paiement"
+        ]
       }
     },
     "/payment-links": {
@@ -1966,18 +2652,29 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["link_type", "title", "currency_code"],
+                "required": [
+                  "link_type",
+                  "title",
+                  "currency_code"
+                ],
                 "properties": {
                   "link_type": {
                     "type": "string",
-                    "enum": ["product", "instant"]
+                    "enum": [
+                      "product",
+                      "instant"
+                    ]
                   },
                   "title": {
                     "type": "string"
                   },
                   "currency_code": {
                     "type": "string",
-                    "enum": ["XOF", "USD", "EUR"]
+                    "enum": [
+                      "XOF",
+                      "USD",
+                      "EUR"
+                    ]
                   },
                   "description": {
                     "type": "string"
@@ -2067,7 +2764,9 @@
           }
         ],
         "summary": "Créer un lien de paiement",
-        "tags": ["Liens de paiement"]
+        "tags": [
+          "Liens de paiement"
+        ]
       },
       "get": {
         "description": "Renvoie tous les liens de l'organisation avec pagination et filtres optionnels (type, actif).",
@@ -2108,7 +2807,10 @@
             "in": "query",
             "description": "Filtrer par type de lien",
             "schema": {
-              "enum": ["product", "instant"],
+              "enum": [
+                "product",
+                "instant"
+              ],
               "type": "string"
             }
           }
@@ -2151,7 +2853,9 @@
           }
         ],
         "summary": "Lister les liens de paiement",
-        "tags": ["Liens de paiement"]
+        "tags": [
+          "Liens de paiement"
+        ]
       }
     },
     "/payment-links/{id}": {
@@ -2193,7 +2897,9 @@
           }
         ],
         "summary": "Obtenir un lien de paiement par ID",
-        "tags": ["Liens de paiement"]
+        "tags": [
+          "Liens de paiement"
+        ]
       }
     },
     "/payout/wave": {
@@ -2225,7 +2931,103 @@
           }
         ],
         "summary": "Lancer un virement Wave",
-        "tags": ["Virements sortants"]
+        "tags": [
+          "Virements sortants"
+        ]
+      }
+    },
+    "/payout/spi": {
+      "post": {
+        "description": "Initie un virement instantané SPI (RPC initiate_spi_payout). Le règlement PI-SPI se poursuit de façon asynchrone.",
+        "operationId": "PayoutsController_createSpiPayout",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Virement SPI initié",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Lancer un virement SPI",
+        "tags": [
+          "Virements sortants"
+        ]
+      }
+    },
+    "/payouts": {
+      "get": {
+        "description": "Liste les virements du marchand pour l’organisation (RPC fetch_payouts).",
+        "operationId": "PayoutsListController_findAll",
+        "parameters": [
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des virements"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Lister les virements",
+        "tags": [
+          "Virements sortants"
+        ]
       }
     },
     "/beneficiary-payouts": {
@@ -2257,7 +3059,9 @@
           }
         ],
         "summary": "Lancer un paiement vers un bénéficiaire",
-        "tags": ["Paiements vers bénéficiaires"]
+        "tags": [
+          "Paiements vers bénéficiaires"
+        ]
       },
       "get": {
         "description": "Renvoie les paiements de l'organisation avec pagination et filtres optionnels (statuts, plage de dates, devise).",
@@ -2357,7 +3161,9 @@
           }
         ],
         "summary": "Lister les paiements vers bénéficiaires",
-        "tags": ["Paiements vers bénéficiaires"]
+        "tags": [
+          "Paiements vers bénéficiaires"
+        ]
       }
     },
     "/beneficiary-payouts/{id}": {
@@ -2399,7 +3205,9 @@
           }
         ],
         "summary": "Obtenir un paiement bénéficiaire par ID",
-        "tags": ["Paiements vers bénéficiaires"]
+        "tags": [
+          "Paiements vers bénéficiaires"
+        ]
       }
     },
     "/webhook-delivery-logs": {
@@ -2481,7 +3289,9 @@
           }
         ],
         "summary": "Lister les journaux de livraison",
-        "tags": ["Journaux de livraison webhooks"]
+        "tags": [
+          "Journaux de livraison webhooks"
+        ]
       }
     },
     "/webhook-delivery-logs/{id}": {
@@ -2523,10 +3333,30 @@
           }
         ],
         "summary": "Obtenir un journal de livraison par ID",
-        "tags": ["Journaux de livraison webhooks"]
+        "tags": [
+          "Journaux de livraison webhooks"
+        ]
       }
     },
     "/webhooks": {
+      "post": {
+        "operationId": "WebhooksController_create",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Webhook créé"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Créer un webhook",
+        "tags": [
+          "Webhooks"
+        ]
+      },
       "get": {
         "operationId": "WebhooksController_findAll",
         "parameters": [],
@@ -2551,7 +3381,72 @@
           }
         ],
         "summary": "Lister les webhooks",
-        "tags": ["Webhooks"]
+        "tags": [
+          "Webhooks"
+        ]
+      }
+    },
+    "/webhooks/{id}/test": {
+      "post": {
+        "operationId": "WebhooksController_test",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Webhook UUID",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Envoyer un événement test au webhook",
+        "tags": [
+          "Webhooks"
+        ]
+      }
+    },
+    "/webhooks/{webhookId}/logs/{logId}/retry": {
+      "post": {
+        "operationId": "WebhooksController_retryDelivery",
+        "parameters": [
+          {
+            "name": "logId",
+            "required": true,
+            "in": "path",
+            "description": "Delivery log UUID",
+            "schema": {}
+          },
+          {
+            "name": "webhookId",
+            "required": true,
+            "in": "path",
+            "description": "Webhook UUID",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Relancer une livraison webhook",
+        "tags": [
+          "Webhooks"
+        ]
       }
     },
     "/webhooks/{id}": {
@@ -2576,7 +3471,9 @@
           }
         ],
         "summary": "Obtenir un webhook par ID",
-        "tags": ["Webhooks"]
+        "tags": [
+          "Webhooks"
+        ]
       },
       "patch": {
         "operationId": "WebhooksController_update",
@@ -2596,29 +3493,14 @@
                     "type": "boolean"
                   },
                   "authorized_events": {
-                    "type": "string"
-                  },
-                  "spi_event_types": {
-                    "type": "string"
-                  },
-                  "supports_spi": {
-                    "type": "boolean"
-                  },
-                  "verification_token": {
-                    "type": "string"
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
                   },
                   "metadata": {
                     "type": "object",
                     "additionalProperties": true
-                  }
-                }
-              },
-              "examples": {
-                "rotateUrl": {
-                  "summary": "Mettre à jour l'URL de livraison",
-                  "value": {
-                    "url": "https://example.com/webhooks/lomi",
-                    "is_active": true
                   }
                 }
               }
@@ -2643,7 +3525,35 @@
           }
         ],
         "summary": "Mettre à jour un webhook",
-        "tags": ["Webhooks"]
+        "tags": [
+          "Webhooks"
+        ]
+      },
+      "delete": {
+        "operationId": "WebhooksController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Webhook UUID",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Supprimer un webhook",
+        "tags": [
+          "Webhooks"
+        ]
       }
     },
     "/charge/wave": {
@@ -2672,12 +3582,42 @@
           }
         ],
         "summary": "Lancer un encaissement direct Wave",
-        "tags": ["Encaissements"]
+        "tags": [
+          "Encaissements"
+        ]
+      }
+    },
+    "/charge/mtn": {
+      "post": {
+        "operationId": "ChargesController_createMtnCharge",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Encaissement MTN initié (RequestToPay)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Lancer un encaissement direct MTN MoMo",
+        "tags": [
+          "Encaissements"
+        ]
       }
     },
     "/payment-intents": {
       "post": {
-        "description": "Crée un Payment Intent carte pour une intégration via Payment Element et renvoie le client_secret.",
+        "description": "Crée un intent de paiement carte pour une intégration embarquée et renvoie le client_secret.",
         "operationId": "PaymentIntentsController_create",
         "parameters": [],
         "requestBody": {
@@ -2719,7 +3659,7 @@
         },
         "responses": {
           "201": {
-            "description": "Payment Intent créé avec succès",
+            "description": "Intent de paiement créé avec succès",
             "content": {
               "application/json": {
                 "schema": {
@@ -2743,8 +3683,74 @@
             "api-key": []
           }
         ],
-        "summary": "Créer un Payment Intent carte (client_secret)",
-        "tags": ["Intents de paiement"]
+        "summary": "Créer un intent de paiement carte (client_secret)",
+        "tags": [
+          "Intents de paiement"
+        ]
+      }
+    },
+    "/payment-intents/{id}": {
+      "get": {
+        "description": "Récupère l’intent de paiement carte et la transaction associée si elle existe.",
+        "operationId": "PaymentIntentsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Identifiant de l’intent de paiement (pi_...)",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Payment Intent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentIntentResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Récupérer un intent de paiement carte",
+        "tags": [
+          "Intents de paiement"
+        ]
+      }
+    },
+    "/payment-intents/{id}/cancel": {
+      "post": {
+        "operationId": "PaymentIntentsController_cancel",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Identifiant de l’intent de paiement (pi_...)",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Intent de paiement annulé"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Annuler un intent de paiement carte",
+        "tags": [
+          "Intents de paiement"
+        ]
       }
     },
     "/agent/capabilities": {
@@ -2757,7 +3763,9 @@
           }
         },
         "summary": "Négociation des capacités de l'agent (surface de découverte non authentifiée)",
-        "tags": ["Agent"]
+        "tags": [
+          "Agent"
+        ]
       }
     },
     "/agent/events": {
@@ -2775,7 +3783,9 @@
           }
         ],
         "summary": "Flux Server-Sent Events (limité à l'organisation, signaux de maintien de connexion)",
-        "tags": ["Agent"]
+        "tags": [
+          "Agent"
+        ]
       }
     },
     "/agent/subscriptions": {
@@ -2793,7 +3803,9 @@
           }
         ],
         "summary": "S'inscrire aux notifications adaptées à l'agent (MVP : registre en mémoire + ping de test SSE)",
-        "tags": ["Agent"]
+        "tags": [
+          "Agent"
+        ]
       },
       "get": {
         "operationId": "AgentSubscriptionsController_list",
@@ -2809,7 +3821,9 @@
           }
         ],
         "summary": "Lister les abonnements de l'agent",
-        "tags": ["Agent"]
+        "tags": [
+          "Agent"
+        ]
       }
     },
     "/agent/subscriptions/{id}": {
@@ -2838,7 +3852,9 @@
           }
         ],
         "summary": "Supprimer un abonnement",
-        "tags": ["Agent"]
+        "tags": [
+          "Agent"
+        ]
       }
     },
     "/agent/workflows": {
@@ -2866,7 +3882,9 @@
           }
         ],
         "summary": "Démarrer un workflow multi-étapes (MVP, idempotence sur idempotency_key)",
-        "tags": ["Agent"]
+        "tags": [
+          "Agent"
+        ]
       }
     },
     "/agent/workflows/{runId}": {
@@ -2891,7 +3909,9 @@
           }
         ],
         "summary": "Obtenir l'état d'une exécution de workflow",
-        "tags": ["Agent"]
+        "tags": [
+          "Agent"
+        ]
       }
     },
     "/agent/workflows/{runId}/steps/{stepId}": {
@@ -2932,7 +3952,9 @@
           }
         ],
         "summary": "Faire avancer une étape du workflow (primitive d'orchestration)",
-        "tags": ["Agent"]
+        "tags": [
+          "Agent"
+        ]
       }
     },
     "/agent/handoff": {
@@ -2960,7 +3982,9 @@
           }
         ],
         "summary": "Transfert inter-services / inter-agents (contexte + enveloppe de tâche)",
-        "tags": ["Agent"]
+        "tags": [
+          "Agent"
+        ]
       }
     },
     "/agent/handoff/{id}": {
@@ -2985,7 +4009,9 @@
           }
         ],
         "summary": "Récupérer un enregistrement de transfert",
-        "tags": ["Agent"]
+        "tags": [
+          "Agent"
+        ]
       }
     }
   },
@@ -3036,7 +4062,11 @@
           "currency_code": {
             "type": "string",
             "example": "XOF",
-            "enum": ["XOF", "USD", "EUR"],
+            "enum": [
+              "XOF",
+              "USD",
+              "EUR"
+            ],
             "description": "Currency code"
           },
           "is_spi_account": {
@@ -3068,7 +4098,11 @@
           "spi_account_status": {
             "type": "string",
             "example": "OUVERT",
-            "enum": ["OUVERT", "BLOQUE", "CLOTURE"],
+            "enum": [
+              "OUVERT",
+              "BLOQUE",
+              "CLOTURE"
+            ],
             "description": "SPI account status"
           },
           "spi_account_balance": {
@@ -3126,7 +4160,11 @@
             "description": "Last updated timestamp"
           }
         },
-        "required": ["currency_code", "balance", "last_updated"]
+        "required": [
+          "currency_code",
+          "balance",
+          "last_updated"
+        ]
       },
       "BalanceBreakdownResponseDto": {
         "type": "object",
@@ -3206,7 +4244,11 @@
           "verification_status": {
             "type": "string",
             "example": "verified",
-            "enum": ["unverified", "starter", "verified"],
+            "enum": [
+              "unverified",
+              "starter",
+              "verified"
+            ],
             "description": "KYC verification status"
           },
           "website_url": {
@@ -3222,13 +4264,21 @@
           "status": {
             "type": "string",
             "example": "active",
-            "enum": ["active", "inactive", "suspended"],
+            "enum": [
+              "active",
+              "inactive",
+              "suspended"
+            ],
             "description": "Organization status"
           },
           "default_currency": {
             "type": "string",
             "example": "XOF",
-            "enum": ["XOF", "USD", "EUR"],
+            "enum": [
+              "XOF",
+              "USD",
+              "EUR"
+            ],
             "description": "Default currency"
           },
           "slug": {
@@ -3395,6 +4445,245 @@
           "calculated_at"
         ]
       },
+      "MerchantResponseDto": {
+        "type": "object",
+        "properties": {
+          "merchant_id": {
+            "type": "string",
+            "example": "904d003c-3736-41d4-90a5-9de74d404fd7"
+          },
+          "name": {
+            "type": "string",
+            "example": "Test Merchant"
+          },
+          "email": {
+            "type": "string",
+            "example": "merchant@example.com"
+          },
+          "phone_number": {
+            "type": "string",
+            "example": "+123456789"
+          },
+          "country": {
+            "type": "string",
+            "example": "SN"
+          },
+          "mrr": {
+            "type": "number",
+            "example": 50000
+          },
+          "arr": {
+            "type": "number",
+            "example": 600000
+          },
+          "merchant_lifetime_value": {
+            "type": "number",
+            "example": 1200000
+          },
+          "retry_payment_every": {
+            "type": "number",
+            "example": 3
+          },
+          "total_retries": {
+            "type": "number",
+            "example": 5
+          },
+          "metadata": {
+            "type": "object"
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "merchant_id",
+          "name",
+          "email",
+          "mrr",
+          "arr",
+          "merchant_lifetime_value",
+          "created_at",
+          "updated_at"
+        ]
+      },
+      "MerchantMrrResponseDto": {
+        "type": "object",
+        "properties": {
+          "merchant_id": {
+            "type": "string"
+          },
+          "mrr": {
+            "type": "number"
+          },
+          "currency_code": {
+            "type": "string",
+            "example": "XOF"
+          },
+          "as_of_date": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "merchant_id",
+          "mrr",
+          "currency_code",
+          "as_of_date"
+        ]
+      },
+      "MerchantArrResponseDto": {
+        "type": "object",
+        "properties": {
+          "merchant_id": {
+            "type": "string"
+          },
+          "arr": {
+            "type": "number"
+          },
+          "currency_code": {
+            "type": "string",
+            "example": "XOF"
+          },
+          "as_of_date": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "merchant_id",
+          "arr",
+          "currency_code",
+          "as_of_date"
+        ]
+      },
+      "MerchantBalanceResponseDto": {
+        "type": "object",
+        "properties": {
+          "merchant_id": {
+            "type": "string"
+          },
+          "currency_code": {
+            "type": "string",
+            "example": "XOF"
+          },
+          "balance": {
+            "type": "number"
+          },
+          "as_of_date": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "merchant_id",
+          "currency_code",
+          "balance",
+          "as_of_date"
+        ]
+      },
+      "SubscriptionResponseDto": {
+        "type": "object",
+        "properties": {
+          "subscription_id": {
+            "type": "string",
+            "example": "123e4567-e89b-12d3-a456-426614174000",
+            "description": "Unique subscription identifier"
+          },
+          "organization_id": {
+            "type": "string",
+            "example": "789e0123-e89b-12d3-a456-426614174000",
+            "description": "Organization ID"
+          },
+          "product_id": {
+            "type": "string",
+            "example": "456e7890-e89b-12d3-a456-426614174000",
+            "description": "Product ID (recurring product)"
+          },
+          "price_id": {
+            "type": "string",
+            "example": "321e4567-e89b-12d3-a456-426614174000",
+            "description": "Price ID used for this subscription",
+            "nullable": true
+          },
+          "customer_id": {
+            "type": "string",
+            "example": "654e7890-e89b-12d3-a456-426614174000",
+            "description": "Customer ID"
+          },
+          "status": {
+            "type": "string",
+            "example": "active",
+            "description": "Subscription status",
+            "enum": [
+              "pending",
+              "active",
+              "past_due",
+              "cancelled",
+              "trialing",
+              "paused"
+            ]
+          },
+          "start_date": {
+            "type": "string",
+            "example": "2024-01-15",
+            "description": "Subscription start date"
+          },
+          "end_date": {
+            "type": "string",
+            "example": "2024-12-31",
+            "description": "Subscription end date (set when cancelled)",
+            "nullable": true
+          },
+          "next_billing_date": {
+            "type": "string",
+            "example": "2024-02-15",
+            "description": "Next billing date (system-managed)",
+            "nullable": true
+          },
+          "metadata": {
+            "type": "object",
+            "example": {
+              "notes": "Premium plan"
+            },
+            "description": "Additional metadata as JSON",
+            "nullable": true
+          },
+          "environment": {
+            "type": "string",
+            "example": "live",
+            "description": "Environment (test or live)",
+            "enum": [
+              "test",
+              "live"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "example": "2024-01-15T10:30:00Z",
+            "description": "When the subscription was created"
+          },
+          "updated_at": {
+            "type": "string",
+            "example": "2024-01-15T10:30:00Z",
+            "description": "When the subscription was last updated"
+          }
+        },
+        "required": [
+          "subscription_id",
+          "organization_id",
+          "product_id",
+          "price_id",
+          "customer_id",
+          "status",
+          "start_date",
+          "end_date",
+          "next_billing_date",
+          "metadata",
+          "environment",
+          "created_at",
+          "updated_at"
+        ]
+      },
       "TransactionResponseDto": {
         "type": "object",
         "properties": {
@@ -3435,7 +4724,11 @@
             "type": "string",
             "example": "payment",
             "description": "Transaction type",
-            "enum": ["payment", "refund", "payout"]
+            "enum": [
+              "payment",
+              "refund",
+              "payout"
+            ]
           },
           "status": {
             "type": "string",
@@ -3554,7 +4847,10 @@
             "type": "string",
             "example": "live",
             "description": "Environment (test or live)",
-            "enum": ["test", "live"]
+            "enum": [
+              "test",
+              "live"
+            ]
           },
           "created_at": {
             "type": "string",
@@ -3676,7 +4972,10 @@
             "type": "string",
             "example": "live",
             "description": "Environment (test or live)",
-            "enum": ["test", "live"]
+            "enum": [
+              "test",
+              "live"
+            ]
           },
           "created_at": {
             "type": "string",
@@ -3705,6 +5004,75 @@
           "environment",
           "created_at",
           "updated_at"
+        ]
+      },
+      "PortalLaunchSessionResponseDto": {
+        "type": "object",
+        "properties": {
+          "customer_id": {
+            "type": "string",
+            "example": "2d8f4f8b-1ea8-4de9-9fd8-f52f743bb265",
+            "description": "Customer UUID"
+          },
+          "organization_id": {
+            "type": "string",
+            "example": "f8b15d6f-901f-4e7c-a0ab-1ce9e8d2a1ba",
+            "description": "Organization UUID"
+          },
+          "launch_token": {
+            "type": "string",
+            "example": "7d3d5f0f0f124d18b96d3f013dea5e408f86e7b0f66a7e09c7f29bcf9244cc4e",
+            "description": "One-time launch token (returned once)"
+          },
+          "launch_url": {
+            "type": "string",
+            "example": "https://customers.lomi.africa/launch?token=7d3d5f0f0f124d18b96d3f013dea5e408f86e7b0f66a7e09c7f29bcf9244cc4e",
+            "description": "Hosted customer portal launch URL"
+          },
+          "expires_in_seconds": {
+            "type": "number",
+            "example": 900,
+            "description": "Launch session TTL in seconds"
+          },
+          "flow_type": {
+            "type": "string",
+            "example": "portal_home",
+            "enum": [
+              "portal_home",
+              "subscription_cancel",
+              "subscription_manage"
+            ],
+            "description": "Requested customer-portal flow type"
+          },
+          "flow_subscription_id": {
+            "type": "string",
+            "example": null,
+            "nullable": true,
+            "description": "Target subscription ID when flow_type=subscription_cancel"
+          },
+          "return_url": {
+            "type": "string",
+            "example": "https://merchant.example.com/account",
+            "nullable": true,
+            "description": "Merchant return URL shown in the portal header/footer"
+          },
+          "flow_after_completion_url": {
+            "type": "string",
+            "example": "https://merchant.example.com/account/subscription-cancelled",
+            "nullable": true,
+            "description": "Redirect destination after successful completion of deep-link flow"
+          }
+        },
+        "required": [
+          "customer_id",
+          "organization_id",
+          "launch_token",
+          "launch_url",
+          "expires_in_seconds",
+          "flow_type",
+          "flow_subscription_id",
+          "return_url",
+          "flow_after_completion_url"
         ]
       },
       "PaymentRequestResponseDto": {
@@ -3869,90 +5237,89 @@
           "updated_at"
         ]
       },
-      "RefundResponseDto": {
+      "CreateRefundResponseDto": {
         "type": "object",
         "properties": {
-          "amount": {
-            "type": "number",
-            "example": 123
-          },
-          "created_at": {
-            "type": "string",
-            "example": "string"
-          },
-          "environment": {
-            "type": "string",
-            "example": "string"
-          },
-          "fee_amount": {
-            "type": "number",
-            "example": 123
-          },
-          "metadata": {
-            "type": "object",
-            "example": {}
-          },
-          "reason": {
-            "type": "string",
-            "example": "string"
+          "success": {
+            "type": "boolean",
+            "example": true
           },
           "refund_id": {
             "type": "string",
-            "example": "string"
-          },
-          "refunded_amount": {
-            "type": "number",
-            "example": 123
-          },
-          "spi_account_number": {
-            "type": "string",
-            "example": "string"
-          },
-          "spi_end2end_id": {
-            "type": "string",
-            "example": "string"
-          },
-          "spi_retour_date_demande": {
-            "type": "string",
-            "example": "string"
-          },
-          "spi_retour_date_irrevocabilite": {
-            "type": "string",
-            "example": "string"
-          },
-          "spi_tx_id": {
-            "type": "string",
-            "example": "string"
-          },
-          "status": {
-            "type": "string",
-            "example": "string"
+            "example": "refund-uuid"
           },
           "transaction_id": {
             "type": "string",
-            "example": "string"
+            "example": "transaction-uuid"
           },
-          "updated_at": {
+          "refunded_amount": {
+            "type": "number",
+            "example": 5000
+          },
+          "status": {
             "type": "string",
-            "example": "string"
+            "example": "completed"
+          },
+          "message": {
+            "type": "string",
+            "example": "Refund recorded. Customer credit is processed by our team."
           }
         },
         "required": [
-          "amount",
-          "created_at",
-          "environment",
-          "fee_amount",
-          "metadata",
-          "reason",
+          "success",
           "refund_id",
-          "refunded_amount",
-          "spi_account_number",
-          "spi_end2end_id",
-          "spi_retour_date_demande",
-          "spi_retour_date_irrevocabilite",
-          "spi_tx_id",
-          "status",
           "transaction_id",
+          "refunded_amount",
+          "status"
+        ]
+      },
+      "RefundListItemDto": {
+        "type": "object",
+        "properties": {
+          "refund_id": {
+            "type": "string",
+            "example": "refund-uuid"
+          },
+          "transaction_id": {
+            "type": "string",
+            "example": "transaction-uuid"
+          },
+          "amount": {
+            "type": "number",
+            "example": 5000
+          },
+          "refunded_amount": {
+            "type": "number",
+            "example": 5000
+          },
+          "fee_amount": {
+            "type": "number",
+            "example": 100
+          },
+          "reason": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "example": "completed"
+          },
+          "created_at": {
+            "type": "string",
+            "example": "2025-01-01T00:00:00.000Z"
+          },
+          "updated_at": {
+            "type": "string",
+            "example": "2025-01-01T00:00:00.000Z"
+          }
+        },
+        "required": [
+          "refund_id",
+          "transaction_id",
+          "amount",
+          "refunded_amount",
+          "fee_amount",
+          "status",
+          "created_at",
           "updated_at"
         ]
       },
@@ -3973,20 +5340,33 @@
             "type": "string",
             "example": "XOF",
             "description": "Currency code",
-            "enum": ["XOF", "USD", "EUR"]
+            "enum": [
+              "XOF",
+              "USD",
+              "EUR"
+            ]
           },
           "billing_interval": {
             "type": "string",
             "example": "month",
             "description": "Billing interval for recurring products",
-            "enum": ["day", "week", "month", "year"],
+            "enum": [
+              "day",
+              "week",
+              "month",
+              "year"
+            ],
             "nullable": true
           },
           "pricing_model": {
             "type": "string",
             "example": "standard",
             "description": "Pricing model",
-            "enum": ["standard", "pay_what_you_want", "tiered"]
+            "enum": [
+              "standard",
+              "pay_what_you_want",
+              "tiered"
+            ]
           },
           "minimum_amount": {
             "type": "number",
@@ -4072,10 +5452,16 @@
             "type": "string",
             "example": "recurring",
             "description": "Product type",
-            "enum": ["one_time", "recurring", "usage_based"]
+            "enum": [
+              "one_time",
+              "recurring",
+              "usage_based"
+            ]
           },
           "images": {
-            "example": ["https://example.com/image.png"],
+            "example": [
+              "https://example.com/image.png"
+            ],
             "description": "Product images URLs",
             "nullable": true,
             "type": "array",
@@ -4105,7 +5491,11 @@
             "type": "string",
             "example": "pause",
             "description": "Action to take on failed payment",
-            "enum": ["pause", "cancel", "retry"],
+            "enum": [
+              "pause",
+              "cancel",
+              "retry"
+            ],
             "nullable": true
           },
           "charge_day": {
@@ -4118,7 +5508,11 @@
             "type": "string",
             "example": "initial",
             "description": "When to charge first payment",
-            "enum": ["initial", "non_initial", "prorated"],
+            "enum": [
+              "initial",
+              "non_initial",
+              "prorated"
+            ],
             "nullable": true
           },
           "trial_enabled": {
@@ -4136,7 +5530,12 @@
             "type": "string",
             "example": "sum",
             "description": "Usage aggregation method",
-            "enum": ["sum", "max", "last_during_period", "last_ever"],
+            "enum": [
+              "sum",
+              "max",
+              "last_during_period",
+              "last_ever"
+            ],
             "nullable": true
           },
           "usage_unit": {
@@ -4149,7 +5548,10 @@
             "type": "string",
             "example": "live",
             "description": "Environment",
-            "enum": ["test", "live"]
+            "enum": [
+              "test",
+              "live"
+            ]
           },
           "prices": {
             "description": "Product prices",
@@ -4201,106 +5603,6 @@
           "updated_at"
         ]
       },
-      "SubscriptionResponseDto": {
-        "type": "object",
-        "properties": {
-          "subscription_id": {
-            "type": "string",
-            "example": "123e4567-e89b-12d3-a456-426614174000",
-            "description": "Unique subscription identifier"
-          },
-          "organization_id": {
-            "type": "string",
-            "example": "789e0123-e89b-12d3-a456-426614174000",
-            "description": "Organization ID"
-          },
-          "product_id": {
-            "type": "string",
-            "example": "456e7890-e89b-12d3-a456-426614174000",
-            "description": "Product ID (recurring product)"
-          },
-          "price_id": {
-            "type": "string",
-            "example": "321e4567-e89b-12d3-a456-426614174000",
-            "description": "Price ID used for this subscription",
-            "nullable": true
-          },
-          "customer_id": {
-            "type": "string",
-            "example": "654e7890-e89b-12d3-a456-426614174000",
-            "description": "Customer ID"
-          },
-          "status": {
-            "type": "string",
-            "example": "active",
-            "description": "Subscription status",
-            "enum": [
-              "pending",
-              "active",
-              "past_due",
-              "cancelled",
-              "trialing",
-              "paused"
-            ]
-          },
-          "start_date": {
-            "type": "string",
-            "example": "2024-01-15",
-            "description": "Subscription start date"
-          },
-          "end_date": {
-            "type": "string",
-            "example": "2024-12-31",
-            "description": "Subscription end date (set when cancelled)",
-            "nullable": true
-          },
-          "next_billing_date": {
-            "type": "string",
-            "example": "2024-02-15",
-            "description": "Next billing date (system-managed)",
-            "nullable": true
-          },
-          "metadata": {
-            "type": "object",
-            "example": {
-              "notes": "Premium plan"
-            },
-            "description": "Additional metadata as JSON",
-            "nullable": true
-          },
-          "environment": {
-            "type": "string",
-            "example": "live",
-            "description": "Environment (test or live)",
-            "enum": ["test", "live"]
-          },
-          "created_at": {
-            "type": "string",
-            "example": "2024-01-15T10:30:00Z",
-            "description": "When the subscription was created"
-          },
-          "updated_at": {
-            "type": "string",
-            "example": "2024-01-15T10:30:00Z",
-            "description": "When the subscription was last updated"
-          }
-        },
-        "required": [
-          "subscription_id",
-          "organization_id",
-          "product_id",
-          "price_id",
-          "customer_id",
-          "status",
-          "start_date",
-          "end_date",
-          "next_billing_date",
-          "metadata",
-          "environment",
-          "created_at",
-          "updated_at"
-        ]
-      },
       "DiscountCouponResponseDto": {
         "type": "object",
         "properties": {
@@ -4323,7 +5625,10 @@
             "type": "string",
             "example": "percentage",
             "description": "Type of discount",
-            "enum": ["percentage", "fixed"]
+            "enum": [
+              "percentage",
+              "fixed"
+            ]
           },
           "discount_percentage": {
             "type": "number",
@@ -4341,7 +5646,11 @@
             "type": "string",
             "example": "all",
             "description": "Customer type this coupon applies to",
-            "enum": ["all", "new", "existing"]
+            "enum": [
+              "all",
+              "new",
+              "existing"
+            ]
           },
           "is_active": {
             "type": "boolean",
@@ -4369,7 +5678,11 @@
             "type": "string",
             "example": "total",
             "description": "Usage frequency limit type",
-            "enum": ["total", "per_customer", "per_customer_per_product"]
+            "enum": [
+              "total",
+              "per_customer",
+              "per_customer_per_product"
+            ]
           },
           "usage_limit_value": {
             "type": "number",
@@ -4406,7 +5719,10 @@
             ]
           },
           "applies_to_product_types": {
-            "example": ["one_time", "recurring"],
+            "example": [
+              "one_time",
+              "recurring"
+            ],
             "description": "Product types this coupon applies to",
             "nullable": true,
             "type": "array",
@@ -4418,7 +5734,10 @@
             "type": "string",
             "example": "live",
             "description": "Environment (test or live)",
-            "enum": ["test", "live"]
+            "enum": [
+              "test",
+              "live"
+            ]
           },
           "created_at": {
             "type": "string",
@@ -5159,13 +6478,21 @@
             "type": "string",
             "example": "XOF",
             "description": "Currency code",
-            "enum": ["XOF", "USD", "EUR"]
+            "enum": [
+              "XOF",
+              "USD",
+              "EUR"
+            ]
           },
           "currency": {
             "type": "string",
             "example": "XOF",
             "description": "Backward-compatible alias for currency_code. Use currency_code in new integrations.",
-            "enum": ["XOF", "USD", "EUR"]
+            "enum": [
+              "XOF",
+              "USD",
+              "EUR"
+            ]
           },
           "customer_id": {
             "type": "string",
@@ -5224,7 +6551,11 @@
           "appearance_theme": {
             "type": "string",
             "example": "light",
-            "enum": ["light", "dark", "flat"],
+            "enum": [
+              "light",
+              "dark",
+              "flat"
+            ],
             "description": "Optional Payment Element theme for client-side card UI: `light`, `dark`, or `flat`."
           },
           "appearance_border_radius": {
@@ -5235,11 +6566,16 @@
           "appearance_billing_address": {
             "type": "string",
             "example": "never",
-            "enum": ["auto", "never"],
+            "enum": [
+              "auto",
+              "never"
+            ],
             "description": "Optional Payment Element billing address collection mode. Use `never` to hide country/address selector in Payment Element UI."
           }
         },
-        "required": ["amount"]
+        "required": [
+          "amount"
+        ]
       },
       "PaymentIntentAppearanceDto": {
         "type": "object",
@@ -5314,7 +6650,10 @@
             "$ref": "#/components/schemas/PaymentIntentDataDto"
           }
         },
-        "required": ["success", "data"]
+        "required": [
+          "success",
+          "data"
+        ]
       },
       "CreateWorkflowDto": {
         "type": "object",

@@ -1,15 +1,17 @@
 ---
 title: Refunds
-description: Initiate refunds on supported rails (`POST /refund/wave`).
+description: Refund completed transactions (`POST /refunds`).
 ---
 
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
 import { Callout } from 'fumadocs-ui/components/callout';
 
-Public merchant refunds are exposed as **`POST /refund/wave`** with `{ transactionId, amount, reason? }`. There is **no** generic refunds list or single-resource `GET` on the public REST surface today—use **webhooks** and transaction history for reconciliation.
+Use **`POST /refunds`** to refund a **completed** transaction. Supported payment types are **card** and **mobile money** (same flows as the dashboard). Your **balance is updated immediately**; customer credit timing depends on the payment type.
 
-<Callout type="warning">
-  Match `transactionId` carefully; refunds are asynchronous and provider responses stream through webhooks.
+List and retrieve refunds with **`GET /refunds`** and **`GET /refunds/{id}`**.
+
+<Callout type="info">
+  Card refunds are recorded immediately on your account. Our team completes the customer credit on the card network separately.
 </Callout>
 
 ## Create a refund
@@ -25,10 +27,11 @@ const lomi = new LomiSDK({
   environment: 'live',
 });
 
-await lomi.refunds.createWaveRefund({
-  transactionId: '123e4567-e89b-12d3-a456-426614174000',
+const refund = await lomi.refunds.create({
+  transaction_id: '123e4567-e89b-12d3-a456-426614174000',
   amount: 5000,
   reason: 'duplicate_charge',
+  refund_type: 'partial', // optional: 'full' | 'partial'
 });
 ```
 </Tab>
@@ -38,10 +41,10 @@ await lomi.refunds.createWaveRefund({
 import requests, os
 
 r = requests.post(
-    "https://api.lomi.africa/refund/wave",
+    "https://api.lomi.africa/refunds",
     headers={"X-API-KEY": os.environ["LOMI_API_KEY"], "Content-Type": "application/json"},
     json={
-        "transactionId": "123e4567-e89b-12d3-a456-426614174000",
+        "transaction_id": "123e4567-e89b-12d3-a456-426614174000",
         "amount": 5000,
         "reason": "duplicate_charge",
     },
@@ -52,11 +55,11 @@ print(r.status_code, r.json())
 
 <Tab value="cURL">
 ```bash
-curl -X POST "https://api.lomi.africa/refund/wave" \
+curl -X POST "https://api.lomi.africa/refunds" \
   -H "X-API-KEY: $LOMI_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "transactionId": "123e4567-e89b-12d3-a456-426614174000",
+    "transaction_id": "123e4567-e89b-12d3-a456-426614174000",
     "amount": 5000,
     "reason": "duplicate_charge"
   }'
@@ -69,6 +72,15 @@ curl -X POST "https://api.lomi.africa/refund/wave" \
 
 | Field | Type | Required |
 | --- | --- | --- |
-| `transactionId` | `string` (UUID) | **Yes** |
+| `transaction_id` | `string` (UUID) | **Yes** |
 | `amount` | `number` | **Yes** |
 | `reason` | `string` | No |
+| `refund_type` | `'full'` \| `'partial'` | No — inferred from `amount` vs transaction gross if omitted |
+
+## List refunds
+
+`GET /refunds?status=completed&limit=50&offset=0`
+
+## Get a refund
+
+`GET /refunds/{refund_id}`

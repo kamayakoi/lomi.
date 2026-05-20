@@ -80,3 +80,21 @@ func (s *SubscriptionsService) List(params map[string]string) (interface{}, erro
 		return out, nil
 	}
 
+
+func (s *SubscriptionsService) Update(id string) (interface{}, error) {
+		path := "/subscriptions/{id}"
+		path = strings.ReplaceAll(path, "{id}", id)
+		bodyResp, err := s.client.doRequest("PATCH", path, nil, nil)
+		if err != nil {
+			return nil, err
+		}
+		if len(bodyResp) == 0 {
+			return nil, nil
+		}
+		var out interface{}
+		if err := json.Unmarshal(bodyResp, &out); err != nil {
+			return nil, err
+		}
+		return out, nil
+	}
+

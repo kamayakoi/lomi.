@@ -1,49 +1,87 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  InternalServerErrorException,
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { SupabaseService } from '../utils/supabase/supabase.service';
-import { CreateWebhookDto } from './dto/create-webhook.dto';
+import { CreateWebhookBodyDto } from './dto/create-webhook-body.dto';
 import { UpdateWebhookDto } from './dto/update-webhook.dto';
 import { AuthContext } from '../core/common/decorators/current-user.decorator';
 import { Database } from '../utils/types/api';
-import { SupabaseClient } from '@supabase/supabase-js';
 
 @Injectable()
 export class WebhooksService {
-  constructor(private readonly supabase: SupabaseService) {}
+  constructor(
+    private readonly supabase: SupabaseService,
+    private readonly configService: ConfigService,
+  ) {}
 
-  async create(createDto: CreateWebhookDto, user: AuthContext) {
-    const insertData: Database['public']['Tables']['webhooks']['Insert'] = {
-      url: createDto.url,
-      authorized_events: (typeof createDto.authorized_events === 'string'
-        ? [createDto.authorized_events]
-        : createDto.authorized_events) as Database['public']['Enums']['webhook_event'][],
-      organization_id: user.organizationId,
-      is_active: createDto.is_active ?? true,
-      spi_event_types: createDto.spi_event_types
-        ? typeof createDto.spi_event_types === 'string'
-          ? [createDto.spi_event_types]
-          : createDto.spi_event_types
-        : null,
-      supports_spi: createDto.supports_spi ?? false,
-      metadata: createDto.metadata ?? null,
-      environment: createDto.environment ?? 'live',
-      verification_token: createDto.verification_token,
+  private normalizeEvents(
+    events: string | string[],
+  ): Database['public']['Enums']['webhook_event'][] {
+    const list = typeof events === 'string' ? [events] : events;
+    if (!list?.length) {
+      throw new BadRequestException('authorized_events is required');
+    }
+    return list as Database['public']['Enums']['webhook_event'][];
+  }
+
+  mapWebhookRow(row: Record<string, unknown>) {
+    return {
+      ...row,
+      id: row.webhook_id ?? row.id,
+      events: row.authorized_events ?? row.events,
+      active: row.is_active ?? row.active,
     };
+  }
 
-    const { data, error } = await (
-      this.supabase.getClient().from('webhooks') as unknown as ReturnType<
-        SupabaseClient<Database>['from']
-      >
-    )
-      .insert(insertData)
-      .select()
-      .single();
+  stripSecret<T extends Record<string, unknown>>(row: T): T {
+    const { verification_token: _removed, ...rest } = row;
+    return rest as T;
+  }
 
-    if (error) throw new Error(error.message);
-    return data;
+  async create(createDto: CreateWebhookBodyDto, user: AuthContext) {
+    const authorizedEvents = this.normalizeEvents(createDto.authorized_events);
+    const metadata =
+      createDto.metadata ??
+      (createDto.description
+        ? { description: createDto.description }
+        : null);
+
+    const { data: webhookId, error } = await this.supabase
+      .getClient()
+      .rpc('create_webhook' as never, {
+        p_merchant_id: user.merchantId,
+        p_organization_id: user.organizationId,
+        p_url: createDto.url,
+        p_authorized_events: authorizedEvents,
+        p_metadata: metadata,
+        p_environment: user.environment || 'live',
+      } as never);
+
+    if (error) {
+      throw new BadRequestException(error.message);
+    }
+
+    if (!webhookId) {
+      throw new InternalServerErrorException('Failed to create webhook');
+    }
+
+    const row = (await this.findOne(String(webhookId), user)) as Record<
+      string,
+      unknown
+    >;
+    const secret = String(row.verification_token ?? '');
+
+    return {
+      data: this.stripSecret(this.mapWebhookRow(row)),
+      secret,
+    };
   }
 
   async findAll(user: AuthContext) {
-    // Use RPC function to bypass RLS
     const { data, error } = await this.supabase.rpc(
       'fetch_organization_webhooks',
       {
@@ -57,45 +95,40 @@ export class WebhooksService {
     );
 
     if (error) throw new Error(error.message);
-    return data || [];
+    const rows = (data as Record<string, unknown>[]) || [];
+    return rows.map((row) =>
+      this.stripSecret(this.mapWebhookRow(row)),
+    );
   }
 
   async findOne(id: string, user: AuthContext) {
-    // Use RPC function to bypass RLS
     const { data, error } = await this.supabase.rpc('get_webhook', {
       p_webhook_id: id,
       p_merchant_id: user.merchantId,
     });
 
     if (error) throw new Error(error.message);
-    if (!data || data.length === 0) {
-      throw new Error('Webhook not found');
+    if (!data || (data as unknown[]).length === 0) {
+      throw new NotFoundException('Webhook not found');
     }
-    return data[0];
+    return (data as Record<string, unknown>[])[0];
+  }
+
+  async findOneForApi(id: string, user: AuthContext) {
+    const row = await this.findOne(id, user);
+    return this.stripSecret(this.mapWebhookRow(row as Record<string, unknown>));
   }
 
   async update(id: string, updateDto: UpdateWebhookDto, user: AuthContext) {
-    // Use RPC function to bypass RLS and ensure proper permissions
-    // Prepare authorized_events if provided
     let authorizedEvents:
       | Database['public']['Enums']['webhook_event'][]
       | null
       | undefined = undefined;
     if (updateDto.authorized_events !== undefined) {
-      if (typeof updateDto.authorized_events === 'string') {
-        authorizedEvents = [
-          updateDto.authorized_events,
-        ] as Database['public']['Enums']['webhook_event'][];
-      } else if (Array.isArray(updateDto.authorized_events)) {
-        authorizedEvents =
-          updateDto.authorized_events as Database['public']['Enums']['webhook_event'][];
-      } else {
-        authorizedEvents = null;
-      }
+      authorizedEvents = this.normalizeEvents(updateDto.authorized_events);
     }
 
-    // Build params object - only include defined fields (omit undefined to use DEFAULT NULL)
-    const params: any = {
+    const params: Record<string, unknown> = {
       p_webhook_id: id,
       p_merchant_id: user.merchantId,
     };
@@ -113,32 +146,100 @@ export class WebhooksService {
       params.p_metadata = updateDto.metadata;
     }
 
-    // Use getClient().rpc() for untyped functions instead of this.supabase.rpc
-    const client = this.supabase.getClient();
-    const { data: updated, error: updateError } = await client.rpc(
-      'update_webhook',
-      params,
-    );
+    const { data: updated, error: updateError } = await this.supabase
+      .getClient()
+      .rpc('update_webhook', params as never);
 
     if (updateError) {
-      throw new Error(
-        `Failed to update webhook: ${updateError.message || updateError}`,
+      throw new BadRequestException(
+        `Failed to update webhook: ${updateError.message}`,
       );
     }
     if (!updated) {
-      throw new Error('Webhook not found or update failed');
+      throw new NotFoundException('Webhook not found or update failed');
     }
 
-    // Fetch the updated webhook to return full details
-    const { data, error } = await this.supabase.rpc('get_webhook', {
-      p_webhook_id: id,
-      p_merchant_id: user.merchantId,
+    const row = await this.findOne(id, user);
+    return this.stripSecret(this.mapWebhookRow(row as Record<string, unknown>));
+  }
+
+  async remove(id: string, user: AuthContext) {
+    const { data, error } = await this.supabase.getClient().rpc(
+      'delete_webhook' as never,
+      {
+        p_webhook_id: id,
+        p_merchant_id: user.merchantId,
+      } as never,
+    );
+
+    if (error) {
+      throw new BadRequestException(error.message);
+    }
+    if (!data) {
+      throw new NotFoundException('Webhook not found');
+    }
+    return { deleted: true };
+  }
+
+  async test(id: string, user: AuthContext) {
+    await this.findOne(id, user);
+
+    const projectRef = this.configService.get<string>('SUPABASE_PROJECT_REF');
+    const anonKey = this.configService.get<string>('SUPABASE_PUBLISHABLE_KEY');
+    if (!projectRef || !anonKey) {
+      throw new InternalServerErrorException(
+        'Webhook test is not configured on this API host',
+      );
+    }
+
+    const edgeFunctionUrl = `https://${projectRef}.supabase.co/functions/v1/test_webhook`;
+    const response = await fetch(edgeFunctionUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${anonKey}`,
+      },
+      body: JSON.stringify({
+        webhook_id: id,
+        merchant_id: user.merchantId,
+      }),
     });
 
-    if (error) throw new Error(error.message);
-    if (!data || data.length === 0) {
-      throw new Error('Webhook not found after update');
+    const body = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new BadRequestException(
+        (body as { message?: string; error?: string }).message ||
+          (body as { error?: string }).error ||
+          'Webhook test delivery failed',
+      );
     }
-    return data[0];
+
+    return body;
+  }
+
+  async retryDelivery(
+    webhookId: string,
+    logId: string,
+    user: AuthContext,
+  ) {
+    await this.findOne(webhookId, user);
+
+    const { data, error } = await this.supabase.getClient().rpc(
+      'retry_webhook_delivery' as never,
+      {
+        p_webhook_id: webhookId,
+        p_log_id: logId,
+        p_merchant_id: user.merchantId,
+      } as never,
+    );
+
+    if (error) {
+      throw new BadRequestException(error.message);
+    }
+    if (!data) {
+      throw new NotFoundException('Delivery log not found or retry failed');
+    }
+
+    return { queued: true };
   }
 }
