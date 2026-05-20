@@ -427,6 +427,7 @@ export const EXPOSED_FUNCTIONS = [
   'create_manual_refund_request_api',
   'create_wave_refund_request_api',
   'rollback_wave_refund',
+  'apply_wave_partial_refund_charges',
   'create_refund',
   'update_organization_balance_for_refund',
   'list_refunds',

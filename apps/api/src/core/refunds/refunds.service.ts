@@ -91,6 +91,7 @@ export class RefundsService {
         user,
         tx,
         feeAmount,
+        feePercentage,
       );
     }
 
@@ -364,6 +365,7 @@ export class RefundsService {
     user: AuthContext,
     tx: TransactionRow,
     feeAmount: number,
+    feePercentage: number,
   ) {
     if (!tx.customer_id) {
       throw new BadRequestException(
@@ -421,6 +423,29 @@ export class RefundsService {
         source: 'api',
       },
     });
+
+    const { data: chargeRows, error: chargeError } =
+      await this.supabaseService.getClient().rpc(
+        'apply_wave_partial_refund_charges' as never,
+        {
+          p_transaction_id: dto.transaction_id,
+          p_refund_id: refundId,
+          p_refund_amount: dto.amount,
+          p_processing_fee_percentage: feePercentage,
+        } as never,
+      );
+
+    if (chargeError) {
+      throw new BadRequestException(chargeError.message);
+    }
+
+    const chargeResult = Array.isArray(chargeRows) ? chargeRows[0] : chargeRows;
+    if ((chargeResult as { success?: boolean })?.success === false) {
+      throw new BadRequestException(
+        (chargeResult as { error_message?: string })?.error_message ??
+          'Failed to apply partial refund charges',
+      );
+    }
 
     return {
       success: true,

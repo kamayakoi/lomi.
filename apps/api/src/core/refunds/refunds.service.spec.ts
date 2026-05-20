@@ -245,6 +245,9 @@ describe('RefundsService', () => {
       if (name === 'create_refund') {
         return { data: 'ref-partial', error: null };
       }
+      if (name === 'apply_wave_partial_refund_charges') {
+        return { data: [{ success: true, error_message: null }], error: null };
+      }
       if (name === 'update_organization_balance_for_refund') {
         throw new Error('partial refunds must not debit balance twice');
       }
@@ -276,6 +279,13 @@ describe('RefundsService', () => {
         p_transaction_id: 'tx-wave',
         p_amount: 5000,
         p_metadata: expect.objectContaining({ balance_via_payout: true }),
+      }),
+    );
+    expect(rpc).toHaveBeenCalledWith(
+      'apply_wave_partial_refund_charges',
+      expect.objectContaining({
+        p_transaction_id: 'tx-wave',
+        p_refund_id: 'ref-partial',
       }),
     );
     expect(rpc).not.toHaveBeenCalledWith(
