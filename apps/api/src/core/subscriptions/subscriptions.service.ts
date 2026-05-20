@@ -77,7 +77,11 @@ export class SubscriptionsService {
    * Note: cancellation_reason is accepted but currently only logged.
    * Future enhancement: Store in audit log or metadata table.
    */
-  async update(id: string, updateDto: UpdateSubscriptionDto, user: AuthContext) {
+  async update(
+    id: string,
+    updateDto: UpdateSubscriptionDto,
+    user: AuthContext,
+  ) {
     await this.findOne(id, user);
 
     const { data: updated, error } = await this.supabase.getClient().rpc(

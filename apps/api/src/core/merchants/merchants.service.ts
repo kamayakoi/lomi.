@@ -27,10 +27,12 @@ export class MerchantsService {
   async getDetails(merchantId: string, user: AuthContext) {
     this.assertMerchantAccess(merchantId, user);
 
-    const { data, error } = await this.supabase.getClient().rpc(
-      'get_merchant_details' as never,
-      { p_merchant_id: merchantId } as never,
-    );
+    const { data, error } = await this.supabase
+      .getClient()
+      .rpc(
+        'get_merchant_details' as never,
+        { p_merchant_id: merchantId } as never,
+      );
 
     if (error) {
       throw new NotFoundException(error.message);
@@ -47,10 +49,9 @@ export class MerchantsService {
   async getMrr(merchantId: string, user: AuthContext) {
     this.assertMerchantAccess(merchantId, user);
 
-    const { data, error } = await this.supabase.getClient().rpc(
-      'get_merchant_mrr' as never,
-      { p_merchant_id: merchantId } as never,
-    );
+    const { data, error } = await this.supabase
+      .getClient()
+      .rpc('get_merchant_mrr' as never, { p_merchant_id: merchantId } as never);
 
     if (error) {
       throw new NotFoundException(error.message);
@@ -73,10 +74,9 @@ export class MerchantsService {
   async getArr(merchantId: string, user: AuthContext) {
     this.assertMerchantAccess(merchantId, user);
 
-    const { data, error } = await this.supabase.getClient().rpc(
-      'get_merchant_arr' as never,
-      { p_merchant_id: merchantId } as never,
-    );
+    const { data, error } = await this.supabase
+      .getClient()
+      .rpc('get_merchant_arr' as never, { p_merchant_id: merchantId } as never);
 
     if (error) {
       throw new NotFoundException(error.message);
@@ -104,7 +104,9 @@ export class MerchantsService {
     this.assertMerchantAccess(merchantId, user);
 
     if (!currencyCode) {
-      throw new BadRequestException('currency_code query parameter is required');
+      throw new BadRequestException(
+        'currency_code query parameter is required',
+      );
     }
 
     const { data, error } = await this.supabase.getClient().rpc(

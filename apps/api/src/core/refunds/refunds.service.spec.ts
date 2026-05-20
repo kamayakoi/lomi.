@@ -35,7 +35,9 @@ describe('RefundsService', () => {
     status: 'completed',
   };
 
-  function buildService(rpcImpl: (name: string, args: Record<string, unknown>) => unknown) {
+  function buildService(
+    rpcImpl: (name: string, args: Record<string, unknown>) => unknown,
+  ) {
     const rpc = jest.fn((name: string, args: Record<string, unknown>) =>
       Promise.resolve(rpcImpl(name, args)),
     );
@@ -51,7 +53,10 @@ describe('RefundsService', () => {
     global.fetch = jest.fn();
 
     return {
-      service: new RefundsService(configService as never, supabaseService as never),
+      service: new RefundsService(
+        configService as never,
+        supabaseService as never,
+      ),
       rpc,
       restore: () => {
         global.fetch = originalFetch;
@@ -84,10 +89,7 @@ describe('RefundsService', () => {
     });
 
     await expect(
-      service.create(
-        { transaction_id: 'tx-card', amount: 1000 },
-        user,
-      ),
+      service.create({ transaction_id: 'tx-card', amount: 1000 }, user),
     ).rejects.toThrow(BadRequestException);
 
     restore();

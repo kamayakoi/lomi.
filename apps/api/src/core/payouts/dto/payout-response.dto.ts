@@ -7,7 +7,11 @@ export class CreatePayoutResponseDto {
   @ApiPropertyOptional({ example: 'payout-uuid', type: String })
   payout_id?: string;
 
-  @ApiPropertyOptional({ example: 'withdrawal', enum: ['withdrawal', 'beneficiary'], type: String })
+  @ApiPropertyOptional({
+    example: 'withdrawal',
+    enum: ['withdrawal', 'beneficiary'],
+    type: String,
+  })
   kind?: 'withdrawal' | 'beneficiary';
 
   @ApiPropertyOptional({ example: 'processing', type: String })

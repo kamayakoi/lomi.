@@ -196,9 +196,12 @@ export class CardChargeService {
 
     const { data: txJson, error: txError } = await this.supabase
       .getClient()
-      .rpc('get_transaction_by_stripe_intent' as never, {
-        p_payment_intent_id: paymentIntentId,
-      } as never);
+      .rpc(
+        'get_transaction_by_stripe_intent' as never,
+        {
+          p_payment_intent_id: paymentIntentId,
+        } as never,
+      );
 
     if (txError) {
       this.logger.warn({

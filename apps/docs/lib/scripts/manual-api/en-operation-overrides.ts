@@ -217,7 +217,8 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
   MerchantsController_getArr: {
     summary: 'Merchant annual recurring revenue',
     body: 'Returns ARR metrics for a merchant ID visible to your API key.',
-    whenToUse: 'Use in partner or marketplace reporting where you track sub-merchant performance.',
+    whenToUse:
+      'Use in partner or marketplace reporting where you track sub-merchant performance.',
     related: '[Merchant MRR](/api/merchants/MerchantsController_getMrr)',
   },
   MerchantsController_getBalance: {
@@ -225,13 +226,16 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     body: 'Returns balance figures for a merchant ID (available, pending, or totals per API shape).',
     whenToUse:
       'Use for marketplace dashboards before initiating movements on behalf of a connected merchant.',
-    related: '[Merchant details](/api/merchants/MerchantsController_getDetails)',
+    related:
+      '[Merchant details](/api/merchants/MerchantsController_getDetails)',
   },
   MerchantsController_getDetails: {
     summary: 'Merchant details',
     body: 'Returns profile and configuration metadata for a merchant ID.',
-    whenToUse: 'Use when onboarding status pages or routing API calls per sub-merchant.',
-    related: '[Merchant balance](/api/merchants/MerchantsController_getBalance)',
+    whenToUse:
+      'Use when onboarding status pages or routing API calls per sub-merchant.',
+    related:
+      '[Merchant balance](/api/merchants/MerchantsController_getBalance)',
   },
   MerchantsController_getMrr: {
     summary: 'Merchant monthly recurring revenue',
@@ -261,7 +265,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     summary: 'Create embedded card charge',
     body: 'Creates a card charge for embedded checkout and returns `client_secret` for client-side confirmation.',
     whenToUse:
-      "Use for in-app card entry where you own the product UI and tokenization flow.",
+      'Use for in-app card entry where you own the product UI and tokenization flow.',
     caveats:
       'Never log or expose `client_secret` publicly; treat it like a short-lived capability for the client SDK.',
     related:
@@ -271,20 +275,23 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     summary: 'Get embedded card charge',
     body: 'Retrieves card charge status and linked transaction when present.',
     whenToUse: 'Use after client confirmation to poll status.',
-    related: '[Create card charge](/api/charge/ChargesController_createCardCharge)',
+    related:
+      '[Create card charge](/api/charge/ChargesController_createCardCharge)',
   },
   ChargesController_cancelCardCharge: {
     summary: 'Cancel embedded card charge',
     body: 'Cancels a card charge before completion.',
     whenToUse: 'Use when the buyer abandons checkout.',
-    related: '[Create card charge](/api/charge/ChargesController_createCardCharge)',
+    related:
+      '[Create card charge](/api/charge/ChargesController_createCardCharge)',
   },
   ProvidersController_findAll: {
     summary: 'List payment providers',
     body: 'Returns payment providers and rails enabled for your organization.',
     whenToUse:
       'Use when building checkout method pickers or validating which rails you can charge on.',
-    related: '[Create Wave charge](/api/charge/ChargesController_createWaveCharge)',
+    related:
+      '[Create Wave charge](/api/charge/ChargesController_createWaveCharge)',
   },
   PaymentLinksController_create: {
     summary: 'Create payment link',
@@ -326,8 +333,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
   PayoutsUnifiedController_create: {
     summary: 'Create payout',
     body: 'Withdraw to a registered payout method (self) or pay a beneficiary on mobile rails (wave/SPI).',
-    whenToUse:
-      'Use for treasury movements from your lomi. balance.',
+    whenToUse: 'Use for treasury movements from your lomi. balance.',
     caveats:
       'Self payouts require payout_method_id; beneficiary wave requires recipient.name and recipient.phone (any mobile number, not payout_method_id). Wave rails (self or beneficiary) return 400 on test API keys—live keys only. MTN returns 400 until supported.',
     related:
@@ -398,7 +404,8 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
   RefundsController_findOne: {
     summary: 'Get refund',
     body: 'Returns a single refund by ID scoped to your organization.',
-    whenToUse: 'Use after create or from webhook-driven flows to confirm refund details.',
+    whenToUse:
+      'Use after create or from webhook-driven flows to confirm refund details.',
     related: '[Create refund](/api/refunds/RefundsController_create)',
   },
   SubscriptionsController_cancel: {

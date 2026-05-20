@@ -32,7 +32,5 @@ export function refundFeePercentageForBalanceRpc(
 
   if (!config || amount <= 0) return 0;
 
-  return (
-    (config.percentage ?? 0) + ((config.fixed_amount ?? 0) / amount) * 100
-  );
+  return (config.percentage ?? 0) + ((config.fixed_amount ?? 0) / amount) * 100;
 }

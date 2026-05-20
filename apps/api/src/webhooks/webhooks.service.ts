@@ -46,20 +46,19 @@ export class WebhooksService {
     const authorizedEvents = this.normalizeEvents(createDto.authorized_events);
     const metadata =
       createDto.metadata ??
-      (createDto.description
-        ? { description: createDto.description }
-        : null);
+      (createDto.description ? { description: createDto.description } : null);
 
-    const { data: webhookId, error } = await this.supabase
-      .getClient()
-      .rpc('create_webhook' as never, {
+    const { data: webhookId, error } = await this.supabase.getClient().rpc(
+      'create_webhook' as never,
+      {
         p_merchant_id: user.merchantId,
         p_organization_id: user.organizationId,
         p_url: createDto.url,
         p_authorized_events: authorizedEvents,
         p_metadata: metadata,
         p_environment: user.environment || 'live',
-      } as never);
+      } as never,
+    );
 
     if (error) {
       throw new BadRequestException(error.message);
@@ -96,9 +95,7 @@ export class WebhooksService {
 
     if (error) throw new Error(error.message);
     const rows = (data as Record<string, unknown>[]) || [];
-    return rows.map((row) =>
-      this.stripSecret(this.mapWebhookRow(row)),
-    );
+    return rows.map((row) => this.stripSecret(this.mapWebhookRow(row)));
   }
 
   async findOne(id: string, user: AuthContext) {
@@ -217,11 +214,7 @@ export class WebhooksService {
     return body;
   }
 
-  async retryDelivery(
-    webhookId: string,
-    logId: string,
-    user: AuthContext,
-  ) {
+  async retryDelivery(webhookId: string, logId: string, user: AuthContext) {
     await this.findOne(webhookId, user);
 
     const { data, error } = await this.supabase.getClient().rpc(

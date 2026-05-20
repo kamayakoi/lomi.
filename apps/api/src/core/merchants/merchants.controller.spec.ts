@@ -44,9 +44,8 @@ describe('MerchantsController', () => {
     };
     jest.spyOn(service, 'getDetails').mockResolvedValue(payload);
 
-    await expect(
-      controller.getDetails(user.merchantId, user),
-    ).resolves.toEqual(payload);
+    await expect(controller.getDetails(user.merchantId, user)).resolves.toEqual(
+      payload,
+    );
   });
-
 });

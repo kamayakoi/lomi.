@@ -147,7 +147,10 @@ export class ChargesService {
     }
   }
 
-  async createMtnCharge(createChargeDto: CreateMtnChargeDto, user: AuthContext) {
+  async createMtnCharge(
+    createChargeDto: CreateMtnChargeDto,
+    user: AuthContext,
+  ) {
     const {
       amount,
       currency,
@@ -165,8 +168,9 @@ export class ChargesService {
       paymentEnvironment === 'test' ? 'development' : 'production';
     const { targetEnvironment } = getMtnCountryConfig(countryCode ?? 'CI');
 
-    const { data: providers, error: providerError } =
-      await this.supabaseService.getClient().rpc(
+    const { data: providers, error: providerError } = await this.supabaseService
+      .getClient()
+      .rpc(
         'fetch_organization_providers_settings_api' as never,
         {
           p_merchant_id: merchantId,
@@ -211,20 +215,23 @@ export class ChargesService {
 
     const { data: txRows, error: txError } = await this.supabaseService
       .getClient()
-      .rpc('create_mtn_transaction' as never, {
-        p_merchant_id: merchantId,
-        p_organization_id: organizationId,
-        p_customer_id: custId,
-        p_amount: amount,
-        p_currency_code: currency,
-        p_product_id: productId ?? null,
-        p_subscription_id: subscriptionId ?? null,
-        p_description: description ?? 'API MTN charge',
-        p_metadata: { source: 'api_direct_charge' },
-        p_quantity: quantity,
-        p_checkout_session_id: null,
-        p_environment: paymentEnvironment,
-      } as never);
+      .rpc(
+        'create_mtn_transaction' as never,
+        {
+          p_merchant_id: merchantId,
+          p_organization_id: organizationId,
+          p_customer_id: custId,
+          p_amount: amount,
+          p_currency_code: currency,
+          p_product_id: productId ?? null,
+          p_subscription_id: subscriptionId ?? null,
+          p_description: description ?? 'API MTN charge',
+          p_metadata: { source: 'api_direct_charge' },
+          p_quantity: quantity,
+          p_checkout_session_id: null,
+          p_environment: paymentEnvironment,
+        } as never,
+      );
 
     const txRow = Array.isArray(txRows) ? txRows[0] : txRows;
     if (txError || !txRow) {
@@ -250,8 +257,9 @@ export class ChargesService {
       payeeNote: `Payment from ${customer.name} via lomi.`,
     };
 
-    const { data: mtnResponse, error: mtnError } =
-      await this.supabaseService.getClient().functions.invoke('mtn', {
+    const { data: mtnResponse, error: mtnError } = await this.supabaseService
+      .getClient()
+      .functions.invoke('mtn', {
         body: {
           path: '/collection/v1_0/requesttopay',
           method: 'POST',

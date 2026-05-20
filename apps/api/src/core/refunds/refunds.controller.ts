@@ -47,7 +47,10 @@ export class RefundsController {
     description: 'Remboursement enregistré',
     type: CreateRefundResponseDto,
   })
-  @ApiResponse({ status: 400, description: 'Entrée invalide ou type non pris en charge' })
+  @ApiResponse({
+    status: 400,
+    description: 'Entrée invalide ou type non pris en charge',
+  })
   async create(
     @Body() createRefundDto: CreateRefundDto,
     @CurrentUser() user: AuthContext,

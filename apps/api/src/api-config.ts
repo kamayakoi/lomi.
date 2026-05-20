@@ -237,7 +237,8 @@ export const API_RESOURCES: APIResourceConfig[] = [
     enabled: true,
     tag: 'Customer Subscriptions',
     idField: 'subscription_id',
-    description: 'Per-customer subscription management (alias of subscriptions RPCs)',
+    description:
+      'Per-customer subscription management (alias of subscriptions RPCs)',
     operations: {
       list: true,
       get: true,

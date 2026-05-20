@@ -82,15 +82,18 @@ export class PayoutsService {
     let beneficiaryRows: Record<string, unknown>[] = [];
     if (paymentEnvironment !== 'test') {
       const { data: beneficiaries, error: bError } =
-        await this.supabaseService.rpc('fetch_beneficiary_payouts' as never, {
-          p_merchant_id: user.merchantId,
-          p_statuses: statusFilter,
-          p_page_number: page,
-          p_page_size: pageSize,
-          p_start_date: startDate ?? null,
-          p_end_date: endDate ?? null,
-          p_currency_code: null,
-        } as never);
+        await this.supabaseService.rpc(
+          'fetch_beneficiary_payouts' as never,
+          {
+            p_merchant_id: user.merchantId,
+            p_statuses: statusFilter,
+            p_page_number: page,
+            p_page_size: pageSize,
+            p_start_date: startDate ?? null,
+            p_end_date: endDate ?? null,
+            p_currency_code: null,
+          } as never,
+        );
 
       if (bError) {
         throw new BadRequestException(bError.message);
@@ -104,10 +107,12 @@ export class PayoutsService {
       );
     }
 
-    const withdrawalRows = (withdrawals ?? []).map((row: Record<string, unknown>) => ({
-      ...row,
-      kind: 'withdrawal' as const,
-    }));
+    const withdrawalRows = (withdrawals ?? []).map(
+      (row: Record<string, unknown>) => ({
+        ...row,
+        kind: 'withdrawal' as const,
+      }),
+    );
 
     return {
       success: true,
@@ -118,10 +123,13 @@ export class PayoutsService {
   async findOne(id: string, user: AuthContext) {
     const { data: withdrawal, error: wError } = await this.supabaseService
       .getClient()
-      .rpc('get_payout_api' as never, {
-        p_payout_id: id,
-        p_organization_id: user.organizationId,
-      } as never);
+      .rpc(
+        'get_payout_api' as never,
+        {
+          p_payout_id: id,
+          p_organization_id: user.organizationId,
+        } as never,
+      );
 
     if (wError) {
       throw new BadRequestException(wError.message);
@@ -135,10 +143,13 @@ export class PayoutsService {
 
     const { data: beneficiary, error: bError } = await this.supabaseService
       .getClient()
-      .rpc('get_beneficiary_payout_api' as never, {
-        p_payout_id: id,
-        p_organization_id: user.organizationId,
-      } as never);
+      .rpc(
+        'get_beneficiary_payout_api' as never,
+        {
+          p_payout_id: id,
+          p_organization_id: user.organizationId,
+        } as never,
+      );
 
     if (bError) {
       throw new BadRequestException(bError.message);
@@ -206,7 +217,10 @@ export class PayoutsService {
     }
   }
 
-  private async createBeneficiaryPayout(dto: CreatePayoutDto, user: AuthContext) {
+  private async createBeneficiaryPayout(
+    dto: CreatePayoutDto,
+    user: AuthContext,
+  ) {
     switch (dto.rail) {
       case 'wave':
         this.assertWavePayoutAllowedInEnvironment(user);
@@ -301,13 +315,16 @@ export class PayoutsService {
   private async selfSpiPayout(dto: CreatePayoutDto, user: AuthContext) {
     const { data: initiated, error: initError } = await this.supabaseService
       .getClient()
-      .rpc('initiate_spi_payout' as never, {
-        p_organization_id: user.organizationId,
-        p_merchant_id: user.merchantId,
-        p_payout_method_id: dto.payout_method_id,
-        p_amount: dto.amount,
-        p_currency_code: dto.currency_code,
-      } as never);
+      .rpc(
+        'initiate_spi_payout' as never,
+        {
+          p_organization_id: user.organizationId,
+          p_merchant_id: user.merchantId,
+          p_payout_method_id: dto.payout_method_id,
+          p_amount: dto.amount,
+          p_currency_code: dto.currency_code,
+        } as never,
+      );
 
     if (initError) {
       throw new BadRequestException(
@@ -325,11 +342,14 @@ export class PayoutsService {
       spi_tx_id: string;
     };
 
-    await this.supabaseService.getClient().rpc('update_spi_payout_status' as never, {
-      p_payout_id: payoutId,
-      p_status: 'processing',
-      p_spi_tx_id: spiTxId,
-    } as never);
+    await this.supabaseService.getClient().rpc(
+      'update_spi_payout_status' as never,
+      {
+        p_payout_id: payoutId,
+        p_status: 'processing',
+        p_spi_tx_id: spiTxId,
+      } as never,
+    );
 
     return {
       success: true,
@@ -370,8 +390,7 @@ export class PayoutsService {
       payout_id: payload.payoutId,
       kind: 'withdrawal' as const,
       status: payload.status ?? 'processing',
-      message:
-        payload.message ?? 'Wave withdrawal initiated',
+      message: payload.message ?? 'Wave withdrawal initiated',
       data: result,
     };
   }
@@ -445,7 +464,9 @@ export class PayoutsService {
     } | null;
 
     if (!row?.payout_id) {
-      throw new BadRequestException(row?.message ?? 'Beneficiary payout failed');
+      throw new BadRequestException(
+        row?.message ?? 'Beneficiary payout failed',
+      );
     }
 
     return {

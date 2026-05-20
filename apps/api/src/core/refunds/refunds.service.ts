@@ -52,7 +52,10 @@ export class RefundsService {
   ) {}
 
   async create(dto: CreateRefundDto, user: AuthContext) {
-    const tx = await this.loadTransaction(dto.transaction_id, user.organizationId);
+    const tx = await this.loadTransaction(
+      dto.transaction_id,
+      user.organizationId,
+    );
     this.assertRefundable(tx, dto.amount);
 
     const gross = Number(tx.gross_amount);
@@ -79,12 +82,7 @@ export class RefundsService {
 
     if (tx.provider_code === 'WAVE') {
       if (isFullRefund) {
-        return this.createMobileMoneyFullRefund(
-          dto,
-          user,
-          tx,
-          feePercentage,
-        );
+        return this.createMobileMoneyFullRefund(dto, user, tx, feePercentage);
       }
       return this.createMobileMoneyPartialRefund(
         dto,
@@ -206,16 +204,22 @@ export class RefundsService {
   ): Promise<RefundFeeConfig> {
     const client = this.supabaseService.getClient();
     const [fullResult, partialResult] = await Promise.all([
-      client.rpc('get_effective_other_fee_config' as never, {
-        p_organization_id: organizationId,
-        p_currency_code: currencyCode,
-        p_subcategory: 'refund',
-      } as never),
-      client.rpc('get_effective_other_fee_config' as never, {
-        p_organization_id: organizationId,
-        p_currency_code: currencyCode,
-        p_subcategory: 'partial_refund',
-      } as never),
+      client.rpc(
+        'get_effective_other_fee_config' as never,
+        {
+          p_organization_id: organizationId,
+          p_currency_code: currencyCode,
+          p_subcategory: 'refund',
+        } as never,
+      ),
+      client.rpc(
+        'get_effective_other_fee_config' as never,
+        {
+          p_organization_id: organizationId,
+          p_currency_code: currencyCode,
+          p_subcategory: 'partial_refund',
+        } as never,
+      ),
     ]);
 
     const pick = (data: unknown) => {
@@ -273,8 +277,7 @@ export class RefundsService {
       transaction_id: dto.transaction_id,
       refunded_amount: result.refunded_amount ?? dto.amount,
       status: result.status ?? 'completed',
-      message:
-        'Refund recorded. Customer credit is processed by our team.',
+      message: 'Refund recorded. Customer credit is processed by our team.',
     };
   }
 
@@ -302,10 +305,7 @@ export class RefundsService {
 
     const ledgerResult = data as RpcRefundResult;
 
-    if (
-      !ledgerResult?.success ||
-      !ledgerResult.refund_id
-    ) {
+    if (!ledgerResult?.success || !ledgerResult.refund_id) {
       throw new BadRequestException(
         ledgerResult?.error ?? 'Failed to create Wave refund request',
       );
@@ -373,9 +373,11 @@ export class RefundsService {
       );
     }
 
-    const customer = await this.loadCustomer(tx.customer_id, user.organizationId);
-    const phone =
-      customer.phone_number || customer.whatsapp_number;
+    const customer = await this.loadCustomer(
+      tx.customer_id,
+      user.organizationId,
+    );
+    const phone = customer.phone_number || customer.whatsapp_number;
     if (!phone) {
       throw new BadRequestException(
         'Customer phone number is required for partial refunds',
@@ -390,8 +392,7 @@ export class RefundsService {
       recipientName: customer.name || 'Customer',
       recipientPhone: phone,
       description:
-        dto.reason ||
-        `Partial refund for transaction ${dto.transaction_id}`,
+        dto.reason || `Partial refund for transaction ${dto.transaction_id}`,
       metadata: {
         is_partial_refund: true,
         partial_refund_for_transaction: dto.transaction_id,
@@ -424,8 +425,9 @@ export class RefundsService {
       },
     });
 
-    const { data: chargeRows, error: chargeError } =
-      await this.supabaseService.getClient().rpc(
+    const { data: chargeRows, error: chargeError } = await this.supabaseService
+      .getClient()
+      .rpc(
         'apply_wave_partial_refund_charges' as never,
         {
           p_transaction_id: dto.transaction_id,
@@ -494,17 +496,21 @@ export class RefundsService {
     feeAmount: number;
     metadata: Record<string, unknown>;
   }): Promise<string> {
-    const { data: refundId, error: createError } =
-      await this.supabaseService.getClient().rpc('create_refund' as never, {
-        p_transaction_id: params.transactionId,
-        p_amount: params.amount,
-        p_reason: params.reason ?? null,
-        p_provider_transaction_id: null,
-        p_provider_merchant_id: null,
-        p_provider_code: params.providerCode,
-        p_metadata: params.metadata,
-        p_created_by: params.merchantId,
-      } as never);
+    const { data: refundId, error: createError } = await this.supabaseService
+      .getClient()
+      .rpc(
+        'create_refund' as never,
+        {
+          p_transaction_id: params.transactionId,
+          p_amount: params.amount,
+          p_reason: params.reason ?? null,
+          p_provider_transaction_id: null,
+          p_provider_merchant_id: null,
+          p_provider_code: params.providerCode,
+          p_metadata: params.metadata,
+          p_created_by: params.merchantId,
+        } as never,
+      );
 
     if (createError || !refundId) {
       this.logger.error(`create_refund failed: ${createError?.message}`);

@@ -44,7 +44,10 @@ export class PayoutsUnifiedController {
     description: 'Virement initié',
     type: CreatePayoutResponseDto,
   })
-  @ApiResponse({ status: 400, description: 'Entrée invalide ou rail non pris en charge' })
+  @ApiResponse({
+    status: 400,
+    description: 'Entrée invalide ou rail non pris en charge',
+  })
   create(@Body() dto: CreatePayoutDto, @CurrentUser() user: AuthContext) {
     return this.payoutsService.create(dto, user);
   }
@@ -66,7 +69,10 @@ export class PayoutsUnifiedController {
     @Query('pageSize', new DefaultValuePipe(50), ParseIntPipe) pageSize = 50,
   ) {
     const statuses = status
-      ? status.split(',').map((s) => s.trim()).filter(Boolean)
+      ? status
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean)
       : undefined;
     return this.payoutsService.findAll(
       user,

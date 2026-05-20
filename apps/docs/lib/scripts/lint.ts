@@ -236,7 +236,9 @@ function collectOpenApiForbiddenStrings(
     return;
   }
   if (value && typeof value === 'object') {
-    for (const [key, child] of Object.entries(value as Record<string, unknown>)) {
+    for (const [key, child] of Object.entries(
+      value as Record<string, unknown>,
+    )) {
       collectOpenApiForbiddenStrings(child, `${jsonPath}.${key}`, errors);
     }
   }
