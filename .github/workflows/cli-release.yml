@@ -9,9 +9,13 @@ on:
 permissions:
   contents: write
 
+env:
+  REPO_DIR: src
+
 jobs:
   build:
     strategy:
+      fail-fast: false
       matrix:
         include:
           - target: x86_64-apple-darwin
@@ -29,18 +33,22 @@ jobs:
 
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      # Repo name ends with "." — checkout to a safe path for Windows runners
+      - uses: actions/checkout@v5
+        with:
+          path: ${{ env.REPO_DIR }}
 
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: ${{ matrix.target }}
 
       - name: Generate rules (OpenAPI + llms.txt)
-        working-directory: apps/cli
+        working-directory: ${{ env.REPO_DIR }}/apps/cli
+        shell: bash
         run: ./scripts/generate-rules.sh
 
       - name: Build
-        working-directory: apps/cli
+        working-directory: ${{ env.REPO_DIR }}/apps/cli
         run: cargo build --release --target ${{ matrix.target }}
 
       - name: Stage release binary
@@ -48,9 +56,9 @@ jobs:
         run: |
           mkdir -p dist
           if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-            cp "apps/cli/target/${{ matrix.target }}/release/lomi.exe" "dist/${{ matrix.asset }}"
+            cp "${{ env.REPO_DIR }}/apps/cli/target/${{ matrix.target }}/release/lomi.exe" "dist/${{ matrix.asset }}"
           else
-            cp "apps/cli/target/${{ matrix.target }}/release/lomi" "dist/${{ matrix.asset }}"
+            cp "${{ env.REPO_DIR }}/apps/cli/target/${{ matrix.target }}/release/lomi" "dist/${{ matrix.asset }}"
           fi
 
       - name: Upload artifact
@@ -64,8 +72,6 @@ jobs:
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/cli-v')
     steps:
-      - uses: actions/checkout@v4
-
       - uses: actions/download-artifact@v4
         with:
           path: artifacts
@@ -83,9 +89,11 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/cli-v')
     defaults:
       run:
-        working-directory: apps/cli/npm
+        working-directory: ${{ env.REPO_DIR }}/apps/cli/npm
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
+        with:
+          path: ${{ env.REPO_DIR }}
 
       - uses: actions/setup-node@v4
         with:
@@ -99,7 +107,6 @@ jobs:
 
       - name: Verify release binaries exist on GitHub
         run: |
-          VERSION="${GITHUB_REF_NAME#cli-v}"
           TAG="${GITHUB_REF_NAME}"
           BASE="https://github.com/${{ github.repository }}/releases/download/${TAG}"
           for asset in lomi-x86_64-apple-darwin lomi-aarch64-apple-darwin lomi-x86_64-unknown-linux-gnu lomi-x86_64-pc-windows-msvc.exe; do
