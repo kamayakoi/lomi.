@@ -251,8 +251,8 @@ rate := lomi.PtrFloat64(0.025)
 | `ProductsAPI`         | `ListProducts`, `CreateProduct`, `RetrieveProduct`, `UpdateProduct`, `DeleteProduct`                                         |
 | `SubscriptionsAPI`    | `ListSubscriptions`, `CreateSubscription`, `RetrieveSubscription`, `UpdateSubscription`, `DeleteSubscription`                |
 | `RefundsAPI`          | `ListRefunds`, `CreateRefund`, `RetrieveRefund`                                                                              |
-| `PayoutsAPI`          | `ListPayouts`, `CreatePayout`, `RetrievePayout`                                                                              |
-| `BeneficiaryPayoutsAPI`| `ListBeneficiaryPayouts`, `CreateBeneficiaryPayout`, `RetrieveBeneficiaryPayout`                                            |
+| `PayoutsAPI`          | `ListPayouts`, `CreatePayout`, `RetrievePayout` (self et beneficiary via `destination`)                                    |
+| `ChargesAPI`          | `CreateWaveCharge`, `CreateMtnCharge`, `CreateCardCharge`, `GetCardCharge`, `CancelCardCharge`                               |
 | `PaymentRequestsAPI`  | `ListPaymentRequests`, `CreatePaymentRequest`, `RetrievePaymentRequest`                                                      |
 | `DiscountCouponsAPI`  | `ListDiscountCoupons`, `CreateDiscountCoupon`, `RetrieveDiscountCoupon`, `UpdateDiscountCoupon`, `DeleteDiscountCoupon`      |
 | `WebhookDeliveryLogsAPI`| `ListWebhookDeliveryLogs`, `RetrieveWebhookDeliveryLog`                                                                    |

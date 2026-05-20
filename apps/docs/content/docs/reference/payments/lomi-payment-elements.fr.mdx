@@ -55,7 +55,7 @@ Avant l’encaissement, créez un Payment Intent sur votre serveur :
 
 ```javascript
 // Votre serveur (exemple Node.js)
-const response = await fetch('https://api.lomi.africa/payment-intents', {
+const response = await fetch('https://api.lomi.africa/charge/card', {
   method: 'POST',
   headers: {
     'X-API-KEY': process.env.LOMI_API_KEY,
@@ -73,7 +73,7 @@ const clientSecret = body.data.client_secret;
 // Pass clientSecret to your frontend
 ```
 
-Détails de l’endpoint : [API Payment Intents](/reference/payments/payment-intents)
+Détails : [Créer un encaissement carte](/api/charge/ChargesController_createCardCharge)
 
 ### 3. Encaisser le paiement (client)
 
@@ -180,7 +180,7 @@ Détails de l’endpoint : [API Payment Intents](/reference/payments/payment-int
 ### Point de terminaison Payment Intent
 
 ```
-POST https://api.lomi.africa/payment-intents
+POST https://api.lomi.africa/charge/card
 ```
 
 | Paramètre        | Type   | Obligatoire | Description                      |

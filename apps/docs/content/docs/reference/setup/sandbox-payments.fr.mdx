@@ -71,7 +71,7 @@ En bac à sable, les paiements carte s’appuient sur des **numéros de carte de
 | Parcours | Ce que vous faites | Ce que fait lomi. |
 | --- | --- | --- |
 | **Checkout hébergé** | URL de test → **Carte** → saisie d’un numéro de test | Transaction **en attente**, puis **completed** et crédit du solde de test après confirmation réussie |
-| **API Payment Intents** | `POST /payment-intents` avec `lomi_sk_test_…` → confirmation avec `lomi_pk_test_…` côté client | Même logique : en attente jusqu’à confirmation, puis completed et solde de test crédité |
+| **API encaissement carte** | `POST /charge/card` avec `lomi_sk_test_…` → confirmation avec `lomi_pk_test_…` côté client | Même logique : en attente jusqu'à confirmation, puis completed et solde de test crédité |
 
 Le formulaire carte du checkout hébergé suit toujours l’environnement du lien de paiement ou de la session (test ou live).
 
@@ -208,6 +208,20 @@ Pour les numéros autorisés en bac à sable MTN, voir le [portail développeur 
 | **Wave** | À la création de la transaction de test | Jamais |
 | **MTN MoMo** | À la création de la transaction de test | Jamais |
 
+## Virements en mode test
+
+Avec une **clé API test**, `POST /payouts` se comporte ainsi :
+
+| `rail` | `destination` | Clé test |
+| --- | --- | --- |
+| `wave` | `self` ou `beneficiary` | **`400`** — virements Wave réservés au live ; aucun appel Wave |
+| `bank`, `spi` | `self` | Retraits test selon les enregistrements applicables |
+| `spi` | `beneficiary` | Peut créer des bénéficiaires en attente (pas de Wave live) |
+
+Les virements **Wave** vers un tiers exigent `recipient.name` et `recipient.phone` avec une **clé live**. Le numéro n’a pas besoin de correspondre à un `payout_method_id`. Voir **[Virements](/reference/payments/payouts)**.
+
+`GET /payouts` avec une clé test ne liste que les **retraits test** ; les virements bénéficiaires live sont exclus.
+
 ## Recettes API et checkout hébergé
 
 <Tabs items={['Test fumée', 'Session checkout', 'Payment intent', 'Lien de paiement']}>
@@ -244,7 +258,7 @@ Ouvrez le `checkout_url` retourné et payez avec une carte de test ou le mobile 
 <Tab value="Payment intent">
 
 ```bash
-curl -sS -X POST "https://sandbox.api.lomi.africa/payment-intents" \
+curl -sS -X POST "https://sandbox.api.lomi.africa/charge/card" \
   -H "X-API-Key: $LOMI_SECRET_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -255,7 +269,7 @@ curl -sS -X POST "https://sandbox.api.lomi.africa/payment-intents" \
   }'
 ```
 
-Utilisez le `client_secret` avec **`lomi_pk_test_…`** côté client. Voir **[Payment Intents](/reference/payments/payment-intents)** et **[lomi Payment Elements](/reference/payments/lomi-payment-elements)**.
+Utilisez le `client_secret` avec **`lomi_pk_test_…`** côté client. Voir **[Encaissements directs](/reference/payments/charges)** et **[lomi Payment Elements](/reference/payments/lomi-payment-elements)**.
 
 </Tab>
 
@@ -293,7 +307,7 @@ Voir **[Webhooks](/reference/payments/webhooks)**. Pour l’automatisation, voir
 - **[Authentification](/reference/setup/authentication)** — clés, environnements, sécurité
 - **[Intégration API](/reference/setup/integration)** — première requête et index API
 - **[Sessions checkout](/reference/payments/checkout-sessions)** — API checkout hébergé
-- **[Payment intents](/reference/payments/payment-intents)** — paiements carte intégrés
+- **[Encaissements directs](/reference/payments/charges)** — Wave, MTN et carte (`POST /charge/card`)
 - **[Liens de paiement](/reference/payments/payment-links)** — liens réutilisables
 - **[lomi Payment Elements](/reference/payments/lomi-payment-elements)** — UI carte côté client
 - **[Webhooks](/reference/payments/webhooks)** — abonnements aux événements

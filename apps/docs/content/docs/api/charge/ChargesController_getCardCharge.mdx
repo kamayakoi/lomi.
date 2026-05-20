@@ -1,6 +1,6 @@
 ---
-title: "Obtenir un encaissement carte"
-description: "Obtenir un encaissement carte"
+title: "Get embedded card charge"
+description: "Get embedded card charge"
 full: true
 method: get
 path: /charge/card/{id}
@@ -9,11 +9,18 @@ operationId: ChargesController_getCardCharge
 
 ## Overview
 
-Obtenir un encaissement carte
+Get embedded card charge
+
+Retrieves card charge status and linked transaction when present.
+
 
 ### When to use this
 
-Use this endpoint when your flow needs `GET /charge/card/&#123;id&#125;` (Obtenir un encaissement carte).
+Use after client confirmation to poll status.
+
+### See also
+
+[Create card charge](/api/charge/ChargesController_createCardCharge)
 
 
 ## Authentication
@@ -48,7 +55,9 @@ _No query parameters._
 
 | Status | Description |
 | --- | --- |
-| `200` | Encaissement carte |
+| `200` | Card charge status |
+
+Response schema: `CardChargeResponseDto` (same shape as create).
 
 ## Errors
 

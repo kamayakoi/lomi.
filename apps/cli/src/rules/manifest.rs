@@ -67,7 +67,7 @@ fn load_rule_file(relative_path: &str) -> Result<String> {
         "sdk-basics.md" => include_str!("../../rules/sdk-basics.md"),
         "checkout-sessions.md" => include_str!("../../rules/checkout-sessions.md"),
         "webhooks.md" => include_str!("../../rules/webhooks.md"),
-        "payment-intents.md" => include_str!("../../rules/payment-intents.md"),
+        "charges.md" => include_str!("../../rules/charges.md"),
         "subscriptions.md" => include_str!("../../rules/subscriptions.md"),
         "api-reference.md" => include_str!("../../rules/api-reference.md"),
         "llms.txt" => include_str!("../../rules/llms.txt"),

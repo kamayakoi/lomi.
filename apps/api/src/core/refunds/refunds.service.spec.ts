@@ -22,6 +22,19 @@ describe('RefundsService', () => {
     status: 'completed',
   };
 
+  const completedWaveTx = {
+    transaction_id: 'tx-wave',
+    organization_id: user.organizationId,
+    customer_id: 'cust-1',
+    gross_amount: 10000,
+    net_amount: 9500,
+    fee_amount: 500,
+    currency_code: 'XOF',
+    provider_code: 'WAVE',
+    payment_method_code: 'MOBILE_MONEY',
+    status: 'completed',
+  };
+
   function buildService(rpcImpl: (name: string, args: Record<string, unknown>) => unknown) {
     const rpc = jest.fn((name: string, args: Record<string, unknown>) =>
       Promise.resolve(rpcImpl(name, args)),
@@ -34,11 +47,24 @@ describe('RefundsService', () => {
       get: (key: string) =>
         key === 'SUPABASE_PROJECT_REF' ? 'proj' : 'anon-key',
     };
-    return { service: new RefundsService(configService as never, supabaseService as never), rpc };
+    const originalFetch = global.fetch;
+    global.fetch = jest.fn();
+
+    return {
+      service: new RefundsService(configService as never, supabaseService as never),
+      rpc,
+      restore: () => {
+        global.fetch = originalFetch;
+      },
+    };
   }
 
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   it('rejects unsupported provider', async () => {
-    const { service } = buildService((name) => {
+    const { service, restore } = buildService((name) => {
       if (name === 'get_transaction') {
         return {
           data: [
@@ -63,10 +89,12 @@ describe('RefundsService', () => {
         user,
       ),
     ).rejects.toThrow(BadRequestException);
+
+    restore();
   });
 
   it('creates card refund via create_manual_refund_request_api', async () => {
-    const { service, rpc } = buildService((name) => {
+    const { service, rpc, restore } = buildService((name) => {
       if (name === 'get_transaction') {
         return { data: [completedCardTx], error: null };
       }
@@ -100,10 +128,166 @@ describe('RefundsService', () => {
         p_transaction_id: 'tx-card',
       }),
     );
+
+    restore();
+  });
+
+  it('creates Wave full refund via ledger RPC then edge with refundId', async () => {
+    const { service, rpc, restore } = buildService((name) => {
+      if (name === 'get_transaction') {
+        return { data: [completedWaveTx], error: null };
+      }
+      if (name.startsWith('get_effective_other_fee_config')) {
+        return { data: [{ percentage: 2, fixed_amount: 0 }], error: null };
+      }
+      if (name === 'create_wave_refund_request_api') {
+        return {
+          data: {
+            success: true,
+            refund_id: 'ref-wave-full',
+            status: 'completed',
+          },
+          error: null,
+        };
+      }
+      return { data: null, error: null };
+    });
+
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      json: async () => ({ success: true, refundId: 'wave-ref-1' }),
+    });
+
+    const result = await service.create(
+      { transaction_id: 'tx-wave', amount: 10000, refund_type: 'full' },
+      user,
+    );
+
+    expect(result.refund_id).toBe('ref-wave-full');
+    expect(rpc).toHaveBeenCalledWith(
+      'create_wave_refund_request_api',
+      expect.objectContaining({
+        p_transaction_id: 'tx-wave',
+        p_refund_amount: 10000,
+      }),
+    );
+
+    const fetchBody = JSON.parse(
+      (global.fetch as jest.Mock).mock.calls[0][1].body,
+    );
+    expect(fetchBody.path).toBe('/refund');
+    expect(fetchBody.body.refundId).toBe('ref-wave-full');
+
+    restore();
+  });
+
+  it('rolls back Wave full refund when edge call fails', async () => {
+    const { service, rpc, restore } = buildService((name) => {
+      if (name === 'get_transaction') {
+        return { data: [completedWaveTx], error: null };
+      }
+      if (name.startsWith('get_effective_other_fee_config')) {
+        return { data: [{ percentage: 2, fixed_amount: 0 }], error: null };
+      }
+      if (name === 'create_wave_refund_request_api') {
+        return {
+          data: {
+            success: true,
+            refund_id: 'ref-wave-full',
+            status: 'completed',
+          },
+          error: null,
+        };
+      }
+      if (name === 'rollback_wave_refund') {
+        return {
+          data: { success: true, refund_id: 'ref-wave-full' },
+          error: null,
+        };
+      }
+      return { data: null, error: null };
+    });
+
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: false,
+      text: async () => 'Wave error',
+    });
+
+    await expect(
+      service.create(
+        { transaction_id: 'tx-wave', amount: 10000, refund_type: 'full' },
+        user,
+      ),
+    ).rejects.toThrow(BadRequestException);
+
+    expect(rpc).toHaveBeenCalledWith(
+      'rollback_wave_refund',
+      expect.objectContaining({ p_refund_id: 'ref-wave-full' }),
+    );
+
+    restore();
+  });
+
+  it('creates Wave partial refund via payout then create_refund only', async () => {
+    const { service, rpc, restore } = buildService((name, args) => {
+      if (name === 'get_transaction') {
+        return { data: [completedWaveTx], error: null };
+      }
+      if (name.startsWith('get_effective_other_fee_config')) {
+        return { data: [{ percentage: 2, fixed_amount: 0 }], error: null };
+      }
+      if (name === 'get_customer') {
+        return {
+          data: [{ name: 'Alice', phone_number: '+221771234567' }],
+          error: null,
+        };
+      }
+      if (name === 'create_refund') {
+        return { data: 'ref-partial', error: null };
+      }
+      if (name === 'update_organization_balance_for_refund') {
+        throw new Error('partial refunds must not debit balance twice');
+      }
+      return { data: null, error: null };
+    });
+
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        payoutId: 'payout-1',
+        wavePayoutId: 'wave-payout-1',
+        totalDeduction: 5100,
+      }),
+    });
+
+    const result = await service.create(
+      {
+        transaction_id: 'tx-wave',
+        amount: 5000,
+        refund_type: 'partial',
+      },
+      user,
+    );
+
+    expect(result.refund_id).toBe('ref-partial');
+    expect(rpc).toHaveBeenCalledWith(
+      'create_refund',
+      expect.objectContaining({
+        p_transaction_id: 'tx-wave',
+        p_amount: 5000,
+        p_metadata: expect.objectContaining({ balance_via_payout: true }),
+      }),
+    );
+    expect(rpc).not.toHaveBeenCalledWith(
+      'update_organization_balance_for_refund',
+      expect.anything(),
+    );
+
+    restore();
   });
 
   it('findOne throws when refund missing', async () => {
-    const { service } = buildService((name) => {
+    const { service, restore } = buildService((name) => {
       if (name === 'get_refund') {
         return { data: [], error: null };
       }
@@ -113,5 +297,7 @@ describe('RefundsService', () => {
     await expect(service.findOne('missing', user)).rejects.toThrow(
       NotFoundException,
     );
+
+    restore();
   });
 });

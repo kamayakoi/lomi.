@@ -1,6 +1,6 @@
 ---
-title: "Créer un virement"
-description: "Créer un virement"
+title: "Create payout"
+description: "Create payout"
 full: true
 method: post
 path: /payouts
@@ -9,14 +9,22 @@ operationId: PayoutsUnifiedController_create
 
 ## Overview
 
-Créer un virement
+Create payout
 
-Virement vers votre compte enregistré (self) ou vers un tiers sur mobile money / SPI (beneficiary).
+Withdraw to a registered payout method (self) or pay a beneficiary on mobile rails (wave/SPI).
 
 
 ### When to use this
 
-Use this endpoint when your flow needs `POST /payouts` (Créer un virement).
+Use for treasury movements from your lomi. balance.
+
+### Good to know
+
+Self payouts require payout_method_id; beneficiary wave requires recipient phone. MTN returns 400 until supported.
+
+### See also
+
+[List payouts](/api/payouts/PayoutsUnifiedController_findAll) · [Check available balance](/api/accounts/AccountsController_checkAvailableBalance)
 
 
 ## Authentication

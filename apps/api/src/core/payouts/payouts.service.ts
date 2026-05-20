@@ -79,33 +79,35 @@ export class PayoutsService {
       throw new BadRequestException(wError.message);
     }
 
-    const { data: beneficiaries, error: bError } = await this.supabaseService.rpc(
-      'fetch_beneficiary_payouts' as never,
-      {
-        p_merchant_id: user.merchantId,
-        p_statuses: statusFilter,
-        p_page_number: page,
-        p_page_size: pageSize,
-        p_start_date: startDate ?? null,
-        p_end_date: endDate ?? null,
-        p_currency_code: null,
-      } as never,
-    );
+    let beneficiaryRows: Record<string, unknown>[] = [];
+    if (paymentEnvironment !== 'test') {
+      const { data: beneficiaries, error: bError } =
+        await this.supabaseService.rpc('fetch_beneficiary_payouts' as never, {
+          p_merchant_id: user.merchantId,
+          p_statuses: statusFilter,
+          p_page_number: page,
+          p_page_size: pageSize,
+          p_start_date: startDate ?? null,
+          p_end_date: endDate ?? null,
+          p_currency_code: null,
+        } as never);
 
-    if (bError) {
-      throw new BadRequestException(bError.message);
+      if (bError) {
+        throw new BadRequestException(bError.message);
+      }
+
+      beneficiaryRows = (beneficiaries ?? []).map(
+        (row: Record<string, unknown>) => ({
+          ...row,
+          kind: 'beneficiary' as const,
+        }),
+      );
     }
 
     const withdrawalRows = (withdrawals ?? []).map((row: Record<string, unknown>) => ({
       ...row,
       kind: 'withdrawal' as const,
     }));
-    const beneficiaryRows = (beneficiaries ?? []).map(
-      (row: Record<string, unknown>) => ({
-        ...row,
-        kind: 'beneficiary' as const,
-      }),
-    );
 
     return {
       success: true,
@@ -179,6 +181,7 @@ export class PayoutsService {
         }
         return this.selfSpiPayout(dto, user);
       case 'wave':
+        this.assertWavePayoutAllowedInEnvironment(user);
         if (method.payout_method_type !== 'mobile_money') {
           throw new BadRequestException(
             'payout_method_id must be a registered mobile money payout method',
@@ -195,9 +198,18 @@ export class PayoutsService {
     }
   }
 
+  private assertWavePayoutAllowedInEnvironment(user: AuthContext): void {
+    if (environmentFromAuth(user) === 'test') {
+      throw new BadRequestException(
+        'Wave payouts are not available in test mode. Use a live API key.',
+      );
+    }
+  }
+
   private async createBeneficiaryPayout(dto: CreatePayoutDto, user: AuthContext) {
     switch (dto.rail) {
       case 'wave':
+        this.assertWavePayoutAllowedInEnvironment(user);
         if (!dto.recipient?.phone || !dto.recipient?.name) {
           throw new BadRequestException(
             'recipient.name and recipient.phone are required for beneficiary payouts',

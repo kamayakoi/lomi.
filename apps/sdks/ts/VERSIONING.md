@@ -18,5 +18,5 @@ Generators in `apps/sdks/scripts/` read the **same** merchant contract as the Ty
 Manifests (`sdk-public-methods.json`, `sdk_python_methods.json`, `sdk_go_methods.json`, `sdk_php_methods.json`) must list the **same** camelCase service keys and method names as TypeScript. Verify with `node scripts/verify-sdk-surface-parity.js` from [`apps/sdks/`](../) (see `verify:sdk-parity` in `apps/sdks/package.json`).
 
 - **Python**: service attributes on `LomiClient` use `snake_case` (e.g. `checkout_sessions`); method names use `snake_case` (e.g. `create_wave_payout`). See `sdk_python_methods.json` for the mapping vs TypeScript.
-- **Go / PHP**: exported struct fields / client properties follow **camelCase** parity with the TS manifest where applicable (e.g. `PaymentIntents`, `paymentIntents`).
+- **Go / PHP**: exported struct fields / client properties follow **camelCase** parity with the TS manifest where applicable (e.g. `Charges`, `charges`).
 - **Breaking changes** to the public allowlist or `METHOD_NAME_BY_OP` mappings are **major** for all published SDKs unless you provide explicit shims and a deprecation window.

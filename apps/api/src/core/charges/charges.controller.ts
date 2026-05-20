@@ -14,8 +14,8 @@ import { CreateMtnChargeDto } from './dto/create-mtn-charge.dto';
 import { ApiKeyGuard } from '../common/guards/api-key.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import type { AuthContext } from '../common/decorators/current-user.decorator';
-import { CreatePaymentIntentDto } from '../payment-intents/dto/create-payment-intent.dto';
-import { PaymentIntentResponseDto } from '../payment-intents/dto/payment-intent-response.dto';
+import { CreateCardChargeDto } from './dto/create-card-charge.dto';
+import { CardChargeResponseDto } from './dto/card-charge-response.dto';
 
 @ApiTags('Encaissements')
 @ApiSecurity('api-key')
@@ -76,11 +76,11 @@ export class ChargesController {
   @ApiResponse({
     status: 201,
     description: 'Encaissement carte créé',
-    type: PaymentIntentResponseDto,
+    type: CardChargeResponseDto,
   })
-  @ApiBody({ type: CreatePaymentIntentDto })
+  @ApiBody({ type: CreateCardChargeDto })
   createCardCharge(
-    @Body() createDto: CreatePaymentIntentDto,
+    @Body() createDto: CreateCardChargeDto,
     @CurrentUser() user: AuthContext,
   ) {
     return this.cardChargeService.create(createDto, user);
@@ -92,7 +92,7 @@ export class ChargesController {
   @ApiResponse({
     status: 200,
     description: 'Encaissement carte',
-    type: PaymentIntentResponseDto,
+    type: CardChargeResponseDto,
   })
   getCardCharge(@Param('id') id: string, @CurrentUser() user: AuthContext) {
     return this.cardChargeService.findOne(id, user);

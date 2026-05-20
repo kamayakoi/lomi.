@@ -1,8 +1,0 @@
-{
-  "title": "Beneficiary Payouts",
-  "pages": [
-    "BeneficiaryPayoutsController_create",
-    "BeneficiaryPayoutsController_findAll",
-    "BeneficiaryPayoutsController_findOne"
-  ]
-}

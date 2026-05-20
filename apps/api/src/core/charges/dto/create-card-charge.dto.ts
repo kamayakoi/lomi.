@@ -1,11 +1,11 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 /**
- * Request body for `POST /payment-intents`.
- * Validation runs in `PaymentIntentsService` (Swagger schema generation is more reliable
+ * Request body for `POST /charge/card`.
+ * Validation runs in `CardChargeService` (Swagger schema generation is more reliable
  * with explicit primitive `type` hints than with `class-validator` on this shape).
  */
-export class CreatePaymentIntentDto {
+export class CreateCardChargeDto {
   @ApiProperty({
     type: Number,
     example: 10000,

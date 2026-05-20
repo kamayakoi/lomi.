@@ -62,7 +62,7 @@ import { LomiSDK, LomiError } from '@lomi./sdk';
 const lomi = new LomiSDK({ apiKey: 'invalid-key' });
 
 try {
-  await lomi.providers.listProviders(); // Exemple de requête
+  await lomi.providers.list(); // Exemple de requête
 } catch (error) {
   if (error instanceof LomiApiError && error.statusCode === 401) {
     console.error('Authentication failed:', error.message);
@@ -93,7 +93,7 @@ const lomi = new LomiSDK({ apiKey: process.env.LOMI_API_KEY! });
 
 async function makeRequestWithRateLimitHandling() {
   try {
-    const response = await lomi.providers.listProviders();
+    const response = await lomi.providers.list();
     // Traiter la réponse en cas de succès
   } catch (error) {
     if (error instanceof LomiApiError && error.statusCode === 429) {

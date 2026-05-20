@@ -1,7 +1,0 @@
-{
-  "title": "Payout",
-  "pages": [
-    "PayoutsController_createSpiPayout",
-    "PayoutsController_createWavePayout"
-  ]
-}

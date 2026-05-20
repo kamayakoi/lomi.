@@ -1,19 +1,19 @@
 import { BadRequestException } from '@nestjs/common';
 
 /** UUID v4 pattern (relaxed case). */
-export const PAYMENT_INTENT_UUID_V4 =
+export const CARD_CHARGE_UUID_V4 =
   /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 const EMAIL_LIKE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export function assertPaymentIntentReconciliationInput(dto: {
+export function assertCardChargeReconciliationInput(dto: {
   customer_id?: string;
   customer_email?: string;
   customer_name?: string;
 }): void {
   const id = dto.customer_id?.trim();
   if (id) {
-    if (!PAYMENT_INTENT_UUID_V4.test(id)) {
+    if (!CARD_CHARGE_UUID_V4.test(id)) {
       throw new BadRequestException('customer_id must be a UUID v4');
     }
     return;
@@ -37,7 +37,7 @@ export function assertPaymentIntentReconciliationInput(dto: {
 export function assertOptionalUuid(field: string, value?: string): void {
   const v = value?.trim();
   if (!v) return;
-  if (!PAYMENT_INTENT_UUID_V4.test(v)) {
+  if (!CARD_CHARGE_UUID_V4.test(v)) {
     throw new BadRequestException(`${field} must be a UUID v4`);
   }
 }

@@ -1,6 +1,6 @@
 ---
-title: "Créer un encaissement carte (client_secret)"
-description: "Créer un encaissement carte (client_secret)"
+title: "Create embedded card charge"
+description: "Create embedded card charge"
 full: true
 method: post
 path: /charge/card
@@ -9,14 +9,22 @@ operationId: ChargesController_createCardCharge
 
 ## Overview
 
-Créer un encaissement carte (client_secret)
+Create embedded card charge
 
-Crée un encaissement carte embarqué et renvoie le client_secret pour votre interface de paiement.
+Creates a card charge for embedded checkout and returns `client_secret` for client-side confirmation.
 
 
 ### When to use this
 
-Use this endpoint when your flow needs `POST /charge/card` (Créer un encaissement carte (client_secret)).
+Use for in-app card entry where you own the product UI and tokenization flow.
+
+### Good to know
+
+Never log or expose `client_secret` publicly; treat it like a short-lived capability for the client SDK.
+
+### See also
+
+[Create checkout session](/api/checkout-sessions/CheckoutSessionsController_create) if you prefer hosted card collection.
 
 
 ## Authentication
@@ -48,7 +56,7 @@ _No query parameters._
 
 JSON request payload.
 
-Schema: `CreatePaymentIntentDto`
+Schema: `CreateCardChargeDto`
 
 | Field | Required | Type | Description |
 | --- | --- | --- | --- |
@@ -82,7 +90,9 @@ Example body:
 
 | Status | Description |
 | --- | --- |
-| `201` | Encaissement carte créé |
+| `201` | Card charge created |
+
+Response schema: `CardChargeResponseDto` — `success` and `data` with `client_secret`, `id` (e.g. `pi_…`), charge `amount`/`currency`, `original_amount`/`original_currency`, `status`, and optional `appearance` for Payment Element UI.
 
 ## Errors
 

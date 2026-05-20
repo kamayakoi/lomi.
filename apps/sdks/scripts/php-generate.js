@@ -255,8 +255,8 @@ class SurfaceTest extends TestCase
     {
         $c = new LomiClient('test');
         $this->assertInstanceOf(LomiClient::class, $c);
-        $this->assertTrue(property_exists($c, 'paymentIntents'));
         $this->assertTrue(property_exists($c, 'charges'));
+        $this->assertTrue(property_exists($c, 'payouts'));
     }
 }
 `,

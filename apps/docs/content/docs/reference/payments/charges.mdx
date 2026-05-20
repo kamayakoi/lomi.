@@ -1,6 +1,6 @@
 ---
 title: Direct charges
-description: Initiate direct payments using specific providers like Wave.
+description: Collect money via Wave, MTN, or embedded card (POST /charge/*).
 ---
 
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
@@ -135,3 +135,31 @@ Returns a `201 Created` status with the Wave session details and checkout URL.
 | `400` | Bad Request (e.g., missing provider configuration, invalid amount). |
 | `401` | Unauthorized (invalid API Key). |
 | `500` | Internal Server Error (payment provider failure). |
+
+## Embedded card charge
+
+Create a card payment and return a `client_secret` for your own checkout UI.
+
+### Endpoints
+
+| Method | Path |
+|--------|------|
+| `POST` | `/charge/card` |
+| `GET` | `/charge/card/{id}` |
+| `POST` | `/charge/card/{id}/cancel` |
+
+```typescript
+const res = await lomi.charges.createCardCharge({
+  amount: 10000,
+  currency_code: 'XOF',
+  customer_email: 'buyer@example.com',
+  customer_name: 'Buyer Name',
+});
+// res.data.client_secret → confirm on the client with your publishable key
+```
+
+See [Create card charge](/api/charge/ChargesController_createCardCharge) and [lomi Payment Elements](/reference/payments/lomi-payment-elements).
+
+## MTN direct charge
+
+`POST /charge/mtn` — same pattern as Wave; see [Create MTN charge](/api/charge/ChargesController_createMtnCharge).

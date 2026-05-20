@@ -3020,186 +3020,6 @@
         ]
       }
     },
-    "/beneficiary-payouts": {
-      "post": {
-        "description": "Initie un paiement vers un bénéficiaire (prestataire, fournisseur, salarié, etc.). Réponse immédiate en statut en attente ; le traitement est asynchrone côté fournisseur (Wave, SPI). Les mises à jour arrivent via webhooks. Sert à payer des tiers depuis le solde du compte.",
-        "operationId": "BeneficiaryPayoutsController_create",
-        "parameters": [],
-        "responses": {
-          "201": {
-            "description": "Paiement initié avec succès (statut en attente)",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BeneficiaryPayoutResponseDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Entrée invalide ou solde insuffisant"
-          },
-          "401": {
-            "description": "Clé API invalide ou manquante"
-          }
-        },
-        "security": [
-          {
-            "api-key": []
-          }
-        ],
-        "summary": "Lancer un paiement vers un bénéficiaire",
-        "tags": [
-          "Paiements vers bénéficiaires"
-        ]
-      },
-      "get": {
-        "description": "Renvoie les paiements de l'organisation avec pagination et filtres optionnels (statuts, plage de dates, devise).",
-        "operationId": "BeneficiaryPayoutsController_findAll",
-        "parameters": [
-          {
-            "name": "offset",
-            "required": false,
-            "in": "query",
-            "description": "Décalage pour la pagination",
-            "schema": {
-              "example": 0,
-              "type": "number"
-            }
-          },
-          {
-            "name": "limit",
-            "required": false,
-            "in": "query",
-            "description": "Nombre maximal de résultats",
-            "schema": {
-              "example": 50,
-              "type": "number"
-            }
-          },
-          {
-            "name": "currencyCode",
-            "required": false,
-            "in": "query",
-            "description": "Code devise",
-            "schema": {
-              "example": "XOF",
-              "type": "string"
-            }
-          },
-          {
-            "name": "endDate",
-            "required": false,
-            "in": "query",
-            "description": "Date de fin (ISO 8601)",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "startDate",
-            "required": false,
-            "in": "query",
-            "description": "Date de début (ISO 8601)",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "statuses",
-            "required": false,
-            "in": "query",
-            "description": "Statuts (séparés par des virgules)",
-            "schema": {
-              "example": "pending,completed,failed",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Liste paginée des paiements",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/BeneficiaryPayoutResponseDto"
-                      }
-                    },
-                    "limit": {
-                      "type": "number"
-                    },
-                    "offset": {
-                      "type": "number"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Clé API invalide ou manquante"
-          }
-        },
-        "security": [
-          {
-            "api-key": []
-          }
-        ],
-        "summary": "Lister les paiements vers bénéficiaires",
-        "tags": [
-          "Paiements vers bénéficiaires"
-        ]
-      }
-    },
-    "/beneficiary-payouts/{id}": {
-      "get": {
-        "description": "Renvoie le détail d’un paiement (statut actuel et informations fournisseur).",
-        "operationId": "BeneficiaryPayoutsController_findOne",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "description": "UUID du paiement",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Détails du paiement",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BeneficiaryPayoutResponseDto"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Clé API invalide ou manquante"
-          },
-          "404": {
-            "description": "Paiement introuvable ou accès refusé"
-          }
-        },
-        "security": [
-          {
-            "api-key": []
-          }
-        ],
-        "summary": "Obtenir un paiement bénéficiaire par ID",
-        "tags": [
-          "Paiements vers bénéficiaires"
-        ]
-      }
-    },
     "/webhook-delivery-logs": {
       "get": {
         "description": "Renvoie les journaux de livraison pour un webhook donné. Ils sont créés automatiquement lors des tentatives d'envoi. Filtrez avec le paramètre de requête webhookId.",
@@ -3615,7 +3435,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreatePaymentIntentDto"
+                "$ref": "#/components/schemas/CreateCardChargeDto"
               }
             }
           }
@@ -3626,7 +3446,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PaymentIntentResponseDto"
+                  "$ref": "#/components/schemas/CardChargeResponseDto"
                 }
               }
             }
@@ -3661,7 +3481,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PaymentIntentResponseDto"
+                  "$ref": "#/components/schemas/CardChargeResponseDto"
                 }
               }
             }
@@ -3703,144 +3523,6 @@
         "summary": "Annuler un encaissement carte",
         "tags": [
           "Encaissements"
-        ]
-      }
-    },
-    "/payment-intents": {
-      "post": {
-        "description": "Crée un intent de paiement carte pour une intégration embarquée et renvoie le client_secret.",
-        "operationId": "PaymentIntentsController_create",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreatePaymentIntentDto"
-              },
-              "examples": {
-                "minimal": {
-                  "summary": "Sans customer_id (e-mail + nom)",
-                  "value": {
-                    "amount": 10000,
-                    "currency_code": "XOF",
-                    "customer_email": "client@example.com",
-                    "customer_name": "Ada Lovelace"
-                  }
-                },
-                "withCustomer": {
-                  "summary": "Avec client + metadata",
-                  "value": {
-                    "amount": 25000,
-                    "currency_code": "XOF",
-                    "customer_id": "550e8400-e29b-41d4-a716-446655440000",
-                    "customer_email": "john@example.com",
-                    "customer_name": "John Doe",
-                    "description": "Invoice #INV-2026-001",
-                    "payment_reference": "INV-2026-001",
-                    "metadata": {
-                      "order_id": "ORD-2026-001",
-                      "source": "mobile_app"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Intent de paiement créé avec succès",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PaymentIntentResponseDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Entrée invalide ou erreur de préparation du montant"
-          },
-          "401": {
-            "description": "Clé API invalide ou manquante"
-          },
-          "503": {
-            "description": "Le processeur de paiement carte n’est pas configuré sur cette instance API"
-          }
-        },
-        "security": [
-          {
-            "api-key": []
-          }
-        ],
-        "summary": "Créer un intent de paiement carte (client_secret)",
-        "tags": [
-          "Intents de paiement"
-        ]
-      }
-    },
-    "/payment-intents/{id}": {
-      "get": {
-        "description": "Récupère l’intent de paiement carte et la transaction associée si elle existe.",
-        "operationId": "PaymentIntentsController_findOne",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "description": "Identifiant de l’intent de paiement (pi_...)",
-            "schema": {}
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Payment Intent",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PaymentIntentResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "api-key": []
-          }
-        ],
-        "summary": "Récupérer un intent de paiement carte",
-        "tags": [
-          "Intents de paiement"
-        ]
-      }
-    },
-    "/payment-intents/{id}/cancel": {
-      "post": {
-        "operationId": "PaymentIntentsController_cancel",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "description": "Identifiant de l’intent de paiement (pi_...)",
-            "schema": {}
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Intent de paiement annulé"
-          }
-        },
-        "security": [
-          {
-            "api-key": []
-          }
-        ],
-        "summary": "Annuler un intent de paiement carte",
-        "tags": [
-          "Intents de paiement"
         ]
       }
     },
@@ -6205,78 +5887,6 @@
           "success"
         ]
       },
-      "BeneficiaryPayoutResponseDto": {
-        "type": "object",
-        "properties": {
-          "account_id": {
-            "type": "string",
-            "example": "string"
-          },
-          "amount": {
-            "type": "number",
-            "example": 123
-          },
-          "created_at": {
-            "type": "string",
-            "example": "string"
-          },
-          "created_by": {
-            "type": "string",
-            "example": "string"
-          },
-          "currency_code": {
-            "type": "string",
-            "example": "string"
-          },
-          "metadata": {
-            "type": "object",
-            "example": {}
-          },
-          "organization_id": {
-            "type": "string",
-            "example": "string"
-          },
-          "payout_id": {
-            "type": "string",
-            "example": "string"
-          },
-          "payout_method_id": {
-            "type": "string",
-            "example": "string"
-          },
-          "provider_code": {
-            "type": "string",
-            "example": "string"
-          },
-          "spi_bulk_instruction_id": {
-            "type": "string",
-            "example": "string"
-          },
-          "status": {
-            "type": "string",
-            "example": "string"
-          },
-          "updated_at": {
-            "type": "string",
-            "example": "string"
-          }
-        },
-        "required": [
-          "account_id",
-          "amount",
-          "created_at",
-          "created_by",
-          "currency_code",
-          "metadata",
-          "organization_id",
-          "payout_id",
-          "payout_method_id",
-          "provider_code",
-          "spi_bulk_instruction_id",
-          "status",
-          "updated_at"
-        ]
-      },
       "WebhookDeliveryLogResponseDto": {
         "type": "object",
         "properties": {
@@ -6516,7 +6126,7 @@
           "webhook_id"
         ]
       },
-      "CreatePaymentIntentDto": {
+      "CreateCardChargeDto": {
         "type": "object",
         "properties": {
           "amount": {
@@ -6627,7 +6237,7 @@
           "amount"
         ]
       },
-      "PaymentIntentAppearanceDto": {
+      "CardChargeAppearanceDto": {
         "type": "object",
         "properties": {
           "theme": {
@@ -6644,7 +6254,7 @@
           }
         }
       },
-      "PaymentIntentDataDto": {
+      "CardChargeDataDto": {
         "type": "object",
         "properties": {
           "id": {
@@ -6676,7 +6286,7 @@
             "example": "requires_payment_method"
           },
           "appearance": {
-            "$ref": "#/components/schemas/PaymentIntentAppearanceDto"
+            "$ref": "#/components/schemas/CardChargeAppearanceDto"
           }
         },
         "required": [
@@ -6689,7 +6299,7 @@
           "status"
         ]
       },
-      "PaymentIntentResponseDto": {
+      "CardChargeResponseDto": {
         "type": "object",
         "properties": {
           "success": {
@@ -6697,7 +6307,7 @@
             "example": true
           },
           "data": {
-            "$ref": "#/components/schemas/PaymentIntentDataDto"
+            "$ref": "#/components/schemas/CardChargeDataDto"
           }
         },
         "required": [

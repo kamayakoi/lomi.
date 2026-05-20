@@ -50,6 +50,8 @@ _Aucun paramètre de requête._
 | --- | --- |
 | `200` | Encaissement carte |
 
+Schéma de réponse : `CardChargeResponseDto` (même forme qu’à la création).
+
 ## Erreurs
 
 Les erreurs suivent le format JSON standard (code de statut et message lisible par machine). Validez les entrées avant appel ; **401** indique une clé manquante/invalide, **404** une ressource introuvable pour cette organisation, **429** une limitation de débit. Pour les retries sûrs sur les créations, envoyez une clé d’idempotence quand votre flux le permet.

@@ -61,7 +61,7 @@ Base URLs:
 - `GET /payment-requests` — Lister les demandes de paiement
 - `POST /payment-requests` — Créer une demande de paiement
 - `GET /payment-requests/{id}` — Obtenir une demande de paiement par ID
-- `POST /payout/spi` — Lancer un virement SPI
+- `POST /payouts` — Créer un virement (self ou beneficiary)
 - `GET /payouts` — Lister les virements
 - `GET /products` — Lister les produits
 - `POST /products` — Créer un produit

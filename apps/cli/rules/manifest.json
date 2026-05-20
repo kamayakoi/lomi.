@@ -27,10 +27,10 @@
           "applyTo": "**/*.{ts,tsx,js,jsx}"
         },
         {
-          "name": "payment-intents",
-          "title": "Payment Intents",
-          "label": "Wave, Mobile Money, and card payment intents",
-          "path": "payment-intents.md",
+          "name": "charges",
+          "title": "Charges",
+          "label": "Wave, MTN MoMo, and embedded card charges",
+          "path": "charges.md",
           "applyTo": "**/*.{ts,tsx,js,jsx}"
         },
         {

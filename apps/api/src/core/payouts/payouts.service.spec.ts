@@ -7,16 +7,24 @@ import { SupabaseService } from '../../utils/supabase/supabase.service';
 describe('PayoutsService', () => {
   let service: PayoutsService;
 
-  const user = {
+  const liveUser = {
     merchantId: 'merchant-1',
     organizationId: 'org-1',
     environment: 'live' as const,
   };
 
+  const testUser = {
+    ...liveUser,
+    environment: 'test' as const,
+  };
+
+  const supabaseRpc = jest.fn();
+  const supabaseGetClientRpc = jest.fn();
+
   const supabaseMock = {
-    rpc: jest.fn(),
+    rpc: supabaseRpc,
     getClient: jest.fn(() => ({
-      rpc: jest.fn(),
+      rpc: supabaseGetClientRpc,
     })),
   };
 
@@ -43,6 +51,11 @@ describe('PayoutsService', () => {
 
     service = module.get(PayoutsService);
     jest.clearAllMocks();
+    global.fetch = jest.fn();
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   it('rejects beneficiary bank payouts', async () => {
@@ -54,7 +67,7 @@ describe('PayoutsService', () => {
           amount: 1000,
           currency_code: 'XOF',
         },
-        user,
+        liveUser,
       ),
     ).rejects.toThrow(BadRequestException);
   });
@@ -69,7 +82,7 @@ describe('PayoutsService', () => {
           currency_code: 'XOF',
           payout_method_id: '550e8400-e29b-41d4-a716-446655440000',
         },
-        user,
+        liveUser,
       ),
     ).rejects.toThrow(/MTN payouts are not supported/);
   });
@@ -83,8 +96,168 @@ describe('PayoutsService', () => {
           amount: 1000,
           currency_code: 'XOF',
         },
-        user,
+        liveUser,
       ),
     ).rejects.toThrow(/payout_method_id is required/);
+  });
+
+  it('rejects beneficiary Wave payouts in test mode', async () => {
+    await expect(
+      service.create(
+        {
+          destination: 'beneficiary',
+          rail: 'wave',
+          amount: 1000,
+          currency_code: 'XOF',
+          recipient: { name: 'Ada', phone: '+221771234567' },
+        },
+        testUser,
+      ),
+    ).rejects.toThrow(/Wave payouts are not available in test mode/);
+
+    expect(global.fetch).not.toHaveBeenCalled();
+  });
+
+  it('rejects self Wave payouts in test mode', async () => {
+    supabaseGetClientRpc.mockResolvedValueOnce({
+      data: [
+        {
+          payout_method_id: '550e8400-e29b-41d4-a716-446655440000',
+          organization_id: 'org-1',
+          account_number: '+221771234567',
+          account_name: 'Merchant',
+          payout_method_type: 'mobile_money',
+          is_valid: true,
+          is_spi_enabled: false,
+          auto_withdrawal_mobile_provider: 'WAVE',
+        },
+      ],
+      error: null,
+    });
+
+    await expect(
+      service.create(
+        {
+          destination: 'self',
+          rail: 'wave',
+          amount: 1000,
+          currency_code: 'XOF',
+          payout_method_id: '550e8400-e29b-41d4-a716-446655440000',
+        },
+        testUser,
+      ),
+    ).rejects.toThrow(/Wave payouts are not available in test mode/);
+
+    expect(global.fetch).not.toHaveBeenCalled();
+  });
+
+  it('requires recipient for beneficiary Wave payouts', async () => {
+    await expect(
+      service.create(
+        {
+          destination: 'beneficiary',
+          rail: 'wave',
+          amount: 1000,
+          currency_code: 'XOF',
+        },
+        liveUser,
+      ),
+    ).rejects.toThrow(/recipient.name and recipient.phone are required/);
+  });
+
+  it('calls Wave edge for live beneficiary Wave payouts', async () => {
+    (global.fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        payoutId: 'payout-uuid',
+        status: 'processing',
+      }),
+    });
+
+    const result = await service.create(
+      {
+        destination: 'beneficiary',
+        rail: 'wave',
+        amount: 1000,
+        currency_code: 'XOF',
+        recipient: { name: 'Ada Lovelace', phone: '+221771234567' },
+        reason: 'Invoice #12',
+      },
+      liveUser,
+    );
+
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+    const [url, options] = (global.fetch as jest.Mock).mock.calls[0] as [
+      string,
+      RequestInit,
+    ];
+    expect(url).toBe('https://testref.supabase.co/functions/v1/wave');
+    const body = JSON.parse(options.body as string) as {
+      path: string;
+      body: Record<string, unknown>;
+    };
+    expect(body.path).toBe('/beneficiary-payout');
+    expect(body.body).toMatchObject({
+      merchantId: 'merchant-1',
+      organizationId: 'org-1',
+      amount: 1000,
+      currency: 'XOF',
+      recipientName: 'Ada Lovelace',
+      recipientPhone: '+221771234567',
+      description: 'Invoice #12',
+    });
+    expect(result).toMatchObject({
+      success: true,
+      kind: 'beneficiary',
+      payout_id: 'payout-uuid',
+    });
+  });
+
+  it('does not fetch beneficiary payouts in test mode list', async () => {
+    supabaseRpc.mockResolvedValueOnce({
+      data: [{ payout_id: 'w-1' }],
+      error: null,
+    });
+
+    const result = await service.findAll(testUser);
+
+    expect(supabaseRpc).toHaveBeenCalledTimes(1);
+    expect(supabaseRpc).toHaveBeenCalledWith(
+      'fetch_payouts',
+      expect.objectContaining({
+        p_environment: 'test',
+      }),
+    );
+    expect(result.data).toEqual([
+      expect.objectContaining({ payout_id: 'w-1', kind: 'withdrawal' }),
+    ]);
+  });
+
+  it('fetches beneficiary payouts in live mode list', async () => {
+    supabaseRpc
+      .mockResolvedValueOnce({
+        data: [{ payout_id: 'w-1' }],
+        error: null,
+      })
+      .mockResolvedValueOnce({
+        data: [{ payout_id: 'b-1' }],
+        error: null,
+      });
+
+    const result = await service.findAll(liveUser);
+
+    expect(supabaseRpc).toHaveBeenCalledTimes(2);
+    expect(supabaseRpc).toHaveBeenNthCalledWith(
+      2,
+      'fetch_beneficiary_payouts',
+      expect.any(Object),
+    );
+    expect(result.data).toHaveLength(2);
+    expect(result.data).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ kind: 'withdrawal' }),
+        expect.objectContaining({ kind: 'beneficiary' }),
+      ]),
+    );
   });
 });

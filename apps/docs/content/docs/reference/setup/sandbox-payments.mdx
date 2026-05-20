@@ -71,7 +71,7 @@ Sandbox card payments use **test card numbers** that mimic real issuer behavior�
 | Flow | What you do | What lomi. does |
 | --- | --- | --- |
 | **Hosted checkout** | Open a test checkout URL → **Card** → enter a test number | Creates a **pending** transaction, then **completed** + test balance credit after successful card confirmation |
-| **Payment Intents API** | `POST /payment-intents` with `lomi_sk_test_…` → confirm with `lomi_pk_test_…` on the client | Same: pending until confirmation, then completed and test balance credited |
+| **Card charge API** | `POST /charge/card` with `lomi_sk_test_…` → confirm with `lomi_pk_test_…` on the client | Same: pending until confirmation, then completed and test balance credited |
 
 The card form on hosted checkout always matches the environment on the payment link or checkout session (test vs live).
 
@@ -208,6 +208,20 @@ For sandbox phone numbers allowed by MTN, see the [MTN MoMo developer portal](ht
 | **Wave** | When the test transaction is created | Never |
 | **MTN MoMo** | When the test transaction is created | Never |
 
+## Payouts in test mode
+
+`POST /payouts` with a **test API key** behaves as follows:
+
+| `rail` | `destination` | Test key |
+| --- | --- | --- |
+| `wave` | `self` or `beneficiary` | **`400`** — Wave payouts are live-only; no Wave API call |
+| `bank`, `spi` | `self` | Follows test withdrawal records where applicable |
+| `spi` | `beneficiary` | May create pending beneficiary records (no live Wave transfer) |
+
+Beneficiary **Wave** payouts require `recipient.name` and `recipient.phone` on a **live** key. The phone number does not need to match a registered `payout_method_id`. See **[Payouts](/reference/payments/payouts)**.
+
+`GET /payouts` with a test key returns **test withdrawals** only; live beneficiary payout rows are not included in the list.
+
 ## API and hosted checkout recipes
 
 <Tabs items={['Smoke test', 'Checkout session', 'Payment intent', 'Payment link']}>
@@ -244,7 +258,7 @@ Open the returned `checkout_url` and pay with a test card or mobile money method
 <Tab value="Payment intent">
 
 ```bash
-curl -sS -X POST "https://sandbox.api.lomi.africa/payment-intents" \
+curl -sS -X POST "https://sandbox.api.lomi.africa/charge/card" \
   -H "X-API-Key: $LOMI_SECRET_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -255,7 +269,7 @@ curl -sS -X POST "https://sandbox.api.lomi.africa/payment-intents" \
   }'
 ```
 
-Use the returned `client_secret` with **`lomi_pk_test_…`** on your client. See **[Payment Intents](/reference/payments/payment-intents)** and **[lomi Payment Elements](/reference/payments/lomi-payment-elements)**.
+Use the returned `client_secret` with **`lomi_pk_test_…`** on your client. See **[Direct charges](/reference/payments/charges)** and **[lomi Payment Elements](/reference/payments/lomi-payment-elements)**.
 
 </Tab>
 
@@ -293,7 +307,7 @@ See **[Webhooks](/reference/payments/webhooks)** for subscription management and
 - **[Authentication](/reference/setup/authentication)** — keys, environments, security
 - **[API integration](/reference/setup/integration)** — first request and API index
 - **[Checkout sessions](/reference/payments/checkout-sessions)** — hosted checkout API
-- **[Payment intents](/reference/payments/payment-intents)** — embedded card payments
+- **[Direct charges](/reference/payments/charges)** — Wave, MTN, and embedded card (`POST /charge/card`)
 - **[Payment links](/reference/payments/payment-links)** — reusable pay links
 - **[lomi Payment Elements](/reference/payments/lomi-payment-elements)** — client-side card UI
 - **[Webhooks](/reference/payments/webhooks)** — event subscriptions

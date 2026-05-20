@@ -96,7 +96,7 @@ use Lomi\LomiClient;
 $client = new LomiClient('your-api-key');
 
 $session = $client->checkoutSessions->create(['amount' => 5000]);
-$intent = $client->paymentIntents->create(['amount' => 1000]);
+$charge = $client->charges->createCardCharge(['amount' => 1000, 'currency_code' => 'XOF']);
 ```
 
 ## Available services
@@ -104,8 +104,7 @@ $intent = $client->paymentIntents->create(['amount' => 1000]);
 All SDKs provide access to these services:
 
 - `accounts` - Balance and account operations
-- `charges` - Direct charges (e.g. Wave)
-- `paymentIntents` - Payment intents API
+- `charges` - Wave, MTN, and embedded card charges (`/charge/*`)
 - `organizations` - Organization metrics (MRR, ARR, etc.)
 - `customers` - Customer management
 - `paymentRequests` - Payment requests
@@ -116,8 +115,10 @@ All SDKs provide access to these services:
 - `discountCoupons` - Coupon management
 - `checkoutSessions` - Checkout creation
 - `paymentLinks` - Payment links
-- `payouts` - Payout management (Platform withdrawals)
-- `beneficiaryPayouts` - Beneficiary payouts
+- `payouts` - Payouts (self withdrawals and beneficiary payouts via `destination`)
+- `customerSubscriptions` - Per-customer subscription management
+- `merchants` - Partner/sub-merchant metrics
+- `providers` - Enabled payment providers
 - `webhooks` - Webhook configuration
 - `webhookDeliveryLogs` - Webhook logs
 

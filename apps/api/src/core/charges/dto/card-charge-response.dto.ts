@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
-export class PaymentIntentAppearanceDto {
+export class CardChargeAppearanceDto {
   @ApiPropertyOptional({ example: 'light', type: String })
   theme?: 'light' | 'dark' | 'flat';
 
@@ -12,7 +12,7 @@ export class PaymentIntentAppearanceDto {
   billing_address?: 'auto' | 'never';
 }
 
-export class PaymentIntentDataDto {
+export class CardChargeDataDto {
   @ApiProperty({ example: 'pi_3QxYk6...', type: String })
   id: string;
 
@@ -34,14 +34,14 @@ export class PaymentIntentDataDto {
   @ApiProperty({ example: 'requires_payment_method', type: String })
   status: string;
 
-  @ApiPropertyOptional({ type: PaymentIntentAppearanceDto })
-  appearance?: PaymentIntentAppearanceDto;
+  @ApiPropertyOptional({ type: CardChargeAppearanceDto })
+  appearance?: CardChargeAppearanceDto;
 }
 
-export class PaymentIntentResponseDto {
+export class CardChargeResponseDto {
   @ApiProperty({ example: true, type: Boolean })
   success: boolean;
 
-  @ApiProperty({ type: PaymentIntentDataDto })
-  data: PaymentIntentDataDto;
+  @ApiProperty({ type: CardChargeDataDto })
+  data: CardChargeDataDto;
 }

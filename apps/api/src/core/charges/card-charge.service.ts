@@ -10,17 +10,17 @@ import { SupabaseService } from '../../utils/supabase/supabase.service';
 import { normalizePaymentEnvironment } from '../../utils/payment-environment';
 import { StripeClientsService } from '../../utils/stripe/stripe-clients.service';
 import { AuthContext } from '../common/decorators/current-user.decorator';
-import { CreatePaymentIntentDto } from '../payment-intents/dto/create-payment-intent.dto';
+import { CreateCardChargeDto } from './dto/create-card-charge.dto';
 import {
   assertOptionalUuid,
-  assertPaymentIntentReconciliationInput,
-} from '../payment-intents/dto/assert-payment-intent-reconciliation';
+  assertCardChargeReconciliationInput,
+} from './dto/assert-card-charge-reconciliation';
 
 type StripeTheme = 'stripe' | 'night' | 'flat';
 type LomiTheme = 'light' | 'dark' | 'flat';
 
 function toStripeTheme(
-  theme?: CreatePaymentIntentDto['appearance_theme'],
+  theme?: CreateCardChargeDto['appearance_theme'],
 ): StripeTheme | undefined {
   if (!theme) return undefined;
   if (theme === 'light' || theme === 'stripe') return 'stripe';
@@ -29,7 +29,7 @@ function toStripeTheme(
 }
 
 function toLomiTheme(
-  theme?: CreatePaymentIntentDto['appearance_theme'],
+  theme?: CreateCardChargeDto['appearance_theme'],
 ): LomiTheme | undefined {
   if (!theme) return undefined;
   if (theme === 'light' || theme === 'stripe') return 'light';
@@ -46,11 +46,11 @@ export class CardChargeService {
     private readonly stripeClients: StripeClientsService,
   ) {}
 
-  async create(createDto: CreatePaymentIntentDto, user: AuthContext) {
+  async create(createDto: CreateCardChargeDto, user: AuthContext) {
     const stripe = this.stripeClients.getClient(user.environment);
     const paymentEnv = normalizePaymentEnvironment(user.environment);
 
-    assertPaymentIntentReconciliationInput(createDto);
+    assertCardChargeReconciliationInput(createDto);
     assertOptionalUuid('product_id', createDto.product_id);
     assertOptionalUuid('subscription_id', createDto.subscription_id);
 
@@ -268,7 +268,7 @@ export class CardChargeService {
    * or create/find via RPC before any Stripe call.
    */
   private async resolveCustomerId(
-    createDto: CreatePaymentIntentDto,
+    createDto: CreateCardChargeDto,
     user: AuthContext,
   ): Promise<string> {
     const trimmedId = createDto.customer_id?.trim();
@@ -310,7 +310,7 @@ export class CardChargeService {
   }
 
   private buildMetadata(
-    createDto: CreatePaymentIntentDto,
+    createDto: CreateCardChargeDto,
     user: AuthContext,
     sourceCurrency: string,
     amount: number,
@@ -392,7 +392,7 @@ export class CardChargeService {
   }
 
   private async createPendingTransaction(
-    createDto: CreatePaymentIntentDto,
+    createDto: CreateCardChargeDto,
     user: AuthContext,
     paymentEnv: ReturnType<typeof normalizePaymentEnvironment>,
     sourceCurrency: string,

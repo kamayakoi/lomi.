@@ -53,30 +53,6 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     whenToUse:
       'Use when finance or support teams need a split between pending and available, not just a single number.',
   },
-  BeneficiaryPayoutsController_create: {
-    summary: 'Create beneficiary payout',
-    body: 'Initiates a payout from your balance to a third-party beneficiary on supported rails.',
-    whenToUse:
-      'Use when paying suppliers or partners to a saved beneficiary profile—not the same as a standard organization payout.',
-    caveats:
-      'Processing is **asynchronous**. Treat the response as accepted for processing; definitive status arrives via [outbound webhooks](/api/webhooks/WebhooksController_findAll) and reconciliation APIs.',
-    related:
-      '[List beneficiary payouts](/api/beneficiary-payouts/BeneficiaryPayoutsController_findAll) · [Check balance](/api/accounts/AccountsController_checkAvailableBalance)',
-  },
-  BeneficiaryPayoutsController_findAll: {
-    summary: 'List beneficiary payouts',
-    body: 'Returns beneficiary payouts for your organization with pagination and filters as exposed by the API.',
-    whenToUse:
-      'Use for ops dashboards, support lookup, or syncing payout state into your back office.',
-    related:
-      '[Retrieve beneficiary payout](/api/beneficiary-payouts/BeneficiaryPayoutsController_findOne)',
-  },
-  BeneficiaryPayoutsController_findOne: {
-    summary: 'Retrieve beneficiary payout',
-    body: 'Returns one beneficiary payout by ID. Responds with **404** when unknown or inaccessible.',
-    whenToUse:
-      'Use when a webhook references a payout ID or a user opens a payout detail screen.',
-  },
   ChargesController_createWaveCharge: {
     summary: 'Create direct mobile-money charge',
     body: 'Starts a payer-facing mobile-money charge on a supported rail; the response includes the next step for the customer.',
@@ -86,6 +62,16 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
       'Follow the provider instructions in the response; UX is rail-specific (USSD, app redirect, etc.).',
     related:
       '[Create checkout session](/api/checkout-sessions/CheckoutSessionsController_create) · [Transactions](/api/transactions/TransactionsController_findAll)',
+  },
+  ChargesController_createMtnCharge: {
+    summary: 'Create MTN MoMo charge',
+    body: 'Starts a payer-facing MTN Mobile Money charge; the response includes the next step for the customer.',
+    whenToUse:
+      'Use for server-initiated MTN collection when you are **not** using a hosted checkout session.',
+    caveats:
+      'Follow the provider instructions in the response; UX is rail-specific (USSD, app prompt, etc.).',
+    related:
+      '[Create Wave charge](/api/charge/ChargesController_createWaveCharge) · [Transactions](/api/transactions/TransactionsController_findAll)',
   },
   CheckoutSessionsController_create: {
     summary: 'Create checkout session',
@@ -157,6 +143,52 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     whenToUse:
       'Use when buyers edit their profile or when syncing CRM changes into lomi.',
   },
+  CustomersController_createPortalLaunchSession: {
+    summary: 'Create customer portal session',
+    body: 'Returns a short-lived URL so the customer can manage subscriptions and payment methods in the hosted portal.',
+    whenToUse:
+      'Use from your app when a logged-in buyer opens “Manage billing” without building portal UI yourself.',
+    related:
+      '[Portal audit log](/api/customers/CustomersController_getPortalAudit) · [Customer subscriptions](/api/customer-subscriptions/CustomerSubscriptionsController_findAll)',
+  },
+  CustomersController_getPortalAudit: {
+    summary: 'Customer portal audit log',
+    body: 'Returns portal activity for a customer (sign-ins, subscription changes, etc.) for support and compliance.',
+    whenToUse:
+      'Use when investigating billing disputes or verifying what the customer changed in the portal.',
+    related:
+      '[Create portal session](/api/customers/CustomersController_createPortalLaunchSession)',
+  },
+  CustomerSubscriptionsController_findAll: {
+    summary: 'List customer subscriptions',
+    body: 'Returns subscriptions across customers with filters as exposed by the API.',
+    whenToUse:
+      'Use for billing ops dashboards and exports—not the same as org-level [subscriptions](/api/subscriptions/SubscriptionsController_findAll).',
+    related:
+      '[Retrieve customer subscription](/api/customer-subscriptions/CustomerSubscriptionsController_findOne)',
+  },
+  CustomerSubscriptionsController_findOne: {
+    summary: 'Retrieve customer subscription',
+    body: 'Returns one customer-scoped subscription by ID. Responds with **404** when unknown or inaccessible.',
+    whenToUse:
+      'Use on portal backends or before patching/canceling a single buyer plan.',
+  },
+  CustomerSubscriptionsController_remove: {
+    summary: 'Cancel customer subscription',
+    body: 'Ends a customer subscription according to platform cancelation rules.',
+    whenToUse:
+      'Use when the buyer cancels via your UI or support cancels on their behalf.',
+    related:
+      '[Update customer subscription](/api/customer-subscriptions/CustomerSubscriptionsController_update)',
+  },
+  CustomerSubscriptionsController_update: {
+    summary: 'Update customer subscription',
+    body: 'Patches a customer subscription (plan, metadata, or lifecycle fields supported by the API).',
+    whenToUse:
+      'Use for upgrades, downgrades, or syncing subscription state from your billing system.',
+    related:
+      '[Retrieve customer subscription](/api/customer-subscriptions/CustomerSubscriptionsController_findOne)',
+  },
   DiscountCouponsController_create: {
     summary: 'Create discount coupon',
     body: 'Creates a coupon with scope and redemption rules for use at checkout or payment links.',
@@ -181,6 +213,31 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     whenToUse: 'Use in marketing dashboards to measure campaign effectiveness.',
     related:
       '[Retrieve coupon](/api/discount-coupons/DiscountCouponsController_findOne)',
+  },
+  MerchantsController_getArr: {
+    summary: 'Merchant annual recurring revenue',
+    body: 'Returns ARR metrics for a merchant ID visible to your API key.',
+    whenToUse: 'Use in partner or marketplace reporting where you track sub-merchant performance.',
+    related: '[Merchant MRR](/api/merchants/MerchantsController_getMrr)',
+  },
+  MerchantsController_getBalance: {
+    summary: 'Merchant balance',
+    body: 'Returns balance figures for a merchant ID (available, pending, or totals per API shape).',
+    whenToUse:
+      'Use for marketplace dashboards before initiating movements on behalf of a connected merchant.',
+    related: '[Merchant details](/api/merchants/MerchantsController_getDetails)',
+  },
+  MerchantsController_getDetails: {
+    summary: 'Merchant details',
+    body: 'Returns profile and configuration metadata for a merchant ID.',
+    whenToUse: 'Use when onboarding status pages or routing API calls per sub-merchant.',
+    related: '[Merchant balance](/api/merchants/MerchantsController_getBalance)',
+  },
+  MerchantsController_getMrr: {
+    summary: 'Merchant monthly recurring revenue',
+    body: 'Returns MRR metrics for a merchant ID visible to your API key.',
+    whenToUse: 'Use for monthly revenue rollups in partner analytics.',
+    related: '[Merchant ARR](/api/merchants/MerchantsController_getArr)',
   },
   OrganizationsController_findAll: {
     summary: 'List organizations',
@@ -221,6 +278,13 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     body: 'Cancels a card charge before completion.',
     whenToUse: 'Use when the buyer abandons checkout.',
     related: '[Create card charge](/api/charge/ChargesController_createCardCharge)',
+  },
+  ProvidersController_findAll: {
+    summary: 'List payment providers',
+    body: 'Returns payment providers and rails enabled for your organization.',
+    whenToUse:
+      'Use when building checkout method pickers or validating which rails you can charge on.',
+    related: '[Create Wave charge](/api/charge/ChargesController_createWaveCharge)',
   },
   PaymentLinksController_create: {
     summary: 'Create payment link',
@@ -265,7 +329,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     whenToUse:
       'Use for treasury movements from your lomi. balance.',
     caveats:
-      'Self payouts require payout_method_id; beneficiary wave requires recipient phone. MTN returns 400 until supported.',
+      'Self payouts require payout_method_id; beneficiary wave requires recipient.name and recipient.phone (any mobile number, not payout_method_id). Wave rails (self or beneficiary) return 400 on test API keys—live keys only. MTN returns 400 until supported.',
     related:
       '[List payouts](/api/payouts/PayoutsUnifiedController_findAll) · [Check available balance](/api/accounts/AccountsController_checkAvailableBalance)',
   },
@@ -362,6 +426,14 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     body: 'Returns one subscription by ID including cycle and price references. Responds with **404** when unknown or inaccessible.',
     whenToUse: 'Use before upgrades, cancelations, or invoicing integration.',
   },
+  SubscriptionsController_update: {
+    summary: 'Update subscription',
+    body: 'Patches an organization subscription (metadata, price, or fields supported by the API).',
+    whenToUse:
+      'Use for plan changes initiated from your admin tools—not the customer-portal-scoped [customer subscriptions](/api/customer-subscriptions/CustomerSubscriptionsController_update) API.',
+    related:
+      '[Retrieve subscription](/api/subscriptions/SubscriptionsController_findOne) · [Cancel subscription](/api/subscriptions/SubscriptionsController_cancel)',
+  },
   TransactionsController_findAll: {
     summary: 'List transactions',
     body: 'Returns ledger transactions with filters for status, provider, method, currency, and time range.',
@@ -389,6 +461,16 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     whenToUse:
       'Use when correlating one failure with a specific HTTP response body your server returned.',
   },
+  WebhooksController_create: {
+    summary: 'Create webhook',
+    body: 'Registers an outbound HTTPS endpoint and the event types you want delivered.',
+    whenToUse:
+      'Use once per environment when wiring your server to lomi. event notifications.',
+    caveats:
+      'Store the signing secret securely; verify signatures on every inbound request.',
+    related:
+      '[List webhooks](/api/webhooks/WebhooksController_findAll) · [Test webhook](/api/webhooks/WebhooksController_test)',
+  },
   WebhooksController_findAll: {
     summary: 'List webhooks',
     body: 'Returns configured outbound webhook subscriptions (URL, events, signing configuration).',
@@ -399,6 +481,27 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     summary: 'Retrieve webhook',
     body: 'Returns one outbound subscription by ID for editing forms.',
     whenToUse: 'Use before rotating secrets or changing the event filter.',
+  },
+  WebhooksController_remove: {
+    summary: 'Delete webhook',
+    body: 'Removes an outbound webhook subscription; deliveries stop for that endpoint.',
+    whenToUse:
+      'Use when decommissioning an environment or rotating to a new endpoint record.',
+    related: '[Create webhook](/api/webhooks/WebhooksController_create)',
+  },
+  WebhooksController_retryDelivery: {
+    summary: 'Retry webhook delivery',
+    body: 'Re-sends a single failed delivery attempt for debugging after you fix your receiver.',
+    whenToUse:
+      'Use from support tools—not a substitute for idempotent handling on your server.',
+    related:
+      '[Webhook delivery logs](/api/webhook-delivery-logs/WebhookDeliveryLogsController_findOne)',
+  },
+  WebhooksController_test: {
+    summary: 'Test webhook',
+    body: 'Sends a sample event to the configured URL so you can validate signature verification and parsing.',
+    whenToUse: 'Use immediately after creating or updating a webhook endpoint.',
+    related: '[Create webhook](/api/webhooks/WebhooksController_create)',
   },
   WebhooksController_update: {
     summary: 'Update webhook',

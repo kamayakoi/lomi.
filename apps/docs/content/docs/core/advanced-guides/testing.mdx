@@ -182,7 +182,7 @@ describe('API Error Handling', () => {
       baseUrl: '...',
     });
     try {
-      await invalidLomi.providers.listProviders();
+      await invalidLomi.providers.list();
       fail('Request should have failed');
     } catch (error: any) {
       expect(error.statusCode).toBe(401);

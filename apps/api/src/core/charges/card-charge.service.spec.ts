@@ -16,14 +16,14 @@ import {
   BadRequestException,
   ServiceUnavailableException,
 } from '@nestjs/common';
-import { PaymentIntentsService } from './payment-intents.service';
+import { CardChargeService } from './card-charge.service';
 import { SupabaseService } from '../../utils/supabase/supabase.service';
 import { StripeClientsService } from '../../utils/stripe/stripe-clients.service';
-import { CreatePaymentIntentDto } from './dto/create-payment-intent.dto';
+import { CreateCardChargeDto } from './dto/create-card-charge.dto';
 import { AuthContext } from '../common/decorators/current-user.decorator';
 
-describe('PaymentIntentsService', () => {
-  let service: PaymentIntentsService;
+describe('CardChargeService', () => {
+  let service: CardChargeService;
   let rpcMock: jest.Mock;
 
   const user = {
@@ -44,7 +44,7 @@ describe('PaymentIntentsService', () => {
 
     const moduleRef: TestingModule = await Test.createTestingModule({
       providers: [
-        PaymentIntentsService,
+        CardChargeService,
         StripeClientsService,
         {
           provide: SupabaseService,
@@ -53,7 +53,7 @@ describe('PaymentIntentsService', () => {
       ],
     }).compile();
 
-    service = moduleRef.get(PaymentIntentsService);
+    service = moduleRef.get(CardChargeService);
 
     rpcMock.mockImplementation((fnName: string) => {
       if (fnName === 'prepare_stripe_payment_amount') {
@@ -101,7 +101,7 @@ describe('PaymentIntentsService', () => {
       amount: 10,
       currency_code: 'XOF',
       customer_email: 'a@example.com',
-    } as CreatePaymentIntentDto;
+    } as CreateCardChargeDto;
 
     await expect(service.create(dto, user)).rejects.toBeInstanceOf(
       BadRequestException,
@@ -117,7 +117,7 @@ describe('PaymentIntentsService', () => {
       description: 'Test',
       quantity: 2,
       metadata: { order: 'ORD-9' },
-    } as CreatePaymentIntentDto;
+    } as CreateCardChargeDto;
 
     const result = await service.create(dto, user);
 
@@ -166,7 +166,7 @@ describe('PaymentIntentsService', () => {
       currency_code: 'EUR',
       customer_email: 'a@example.com',
       customer_name: 'Ada Lovelace',
-    } as CreatePaymentIntentDto;
+    } as CreateCardChargeDto;
 
     await service.create(dto, user);
 
@@ -196,7 +196,7 @@ describe('PaymentIntentsService', () => {
     const dto = {
       amount: 10,
       customer_id: '550e8400-e29b-41d4-a716-446655440000',
-    } as CreatePaymentIntentDto;
+    } as CreateCardChargeDto;
 
     await expect(service.create(dto, user)).rejects.toBeInstanceOf(
       BadRequestException,
@@ -230,7 +230,7 @@ describe('PaymentIntentsService', () => {
       amount: 10,
       customer_email: 'x@example.com',
       customer_name: 'Test',
-    } as CreatePaymentIntentDto;
+    } as CreateCardChargeDto;
 
     await expect(service.create(dto, user)).rejects.toBeInstanceOf(
       BadRequestException,
@@ -263,7 +263,7 @@ describe('PaymentIntentsService', () => {
     const dto = {
       amount: 10,
       customer_id: '550e8400-e29b-41d4-a716-446655440000',
-    } as CreatePaymentIntentDto;
+    } as CreateCardChargeDto;
 
     await expect(service.create(dto, user)).rejects.toBeInstanceOf(
       BadRequestException,
@@ -280,19 +280,19 @@ describe('PaymentIntentsService', () => {
 
       const mod = await Test.createTestingModule({
         providers: [
-          PaymentIntentsService,
+          CardChargeService,
           StripeClientsService,
           { provide: SupabaseService, useValue: supabaseOnly },
         ],
       }).compile();
 
-      const bare = mod.get(PaymentIntentsService);
+      const bare = mod.get(CardChargeService);
       await expect(
         bare.create(
           {
             amount: 1,
             customer_id: '550e8400-e29b-41d4-a716-446655440000',
-          } as CreatePaymentIntentDto,
+          } as CreateCardChargeDto,
           user,
         ),
       ).rejects.toBeInstanceOf(ServiceUnavailableException);

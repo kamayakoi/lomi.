@@ -9,7 +9,11 @@ import { Callout } from 'fumadocs-ui/components/callout';
 Utilisez **`POST /payouts`** pour tous les virements sortants.
 
 - **`destination: "self"`** — retrait vers un **moyen de paiement enregistré** (`payout_method_id` requis). Rails : `bank`, `spi`, `wave`.
-- **`destination: "beneficiary"`** — paiement à un tiers sur **mobile money** (`wave` aujourd’hui). `recipient.name` et `recipient.phone` requis.
+- **`destination: "beneficiary"`** — paiement à un tiers sur **mobile money** (`wave` aujourd’hui). `recipient.name` et `recipient.phone` requis (numéro libre ; **sans** lien avec `payout_method_id`).
+
+<Callout type="warn">
+  **Les virements Wave (`rail: "wave"`) exigent une clé API live** (`lomi_sk_live_…`). Les clés test renvoient `400` pour les virements self et beneficiary Wave — aucun appel Wave réel.
+</Callout>
 
 <Callout type="info">
   Les virements MTN renvoient `400` jusqu’à prise en charge.
@@ -44,5 +48,5 @@ curl -X POST "https://api.lomi.africa/payouts" \
 
 ## Lister et obtenir
 
-- `GET /payouts`
-- `GET /payouts/{id}`
+- `GET /payouts` — retraits et virements bénéficiaires (`kind`). Les clés test ne listent que les retraits test ; les bénéficiaires live sont exclus.
+- `GET /payouts/{id}` — retrait marchand ou bénéficiaire, limité à l’organisation de la clé.

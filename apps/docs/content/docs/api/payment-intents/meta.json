@@ -1,8 +1,0 @@
-{
-  "title": "Payment Intents",
-  "pages": [
-    "PaymentIntentsController_cancel",
-    "PaymentIntentsController_create",
-    "PaymentIntentsController_findOne"
-  ]
-}

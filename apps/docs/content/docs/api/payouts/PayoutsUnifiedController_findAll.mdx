@@ -1,6 +1,6 @@
 ---
-title: "Lister les virements"
-description: "Lister les virements"
+title: "List payouts"
+description: "List payouts"
 full: true
 method: get
 path: /payouts
@@ -9,11 +9,18 @@ operationId: PayoutsUnifiedController_findAll
 
 ## Overview
 
-Lister les virements
+List payouts
+
+Returns withdrawals and beneficiary payouts with a kind discriminator.
+
 
 ### When to use this
 
-Use this endpoint when your flow needs `GET /payouts` (Lister les virements).
+Use for reconciliation and support.
+
+### See also
+
+[Get payout](/api/payouts/PayoutsUnifiedController_findOne)
 
 
 ## Authentication

@@ -48,7 +48,7 @@ _Aucun paramètre de requête._
 
 Charge utile JSON.
 
-Schéma: `CreatePaymentIntentDto`
+Schéma: `CreateCardChargeDto`
 
 | Champ | Obligatoire | Type | Description |
 | --- | --- | --- | --- |
@@ -83,6 +83,8 @@ Exemple de corps :
 | Statut | Description |
 | --- | --- |
 | `201` | Encaissement carte créé |
+
+Schéma de réponse : `CardChargeResponseDto` — `success` et `data` avec `client_secret`, `id` (ex. `pi_…`), montants, `status`, et `appearance` optionnel pour l’UI Payment Element.
 
 ## Erreurs
 

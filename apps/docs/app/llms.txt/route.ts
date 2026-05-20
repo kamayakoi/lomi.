@@ -135,12 +135,12 @@ export async function GET() {
       `- **Direct mobile-money charge (server-initiated)** → [${charge.data.title ?? 'Charge'}](${docsOrigin}${charge.url}) when you are not using hosted checkout.`,
     );
   }
-  const pi = pages.find(
-    (p) => p.slugs[2] === 'PaymentIntentsController_create',
+  const cardCharge = pages.find(
+    (p) => p.slugs[2] === 'ChargesController_createCardCharge',
   );
-  if (pi) {
+  if (cardCharge) {
     lines.push(
-      `- **Card PaymentIntent / Elements-style** → [${pi.data.title ?? 'PaymentIntent'}](${docsOrigin}${pi.url}).`,
+      `- **Embedded card charge (Elements-style)** → [${cardCharge.data.title ?? 'Card charge'}](${docsOrigin}${cardCharge.url}).`,
     );
   }
   const pr = pages.find(
@@ -157,16 +157,10 @@ export async function GET() {
       `- **Subscriptions** → explore [${subList.data.title ?? 'Subscriptions'}](${docsOrigin}${subList.url}) (list, cancel, per-customer).`,
     );
   }
-  const payout = firstApiPageInFolder(pages, 'payout');
-  const ben = firstApiPageInFolder(pages, 'beneficiary-payouts');
-  if (payout) {
+  const payouts = firstApiPageInFolder(pages, 'payouts');
+  if (payouts) {
     lines.push(
-      `- **Payouts to your wallet** → [${payout.data.title ?? 'Payout'}](${docsOrigin}${payout.url}).`,
-    );
-  }
-  if (ben) {
-    lines.push(
-      `- **Third-party beneficiary payouts** → [${ben.data.title ?? 'Beneficiary payouts'}](${docsOrigin}${ben.url}).`,
+      `- **Payouts (self wallet or third-party beneficiaries)** → [${payouts.data.title ?? 'Payouts'}](${docsOrigin}${payouts.url}).`,
     );
   }
   const wh = firstApiPageInFolder(pages, 'webhooks');

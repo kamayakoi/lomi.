@@ -1,6 +1,6 @@
 ---
-title: "Obtenir un virement"
-description: "Obtenir un virement"
+title: "Get payout"
+description: "Get payout"
 full: true
 method: get
 path: /payouts/{id}
@@ -9,11 +9,18 @@ operationId: PayoutsUnifiedController_findOne
 
 ## Overview
 
-Obtenir un virement
+Get payout
+
+Returns a single payout by ID scoped to your organization.
+
 
 ### When to use this
 
-Use this endpoint when your flow needs `GET /payouts/&#123;id&#125;` (Obtenir un virement).
+Use after create or from webhooks.
+
+### See also
+
+[Create payout](/api/payouts/PayoutsUnifiedController_create)
 
 
 ## Authentication

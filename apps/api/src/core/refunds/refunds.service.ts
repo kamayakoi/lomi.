@@ -28,6 +28,20 @@ type TransactionRow = {
   status: string;
 };
 
+type RpcRefundResult = {
+  success?: boolean;
+  error?: string;
+  refund_id?: string;
+  refunded_amount?: number;
+  status?: string;
+};
+
+type BeneficiaryPayoutEdgeResult = {
+  payoutId?: string;
+  wavePayoutId?: string;
+  totalDeduction?: number;
+};
+
 @Injectable()
 export class RefundsService {
   private readonly logger = new Logger(RefundsService.name);
@@ -69,7 +83,6 @@ export class RefundsService {
           dto,
           user,
           tx,
-          feeAmount,
           feePercentage,
         );
       }
@@ -78,7 +91,6 @@ export class RefundsService {
         user,
         tx,
         feeAmount,
-        feePercentage,
       );
     }
 
@@ -246,13 +258,7 @@ export class RefundsService {
       throw new BadRequestException(error.message);
     }
 
-    const result = data as {
-      success?: boolean;
-      error?: string;
-      refund_id?: string;
-      refunded_amount?: number;
-      status?: string;
-    };
+    const result = data as RpcRefundResult;
 
     if (!result?.success) {
       throw new BadRequestException(
@@ -275,31 +281,73 @@ export class RefundsService {
     dto: CreateRefundDto,
     user: AuthContext,
     tx: TransactionRow,
-    feeAmount: number,
     feePercentage: number,
   ) {
-    await this.invokePaymentEdge('/refund', {
-      transactionId: dto.transaction_id,
-      amount: String(dto.amount),
-      currency: tx.currency_code,
-      reason: dto.reason,
-    });
+    const { data, error } = await this.supabaseService.getClient().rpc(
+      'create_wave_refund_request_api' as never,
+      {
+        p_merchant_id: user.merchantId,
+        p_organization_id: user.organizationId,
+        p_transaction_id: dto.transaction_id,
+        p_refund_amount: dto.amount,
+        p_processing_fee_percentage: feePercentage,
+        p_reason: dto.reason ?? null,
+      } as never,
+    );
 
-    const refundId = await this.recordRefundAndBalance({
-      transactionId: dto.transaction_id,
-      amount: dto.amount,
-      reason: dto.reason,
-      providerCode: tx.provider_code,
-      merchantId: user.merchantId,
-      feeAmount,
-      feePercentage,
-      metadata: {
-        processing_fee: feeAmount,
-        net_refund_amount: dto.amount - feeAmount,
-        refund_method: 'full_refund',
-        source: 'api',
-      },
-    });
+    if (error) {
+      throw new BadRequestException(error.message);
+    }
+
+    const ledgerResult = data as RpcRefundResult;
+
+    if (
+      !ledgerResult?.success ||
+      !ledgerResult.refund_id
+    ) {
+      throw new BadRequestException(
+        ledgerResult?.error ?? 'Failed to create Wave refund request',
+      );
+    }
+
+    const refundId = ledgerResult.refund_id;
+
+    try {
+      await this.invokePaymentEdge('/refund', {
+        transactionId: dto.transaction_id,
+        amount: String(dto.amount),
+        currency: tx.currency_code,
+        reason: dto.reason,
+        refundId,
+      });
+    } catch (edgeError) {
+      const rollbackMessage =
+        edgeError instanceof Error ? edgeError.message : 'Wave API failed';
+
+      const { data: rollbackData, error: rollbackError } =
+        await this.supabaseService.getClient().rpc(
+          'rollback_wave_refund' as never,
+          {
+            p_refund_id: refundId,
+            p_reason: rollbackMessage,
+          } as never,
+        );
+
+      if (rollbackError) {
+        this.logger.error(
+          `rollback_wave_refund failed after Wave error: ${rollbackError.message}`,
+        );
+      } else {
+        const rollbackResult = rollbackData as RpcRefundResult;
+        if (rollbackResult?.success !== true) {
+          this.logger.error(
+            `rollback_wave_refund returned failure: ${rollbackResult?.error ?? 'unknown'}`,
+          );
+        }
+      }
+
+      throw edgeError;
+    }
 
     return {
       success: true,
@@ -316,7 +364,6 @@ export class RefundsService {
     user: AuthContext,
     tx: TransactionRow,
     feeAmount: number,
-    feePercentage: number,
   ) {
     if (!tx.customer_id) {
       throw new BadRequestException(
@@ -333,7 +380,7 @@ export class RefundsService {
       );
     }
 
-    const payoutResult = await this.invokePaymentEdge('/beneficiary-payout', {
+    const payoutResult = (await this.invokePaymentEdge('/beneficiary-payout', {
       merchantId: user.merchantId,
       organizationId: user.organizationId,
       amount: dto.amount,
@@ -350,12 +397,9 @@ export class RefundsService {
         refund_type: 'partial',
         source: 'api',
       },
-    }) as {
-      payoutId?: string;
-      wavePayoutId?: string;
-    };
+    })) as BeneficiaryPayoutEdgeResult;
 
-    const refundId = await this.recordRefundAndBalance({
+    const refundId = await this.recordRefundOnly({
       transactionId: dto.transaction_id,
       amount: dto.amount,
       reason: dto.reason
@@ -364,13 +408,14 @@ export class RefundsService {
       providerCode: tx.provider_code,
       merchantId: user.merchantId,
       feeAmount,
-      feePercentage,
       metadata: {
         processing_fee: feeAmount,
-        net_refund_amount: dto.amount - feeAmount,
+        customer_refund_amount: dto.amount,
         refund_method: 'partial_beneficiary_payout',
+        balance_via_payout: true,
         beneficiary_payout_id: payoutResult?.payoutId,
         payout_reference: payoutResult?.wavePayoutId,
+        payout_total_deduction: payoutResult?.totalDeduction,
         customer_phone: phone,
         is_partial_refund: true,
         source: 'api',
@@ -414,14 +459,14 @@ export class RefundsService {
     return customer;
   }
 
-  private async recordRefundAndBalance(params: {
+  /** Records refund row only — balance already handled by beneficiary payout. */
+  private async recordRefundOnly(params: {
     transactionId: string;
     amount: number;
     reason?: string;
     providerCode: string;
     merchantId: string;
     feeAmount: number;
-    feePercentage: number;
     metadata: Record<string, unknown>;
   }): Promise<string> {
     const { data: refundId, error: createError } =
@@ -440,33 +485,6 @@ export class RefundsService {
       this.logger.error(`create_refund failed: ${createError?.message}`);
       throw new BadRequestException(
         createError?.message ?? 'Failed to record refund',
-      );
-    }
-
-    const { data: balanceRows, error: balanceError } =
-      await this.supabaseService.getClient().rpc(
-        'update_organization_balance_for_refund' as never,
-        {
-          p_transaction_id: params.transactionId,
-          p_refund_amount: params.amount,
-          p_processing_fee_percentage: params.feePercentage,
-        } as never,
-      );
-
-    if (balanceError) {
-      throw new BadRequestException(balanceError.message);
-    }
-
-    const balanceResult = Array.isArray(balanceRows)
-      ? balanceRows[0]
-      : balanceRows;
-    const success = (balanceResult as { success?: boolean })?.success;
-    const errorMessage = (balanceResult as { error_message?: string })
-      ?.error_message;
-
-    if (success === false) {
-      throw new BadRequestException(
-        errorMessage ?? 'Insufficient balance for refund',
       );
     }
 

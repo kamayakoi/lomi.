@@ -425,6 +425,8 @@ export const EXPOSED_FUNCTIONS = [
   'get_transaction_by_stripe_intent',
   'fetch_organization_providers_settings_api',
   'create_manual_refund_request_api',
+  'create_wave_refund_request_api',
+  'rollback_wave_refund',
   'create_refund',
   'update_organization_balance_for_refund',
   'list_refunds',

@@ -148,7 +148,7 @@ async function runPreDeploymentChecks(): Promise<void> {
   try {
     // 1. Verify API connectivity (e.g., fetch providers)
     console.log('Checking API connectivity...');
-    const providers = await lomi.providers.listProviders();
+    const providers = await lomi.providers.list();
     if (!providers || providers.data.length === 0) {
       throw new Error('Failed to fetch providers or no providers available.');
     }
@@ -323,7 +323,7 @@ export async function checkServiceHealth(): Promise<{
 
   try {
     // Check lomi. API status (e.g., list providers)
-    await lomi.providers.listProviders();
+    await lomi.providers.list();
   } catch (error: any) {
     errors.push(`lomi. API check failed: ${error.message}`);
   }

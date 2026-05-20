@@ -27,12 +27,10 @@ import { DiscountCouponsModule } from './core/discount-coupons/discount-coupons.
 import { CheckoutSessionsModule } from './core/checkout-sessions/checkout-sessions.module';
 import { PaymentLinksModule } from './core/payment-links/payment-links.module';
 import { PayoutsModule } from './core/payouts/payouts.module';
-import { BeneficiaryPayoutsModule } from './core/beneficiary-payouts/beneficiary-payouts.module';
 import { WebhookDeliveryLogsModule } from './core/webhook-delivery-logs/webhook-delivery-logs.module';
 import { WebhooksOpenApiModule } from './webhooks/webhooks-open-api.module';
 import { ApiLoggingInterceptor } from './core/interceptors/api-logging.interceptor';
 import { ChargesModule } from './core/charges/charges.module';
-import { PaymentIntentsModule } from './core/payment-intents/payment-intents.module';
 import { GlobalJsonExceptionFilter } from './core/filters/json-exception.filter';
 import { THROTTLE_LIMIT, THROTTLE_TTL_MS } from './config/http.constants';
 import { AgentModule } from './agent/agent.module';
@@ -66,11 +64,9 @@ import { AgentModule } from './agent/agent.module';
     CheckoutSessionsModule,
     PaymentLinksModule,
     PayoutsModule,
-    BeneficiaryPayoutsModule,
     WebhookDeliveryLogsModule,
     WebhooksOpenApiModule,
     ChargesModule,
-    PaymentIntentsModule,
     AgentModule,
   ],
   controllers: [AppController],
