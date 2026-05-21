@@ -205,6 +205,7 @@ export class StripeWebhookService {
         const paymentMethod =
           await stripe.paymentMethods.retrieve(paymentMethodId);
         const cardCountry = paymentMethod.card?.country;
+        const walletType = paymentMethod.card?.wallet?.type;
 
         // "International" = NOT France (FR). User's policy: only France is domestic.
         const isInternational = cardCountry
@@ -215,6 +216,7 @@ export class StripeWebhookService {
           message: 'international_card_check',
           payment_intent_id: paymentIntent.id,
           card_country: cardCountry,
+          wallet_type: walletType ?? null,
           is_international: isInternational,
         });
 
@@ -231,6 +233,7 @@ export class StripeWebhookService {
             exp_year: paymentMethod.card?.exp_year,
             country: cardCountry,
             fingerprint: paymentMethod.card?.fingerprint || paymentMethodId,
+            wallet_type: walletType ?? undefined,
           },
           p_is_international: isInternational,
         });
