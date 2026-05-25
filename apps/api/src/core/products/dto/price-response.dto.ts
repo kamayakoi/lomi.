@@ -53,8 +53,7 @@ export class PriceResponseDto {
 
   @ApiProperty({
     example: 50000.0,
-    description:
-      'Optional upper bound on unit price (pay_what_you_want only).',
+    description: 'Optional upper bound on unit price (pay_what_you_want only).',
     nullable: true,
     type: Number,
   })
