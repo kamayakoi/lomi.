@@ -79,7 +79,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     whenToUse:
       'Use for e-commerce, invoices, or any flow where you want lomi. to host payment collection and return the customer to your site.',
     caveats:
-      'Prefer checkout sessions over ad-hoc charges when you need a consistent buyer experience across payment methods.',
+      'Prefer checkout sessions over ad-hoc charges when you need a consistent buyer experience across payment methods. For pay_what_you_want products, amount must fall within the linked price minimum_amount and maximum_amount bounds (unit × quantity).',
     related:
       '[Payment links](/api/payment-links/PaymentLinksController_create) · [Retrieve checkout session](/api/checkout-sessions/CheckoutSessionsController_findOne)',
   },
@@ -360,7 +360,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
   },
   ProductsController_create: {
     summary: 'Create product',
-    body: 'Creates a catalog product with at least one price in a single request.',
+    body: 'Creates a catalog product with at least one price in a single request. Supports pay_what_you_want via pricing_model and minimum_amount/maximum_amount on nested prices.',
     whenToUse:
       'Use when onboarding catalog data for checkout, subscriptions, or payment links backed by SKUs.',
     related:

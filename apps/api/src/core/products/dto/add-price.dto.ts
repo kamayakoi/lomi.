@@ -3,7 +3,8 @@ import { ApiProperty } from '@nestjs/swagger';
 export class AddPriceDto {
   @ApiProperty({
     example: 10000.0,
-    description: 'Price amount',
+    description:
+      'Price amount. For standard/tiered: fixed unit price. For pay_what_you_want: suggested unit price pre-filled at checkout (defaults to minimum_amount if omitted).',
   })
   amount: number;
 
@@ -33,14 +34,16 @@ export class AddPriceDto {
 
   @ApiProperty({
     example: 5000.0,
-    description: 'Minimum amount (required for pay_what_you_want)',
+    description:
+      'Lowest unit price the customer may pay. Required when pricing_model is pay_what_you_want.',
     required: false,
   })
   minimum_amount?: number;
 
   @ApiProperty({
     example: 50000.0,
-    description: 'Maximum amount (optional for pay_what_you_want)',
+    description:
+      'Optional upper bound on unit price when pricing_model is pay_what_you_want.',
     required: false,
   })
   maximum_amount?: number;

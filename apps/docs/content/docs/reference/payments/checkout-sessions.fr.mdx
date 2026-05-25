@@ -28,7 +28,7 @@ Crée une session et renvoie une URL pour rediriger le client.
 
 | Champ | Type | Obligatoire | Description |
 |-------|------|-------------|-------------|
-| `amount` | `number` | Non* | Montant à encaisser. Facultatif si `product_id` est fourni. |
+| `amount` | `number` | Non* | Sous-total produit (unité × quantité, hors frais). Pour tarifs standard : doit correspondre au catalogue. Pour PWYW : le prix unitaire doit être dans `[minimum_amount, maximum_amount]` |
 | `currency_code` | `string` | **Oui** | Code devise (`XOF`, `USD`, `EUR`) |
 | `title` | `string` | Non | Titre affiché sur le tunnel |
 | `description` | `string` | Non | Description de l’achat |
@@ -36,8 +36,8 @@ Crée une session et renvoie une URL pour rediriger le client.
 | `customer_email` | `string` | Non | E-mail (préremplit le formulaire) |
 | `customer_name` | `string` | Non | Nom (préremplit le formulaire) |
 | `customer_phone` | `string` | Non | Téléphone (préremplit le formulaire) |
-| `product_id` | `string` | Non | ID produit (montant calculé à partir du tarif) |
-| `price_id` | `string` | Non | Tarif précis si le produit en a plusieurs |
+| `product_id` | `string` | Non | ID produit (montant calculé à partir du tarif ; bornes PWYW appliquées si `amount` est fourni) |
+| `price_id` | `string` | Non | Tarif précis si le produit en a plusieurs (validation PWYW sur cette ligne de tarif) |
 | `subscription_id` | `string` | Non | ID d’abonnement pour renouvellements ou modifications |
 | `quantity` | `number` | Non | Quantité (défaut : `1`) |
 | `allow_quantity` | `boolean` | Non | Autoriser le client à modifier la quantité |
@@ -49,6 +49,15 @@ Crée une session et renvoie une URL pour rediriger le client.
 | `metadata` | `object` | Non | Paires clé-valeur personnalisées |
 
 *`amount` est requis sauf si `product_id` est fourni.
+
+### Produits « payez ce que vous voulez »
+
+Lorsque `product_id` ou `price_id` pointe vers un tarif avec `pricing_model: pay_what_you_want` :
+
+- **Omettre `amount`** — la session utilise le prix unitaire suggéré (`amount` sur le tarif) × `quantity`.
+- **Fournir `amount`** — doit être un sous-total valide : prix unitaire dans `[minimum_amount, maximum_amount]` × `quantity`. Le serveur rejette les valeurs hors bornes.
+- **Tunnel hébergé** — l’acheteur peut modifier le prix unitaire avant de payer ; validation côté client et serveur.
+- **Flux programmatiques** — définissez `amount` à la création de session si le total est déjà connu.
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>
 
@@ -84,6 +93,15 @@ const productSession = await lomi.checkoutSessions.create({
   success_url: 'https://your-site.com/success',
 });
 
+// Produit PWYW avec montant personnalisé et quantité
+const pwywSession = await lomi.checkoutSessions.create({
+  product_id: 'prod_tip_jar...',
+  currency_code: 'XOF',
+  amount: 1500,
+  quantity: 2,
+  success_url: 'https://your-site.com/success',
+});
+
 console.log(`Redirect to: ${session.checkout_url}`);
 ```
 </Tab>
@@ -109,6 +127,15 @@ session = client.checkout_sessions.create({
     "metadata": {
         "order_id": "ORD-12345"
     }
+})
+
+# Produit PWYW avec montant personnalisé et quantité
+pwyw_session = client.checkout_sessions.create({
+    "product_id": "prod_tip_jar...",
+    "currency_code": "XOF",
+    "amount": 1500,
+    "quantity": 2,
+    "success_url": "https://your-site.com/success"
 })
 
 print(f"Redirect to: {session['checkout_url']}")

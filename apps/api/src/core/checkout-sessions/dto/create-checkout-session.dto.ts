@@ -32,7 +32,7 @@ export class CreateCheckoutSessionDto {
   @ApiProperty({
     example: 10000.0,
     description:
-      'Amount to charge. Optional if product_id is provided (amount will be calculated from product price).',
+      'Product subtotal (unit price × quantity, excluding fees). Optional if product_id is provided (defaults to catalog price). For standard prices: must match the configured price. For pay_what_you_want: unit amount must be within [minimum_amount, maximum_amount]; total = unit × quantity.',
     required: false,
   })
   amount?: number;
@@ -116,14 +116,16 @@ export class CreateCheckoutSessionDto {
 
   @ApiProperty({
     example: '123e4567-e89b-12d3-a456-426614174000',
-    description: 'Product ID',
+    description:
+      'Product ID. When set with amount, pay_what_you_want bounds on the linked price are enforced.',
     required: false,
   })
   product_id?: string;
 
   @ApiProperty({
     example: '321e4567-e89b-12d3-a456-426614174000',
-    description: 'Specific price ID (if product has multiple prices)',
+    description:
+      'Specific price ID (if product has multiple prices). PWYW validation uses this price row minimum_amount and maximum_amount.',
     required: false,
   })
   price_id?: string;

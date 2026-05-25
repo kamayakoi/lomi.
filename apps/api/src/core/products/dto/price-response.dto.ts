@@ -11,7 +11,8 @@ export class PriceResponseDto {
 
   @ApiProperty({
     example: 10000.0,
-    description: 'Price amount',
+    description:
+      'Price amount. For standard/tiered: fixed unit price. For pay_what_you_want: suggested unit price pre-filled at checkout.',
     type: Number,
   })
   amount: number;
@@ -43,7 +44,8 @@ export class PriceResponseDto {
 
   @ApiProperty({
     example: 5000.0,
-    description: 'Minimum amount (for pay_what_you_want)',
+    description:
+      'Lowest unit price the customer may pay (pay_what_you_want only).',
     nullable: true,
     type: Number,
   })
@@ -51,7 +53,8 @@ export class PriceResponseDto {
 
   @ApiProperty({
     example: 50000.0,
-    description: 'Maximum amount (for pay_what_you_want)',
+    description:
+      'Optional upper bound on unit price (pay_what_you_want only).',
     nullable: true,
     type: Number,
   })

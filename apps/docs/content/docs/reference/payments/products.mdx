@@ -47,17 +47,17 @@ Create a new product with one or more prices. At least one price is required.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `amount` | `number` | **Yes** | Price amount (smallest currency unit) |
+| `amount` | `number` | **Yes** | Unit price (smallest currency unit). For `standard`/`tiered`: fixed price. For `pay_what_you_want`: **suggested** unit price pre-filled at checkout |
 | `currency_code` | `string` | **Yes** | `XOF`, `USD`, `EUR` |
 | `billing_interval` | `string` | No | `day`, `week`, `month`, `year` (required for recurring products) |
 | `pricing_model` | `string` | No | `standard` (default), `pay_what_you_want`, or `tiered` |
-| `minimum_amount` | `number` | PWYW | Required when `pricing_model` is `pay_what_you_want` |
-| `maximum_amount` | `number` | No | Optional upper bound for `pay_what_you_want` |
+| `minimum_amount` | `number` | PWYW | Required when `pricing_model` is `pay_what_you_want` — lowest unit price the customer may pay |
+| `maximum_amount` | `number` | No | Optional upper bound on unit price for `pay_what_you_want` |
 | `is_default` | `boolean` | No | Set as default price |
 | `metadata` | `object` | No | Optional metadata on the price |
 
 <Callout type="info">
-  `pay_what_you_want` requires `minimum_amount` (and may include `maximum_amount`). For `standard` and `tiered`, omit those unless your integration uses them.
+  For `pay_what_you_want`: `minimum_amount` is required; `amount` is the suggested unit price (defaults to `minimum_amount` if omitted). Ensure `amount >= minimum_amount`, and when `maximum_amount` is set, `amount <= maximum_amount`. For `standard` and `tiered`, omit `minimum_amount` and `maximum_amount`.
 </Callout>
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>
@@ -104,6 +104,22 @@ const subscription = await lomi.products.create({
   failed_payment_action: 'retry',
 });
 
+// Pay what you want (one-time only)
+const tipJar = await lomi.products.create({
+  name: 'Community tip jar',
+  product_type: 'one_time',
+  prices: [
+    {
+      pricing_model: 'pay_what_you_want',
+      amount: 1000,
+      minimum_amount: 500,
+      maximum_amount: 5000,
+      currency_code: 'XOF',
+      is_default: true,
+    },
+  ],
+});
+
 console.log(`Product created: ${product.product_id}`);
 ```
 </Tab>
@@ -133,6 +149,22 @@ product = client.products.create({
     "display_on_storefront": True
 })
 
+# Pay what you want (one-time only)
+tip_jar = client.products.create({
+    "name": "Community tip jar",
+    "product_type": "one_time",
+    "prices": [
+        {
+            "pricing_model": "pay_what_you_want",
+            "amount": 1000,
+            "minimum_amount": 500,
+            "maximum_amount": 5000,
+            "currency_code": "XOF",
+            "is_default": True
+        }
+    ]
+})
+
 print(f"Product created: {product['product_id']}")
 ```
 </Tab>
@@ -154,6 +186,25 @@ curl -X POST "https://api.lomi.africa/products" \
       }
     ],
     "display_on_storefront": true
+  }'
+
+# Pay what you want (one-time only)
+curl -X POST "https://api.lomi.africa/products" \
+  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Community tip jar",
+    "product_type": "one_time",
+    "prices": [
+      {
+        "pricing_model": "pay_what_you_want",
+        "amount": 1000,
+        "minimum_amount": 500,
+        "maximum_amount": 5000,
+        "currency_code": "XOF",
+        "is_default": true
+      }
+    ]
   }'
 ```
 </Tab>
@@ -251,6 +302,15 @@ const price = await lomi.products.addPrice('prod_abc123...', {
 });
 
 console.log(`New price added: ${price.price_id}`);
+
+// Pay what you want price
+const pwywPrice = await lomi.products.addPrice('prod_abc123...', {
+  pricing_model: 'pay_what_you_want',
+  amount: 1000,
+  minimum_amount: 500,
+  maximum_amount: 5000,
+  currency_code: 'XOF',
+});
 ```
 </Tab>
 

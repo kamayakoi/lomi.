@@ -28,7 +28,7 @@ Creates a new checkout session and returns a URL to redirect your customer to.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `amount` | `number` | No* | Amount to charge. Optional if `product_id` is provided |
+| `amount` | `number` | No* | Product subtotal (unit × quantity, excluding fees). For standard prices: must match catalog price. For PWYW: unit amount must be within `[minimum_amount, maximum_amount]` |
 | `currency_code` | `string` | **Yes** | Currency code (`XOF`, `USD`, `EUR`) |
 | `title` | `string` | No | Title shown on checkout page |
 | `description` | `string` | No | Description of the purchase |
@@ -36,8 +36,8 @@ Creates a new checkout session and returns a URL to redirect your customer to.
 | `customer_email` | `string` | No | Customer email (pre-fills form) |
 | `customer_name` | `string` | No | Customer name (pre-fills form) |
 | `customer_phone` | `string` | No | Customer phone (pre-fills form) |
-| `product_id` | `string` | No | Product ID (amount calculated from product price) |
-| `price_id` | `string` | No | Specific price ID if product has multiple prices |
+| `product_id` | `string` | No | Product ID (amount calculated from product price; PWYW bounds enforced when amount is provided) |
+| `price_id` | `string` | No | Specific price ID if product has multiple prices (PWYW validation uses this price row) |
 | `subscription_id` | `string` | No | Subscription ID for renewals/modifications |
 | `quantity` | `number` | No | Quantity (default: `1`) |
 | `allow_quantity` | `boolean` | No | Allow customer to change quantity |
@@ -49,6 +49,15 @@ Creates a new checkout session and returns a URL to redirect your customer to.
 | `metadata` | `object` | No | Custom key-value pairs |
 
 *`amount` is required unless `product_id` is provided.
+
+### Pay what you want products
+
+When `product_id` or `price_id` points to a price with `pricing_model: pay_what_you_want`:
+
+- **Omit `amount`** — the session uses the suggested unit price (`amount` on the price row) × `quantity`.
+- **Pass `amount`** — must be a valid subtotal: unit price within `[minimum_amount, maximum_amount]` × `quantity`. The server rejects out-of-range values.
+- **Hosted checkout** — the buyer can change the unit price before paying; validation runs client-side and server-side.
+- **Programmatic flows** — set `amount` at session creation when you already know the chosen total.
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>
 
@@ -84,6 +93,15 @@ const productSession = await lomi.checkoutSessions.create({
   success_url: 'https://your-site.com/success',
 });
 
+// PWYW product with custom amount and quantity
+const pwywSession = await lomi.checkoutSessions.create({
+  product_id: 'prod_tip_jar...',
+  currency_code: 'XOF',
+  amount: 1500,
+  quantity: 2,
+  success_url: 'https://your-site.com/success',
+});
+
 console.log(`Redirect to: ${session.checkout_url}`);
 ```
 </Tab>
@@ -110,6 +128,15 @@ session = client.checkout_sessions.create({
     "metadata": {
         "order_id": "ORD-12345"
     }
+})
+
+# PWYW product with custom amount and quantity
+pwyw_session = client.checkout_sessions.create({
+    "product_id": "prod_tip_jar...",
+    "currency_code": "XOF",
+    "amount": 1500,
+    "quantity": 2,
+    "success_url": "https://your-site.com/success"
 })
 
 print(f"Redirect to: {session['checkout_url']}")
