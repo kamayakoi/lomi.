@@ -81,8 +81,9 @@
   --sidebar-accent-foreground: hsl(210 40% 98%);
   --sidebar-border: oklch(0.929 0.013 255.508);
   --sidebar-ring: oklch(0.704 0.04 256.788);
-  --selection-background: 177 65% 85%;
-  --selection-foreground: 177 65% 25%;
+  --selection-bg: 215 55% 72%;
+  --selection-bg-alpha: 0.3;
+  --selection-foreground: 215 30% 15%;
 }
 
 .dark {
@@ -130,8 +131,9 @@
   --sidebar-accent-foreground: hsl(240 4.8% 95.9%);
   --sidebar-border: oklch(1 0 0 / 12%);
   --sidebar-ring: oklch(0.552 0.016 285.938);
-  --selection-background: 177 65% 15%;
-  --selection-foreground: 177 65% 70%;
+  --selection-bg: 215 45% 45%;
+  --selection-bg-alpha: 0.35;
+  --selection-foreground: 215 30% 90%;
   --shadow-2xs: 0px 2px 0px 0px hsl(0 0% 20% / 0.07);
   --shadow-xs: 0px 2px 0px 0px hsl(0 0% 20% / 0.07);
   --shadow-sm:
@@ -170,12 +172,12 @@
 
 @layer base {
   ::selection {
-    background-color: hsl(var(--selection-background));
+    background-color: hsl(var(--selection-bg) / var(--selection-bg-alpha));
     color: hsl(var(--selection-foreground));
   }
 
   ::-moz-selection {
-    background-color: hsl(var(--selection-background));
+    background-color: hsl(var(--selection-bg) / var(--selection-bg-alpha));
     color: hsl(var(--selection-foreground));
   }
 }
@@ -254,7 +256,7 @@ button:active:focus {
   }
 
   .mention-textarea::selection {
-    background: rgba(59, 130, 246, 0.3) !important;
+    background: hsl(var(--selection-bg) / var(--selection-bg-alpha)) !important;
     color: transparent !important;
   }
 
