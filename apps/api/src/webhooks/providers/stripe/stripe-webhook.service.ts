@@ -1,5 +1,6 @@
 import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { SupabaseService } from '../../../utils/supabase/supabase.service';
+import { WideEventService } from '../../../utils/telemetry/wide-event.service';
 import { WebhookSenderService } from '../../webhook-sender.service';
 import { sanitizeMerchantWebhookTransactionPayload } from '../../sanitize-merchant-webhook-transaction-payload';
 import { WebhookEvent } from '../../../utils/types/api';
@@ -15,6 +16,7 @@ export class StripeWebhookService {
     private readonly supabase: SupabaseService,
     private readonly webhookSender: WebhookSenderService,
     private readonly stripeClients: StripeClientsService,
+    private readonly wideEvent: WideEventService,
   ) {}
 
   /**
@@ -274,6 +276,22 @@ export class StripeWebhookService {
         error: statusError?.message || 'Unknown error',
       });
       // Continue processing - don't fail the entire webhook
+    }
+
+    if (txnData && metadata.organization_id) {
+      this.wideEvent.logEvent({
+        eventName: 'stripe_payment_confirmed',
+        organizationId: metadata.organization_id,
+        correlationId: metadata.checkout_session_id,
+        attributes: {
+          'organization.id': metadata.organization_id,
+          'checkout.session_id': metadata.checkout_session_id,
+          'stripe.payment_intent_id': paymentIntent.id,
+          'payment.amount': paymentIntent.amount,
+          'payment.currency': paymentIntent.currency,
+          'telemetry.source_layer': 'api:webhook',
+        },
+      });
     }
 
     // =========================================================================

@@ -5,6 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { SupabaseService } from '../../../utils/supabase/supabase.service';
+import { WideEventService } from '../../../utils/telemetry/wide-event.service';
 import { WebhookSenderService } from '../../webhook-sender.service';
 import { sanitizeMerchantWebhookTransactionPayload } from '../../sanitize-merchant-webhook-transaction-payload';
 import { WebhookEvent } from '../../../utils/types/api';
@@ -18,6 +19,7 @@ export class WaveWebhookService {
   constructor(
     private readonly supabase: SupabaseService,
     private readonly webhookSender: WebhookSenderService,
+    private readonly wideEvent: WideEventService,
   ) {}
 
   /**
@@ -319,6 +321,14 @@ export class WaveWebhookService {
               },
             );
 
+            this.logWavePaymentCompleted({
+              organizationId: result.r_organization_id,
+              sessionId,
+              transactionId: result.r_transaction_id,
+              amount: data.amount,
+              currency: data.currency,
+            });
+
             await this.triggerMerchantWebhook(
               result.r_transaction_id,
               result.r_organization_id,
@@ -387,6 +397,14 @@ export class WaveWebhookService {
         },
       );
 
+      this.logWavePaymentCompleted({
+        organizationId: sessionData.organization_id,
+        sessionId,
+        transactionId: sessionData.transaction_id,
+        amount: data.amount,
+        currency: data.currency,
+      });
+
       // Note: Balance is now automatically updated by the database when status = 'completed'
 
       // Trigger merchant webhooks
@@ -423,6 +441,14 @@ export class WaveWebhookService {
         },
       },
     );
+
+    this.logWavePaymentCompleted({
+      organizationId: transaction.organization_id,
+      sessionId,
+      transactionId: transaction.transaction_id,
+      amount: data.amount,
+      currency: data.currency,
+    });
 
     // Note: Balance is now automatically updated by the database when status = 'completed'
     // The update_balances_for_transaction function is called internally by update_transaction_status
@@ -604,6 +630,28 @@ export class WaveWebhookService {
     });
 
     return { transaction_id: transaction.transaction_id };
+  }
+
+  /** Logs a wide event when a Wave checkout completes successfully. */
+  private logWavePaymentCompleted(params: {
+    organizationId: string;
+    sessionId: string;
+    transactionId: string;
+    amount: unknown;
+    currency: unknown;
+  }): void {
+    this.wideEvent.logEvent({
+      eventName: 'wave_payment_completed',
+      organizationId: params.organizationId,
+      correlationId: params.sessionId,
+      attributes: {
+        'checkout.session_id': params.sessionId,
+        'payment.transaction_id': params.transactionId,
+        'payment.amount': params.amount,
+        'payment.currency': params.currency,
+        'telemetry.source_layer': 'api:webhook',
+      },
+    });
   }
 
   /**
