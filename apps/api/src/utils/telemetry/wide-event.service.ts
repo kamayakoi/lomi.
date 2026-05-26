@@ -72,20 +72,25 @@ export class WideEventService {
     } = params;
 
     void this.supabase
-      .rpc('log_wide_event' as never, {
-        p_event_name: eventName,
-        p_category: category,
-        p_severity: severity,
-        p_correlation_id: correlationId ?? undefined,
-        p_organization_id: organizationId ?? undefined,
-        p_attributes: attributes,
-        p_message: message ?? undefined,
-        p_source: source,
-        p_environment: process.env.NODE_ENV || 'production',
-      } as never)
+      .rpc(
+        'log_wide_event' as never,
+        {
+          p_event_name: eventName,
+          p_category: category,
+          p_severity: severity,
+          p_correlation_id: correlationId ?? undefined,
+          p_organization_id: organizationId ?? undefined,
+          p_attributes: attributes,
+          p_message: message ?? undefined,
+          p_source: source,
+          p_environment: process.env.NODE_ENV || 'production',
+        } as never,
+      )
       .then(({ error }) => {
         if (error) {
-          this.logger.warn(`Failed to log wide event ${eventName}: ${error.message}`);
+          this.logger.warn(
+            `Failed to log wide event ${eventName}: ${error.message}`,
+          );
         }
       })
       .catch((error: unknown) => {

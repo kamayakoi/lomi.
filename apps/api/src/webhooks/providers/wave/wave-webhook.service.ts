@@ -304,14 +304,15 @@ export class WaveWebhookService {
             );
 
             // Process completion
-            const recoveryMetadata = await this.buildWaveCheckoutCompletionMetadata(
-              {
-                ...data,
-                transaction_id: waveTxnId,
-              },
-              result.r_transaction_id,
-              { recovered: wasRecovered },
-            );
+            const recoveryMetadata =
+              await this.buildWaveCheckoutCompletionMetadata(
+                {
+                  ...data,
+                  transaction_id: waveTxnId,
+                },
+                result.r_transaction_id,
+                { recovered: wasRecovered },
+              );
             await this.updateTransactionStatus(
               result.r_transaction_id,
               'completed',
@@ -629,7 +630,9 @@ export class WaveWebhookService {
   private async handleMerchantPaymentReceived(data: any) {
     const waveTxnId = data?.id;
     const senderMobile =
-      typeof data?.sender_mobile === 'string' ? data.sender_mobile.trim() : null;
+      typeof data?.sender_mobile === 'string'
+        ? data.sender_mobile.trim()
+        : null;
 
     if (!waveTxnId || !senderMobile) {
       this.logger.warn(
@@ -638,16 +641,21 @@ export class WaveWebhookService {
       return { message: 'ignored_missing_fields' };
     }
 
-    const transaction = await this.findWaveTransactionByProviderTxnId(waveTxnId);
+    const transaction =
+      await this.findWaveTransactionByProviderTxnId(waveTxnId);
     if (!transaction) {
       this.logger.warn(`No transaction found for Wave payment ${waveTxnId}`);
       return { message: 'transaction_not_found' };
     }
 
-    await this.updateTransactionStatus(transaction.transaction_id, transaction.status, {
-      payment_mobile: senderMobile,
-      sender_mobile: senderMobile,
-    });
+    await this.updateTransactionStatus(
+      transaction.transaction_id,
+      transaction.status,
+      {
+        payment_mobile: senderMobile,
+        sender_mobile: senderMobile,
+      },
+    );
 
     return { transaction_id: transaction.transaction_id };
   }
