@@ -111,6 +111,9 @@ export class WaveWebhookService {
       case 'checkout.session.expired':
         return await this.handleExpired(event.data);
 
+      case 'merchant.payment_received':
+        return await this.handleMerchantPaymentReceived(event.data);
+
       case 'test.test_event':
         this.logger.log('Received test event from Wave');
         return { message: 'Test event received' };
@@ -301,24 +304,18 @@ export class WaveWebhookService {
             );
 
             // Process completion
+            const recoveryMetadata = await this.buildWaveCheckoutCompletionMetadata(
+              {
+                ...data,
+                transaction_id: waveTxnId,
+              },
+              result.r_transaction_id,
+              { recovered: wasRecovered },
+            );
             await this.updateTransactionStatus(
               result.r_transaction_id,
               'completed',
-              {
-                wave_transaction_id: waveTxnId,
-                wave_payment_status: 'succeeded',
-                wave_session: {
-                  id: sessionId,
-                  checkout_status: data.checkout_status,
-                  payment_status: data.payment_status,
-                  transaction_id: waveTxnId,
-                  when_created: data.when_created,
-                  when_expires: data.when_expires,
-                  when_completed: data.when_completed,
-                  client_reference: data.client_reference,
-                  recovered: wasRecovered,
-                },
-              },
+              recoveryMetadata,
             );
 
             this.logWavePaymentCompleted({
@@ -379,22 +376,18 @@ export class WaveWebhookService {
       );
 
       // Update checkout session status (balance is now updated automatically by the DB)
+      const sessionCompletionMetadata =
+        await this.buildWaveCheckoutCompletionMetadata(
+          {
+            ...data,
+            transaction_id: waveTxnId,
+          },
+          sessionData.transaction_id,
+        );
       await this.updateTransactionStatus(
         sessionData.transaction_id,
         'completed',
-        {
-          wave_transaction_id: waveTxnId,
-          wave_payment_status: 'succeeded',
-          wave_session: {
-            id: sessionId,
-            checkout_status: data.checkout_status,
-            payment_status: data.payment_status,
-            transaction_id: waveTxnId,
-            when_created: data.when_created,
-            when_expires: data.when_expires,
-            when_completed: data.when_completed,
-          },
-        },
+        sessionCompletionMetadata,
       );
 
       this.logWavePaymentCompleted({
@@ -424,21 +417,19 @@ export class WaveWebhookService {
     );
 
     // Update transaction status (balance is now updated automatically by the DB)
+    const completionMetadata = await this.buildWaveCheckoutCompletionMetadata(
+      {
+        ...data,
+        transaction_id: waveTxnId,
+      },
+      transaction.transaction_id,
+    );
     await this.updateTransactionStatus(
       transaction.transaction_id,
       'completed',
       {
         wave_session_id: sessionId,
-        wave_transaction_id: waveTxnId,
-        wave_session: {
-          id: sessionId,
-          checkout_status: data.checkout_status,
-          payment_status: data.payment_status,
-          transaction_id: waveTxnId,
-          when_created: data.when_created,
-          when_expires: data.when_expires,
-          when_completed: data.when_completed,
-        },
+        ...completionMetadata,
       },
     );
 
@@ -630,6 +621,138 @@ export class WaveWebhookService {
     });
 
     return { transaction_id: transaction.transaction_id };
+  }
+
+  /**
+   * Persist the actual Wave wallet used (`sender_mobile`) on the transaction.
+   */
+  private async handleMerchantPaymentReceived(data: any) {
+    const waveTxnId = data?.id;
+    const senderMobile =
+      typeof data?.sender_mobile === 'string' ? data.sender_mobile.trim() : null;
+
+    if (!waveTxnId || !senderMobile) {
+      this.logger.warn(
+        'merchant.payment_received missing transaction id or sender_mobile',
+      );
+      return { message: 'ignored_missing_fields' };
+    }
+
+    const transaction = await this.findWaveTransactionByProviderTxnId(waveTxnId);
+    if (!transaction) {
+      this.logger.warn(`No transaction found for Wave payment ${waveTxnId}`);
+      return { message: 'transaction_not_found' };
+    }
+
+    await this.updateTransactionStatus(transaction.transaction_id, transaction.status, {
+      payment_mobile: senderMobile,
+      sender_mobile: senderMobile,
+    });
+
+    return { transaction_id: transaction.transaction_id };
+  }
+
+  private readWavePaymentMobile(
+    source?: Record<string, unknown> | null,
+  ): string | undefined {
+    if (!source) return undefined;
+
+    const keys = [
+      'sender_mobile',
+      'payment_mobile',
+      'mobile_money_phone',
+      'customerPhone',
+      'customer_phone',
+      'phoneNumber',
+      'phone',
+      'restrict_payer_mobile',
+      'enforce_payer_mobile',
+    ];
+
+    for (const key of keys) {
+      const value = source[key];
+      if (typeof value === 'string' && value.trim()) {
+        return value.trim();
+      }
+    }
+
+    return undefined;
+  }
+
+  private async buildWaveCheckoutCompletionMetadata(
+    data: Record<string, any>,
+    transactionId: string,
+    extras?: Record<string, unknown>,
+  ): Promise<Record<string, any>> {
+    const { data: txnRows, error } = await (
+      this.supabase.getClient() as any
+    ).rpc('get_transaction', {
+      p_transaction_id: transactionId,
+    });
+
+    if (error) {
+      this.logger.warn(
+        `Failed to load transaction metadata for ${transactionId}: ${error.message}`,
+      );
+    }
+
+    const txnRow = Array.isArray(txnRows) ? txnRows[0] : txnRows;
+    const existingMetadata =
+      txnRow?.metadata &&
+      typeof txnRow.metadata === 'object' &&
+      !Array.isArray(txnRow.metadata)
+        ? (txnRow.metadata as Record<string, unknown>)
+        : null;
+
+    const paymentMobile =
+      this.readWavePaymentMobile(data) ??
+      this.readWavePaymentMobile(existingMetadata ?? undefined);
+
+    return {
+      wave_transaction_id: data.transaction_id ?? data.id,
+      wave_payment_status: 'succeeded',
+      wave_session: {
+        id: data.id,
+        checkout_status: data.checkout_status,
+        payment_status: data.payment_status,
+        transaction_id: data.transaction_id ?? data.id,
+        when_created: data.when_created,
+        when_expires: data.when_expires,
+        when_completed: data.when_completed,
+        client_reference: data.client_reference,
+        ...extras,
+      },
+      ...(paymentMobile ? { payment_mobile: paymentMobile } : {}),
+    };
+  }
+
+  private async findWaveTransactionByProviderTxnId(waveTxnId: string): Promise<{
+    transaction_id: string;
+    status: string;
+  } | null> {
+    const { data, error } = await (this.supabase.getClient() as any).rpc(
+      'find_wave_transaction_by_provider_txn_id',
+      {
+        p_wave_transaction_id: waveTxnId,
+      },
+    );
+
+    if (error) {
+      this.logger.warn(
+        `Failed to resolve Wave transaction ${waveTxnId}: ${error.message}`,
+      );
+      return null;
+    }
+
+    const row = Array.isArray(data) ? data[0] : data;
+    if (!row?.transaction_id || !row?.status) {
+      return null;
+    }
+
+    return {
+      transaction_id: row.transaction_id,
+      status: row.status,
+    };
   }
 
   /** Logs a wide event when a Wave checkout completes successfully. */

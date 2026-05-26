@@ -444,6 +444,7 @@ export const EXPOSED_FUNCTIONS = [
   'get_wave_transaction_by_checkout_id',
   'get_checkout_session_by_wave_id',
   'recover_missing_wave_transaction',
+  'find_wave_transaction_by_provider_txn_id',
   'update_transaction_status',
   'update_balances_for_transaction',
   // Stripe webhook handlers
