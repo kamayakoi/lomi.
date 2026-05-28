@@ -13,10 +13,16 @@ export async function createClient() {
     throw new Error('Missing Supabase environment variables');
   }
 
-  // Check if we're in production
   const isProduction = process.env.NODE_ENV === 'production';
+  // Read the same session namespace as apps/dashboard for API Try It SSO.
+  const dashboardAuthStorageKey = `sb-${new URL(supabaseUrl).hostname.split('.')[0]}-dashboard-auth`;
 
   const client = createServerClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      storageKey: dashboardAuthStorageKey,
+      autoRefreshToken: true,
+      persistSession: true,
+    },
     cookies: {
       getAll() {
         return cookieStore.getAll();
@@ -24,7 +30,6 @@ export async function createClient() {
       setAll(cookiesToSet) {
         try {
           cookiesToSet.forEach(({ name, value, options }) => {
-            // Use same domain strategy as website app to share cookies
             const cookieOptions = {
               ...options,
               domain: isProduction ? '.lomi.africa' : options.domain,
