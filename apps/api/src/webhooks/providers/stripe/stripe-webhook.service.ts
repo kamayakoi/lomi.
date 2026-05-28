@@ -78,6 +78,11 @@ export class StripeWebhookService {
           event.data.object as Stripe.PaymentIntent,
         );
 
+      case 'setup_intent.succeeded':
+        return await this.handleSetupIntentSucceeded(
+          event.data.object as Stripe.SetupIntent,
+        );
+
       // ========================================================================
       // CHARGE EVENTS
       // ========================================================================
@@ -353,6 +358,72 @@ export class StripeWebhookService {
     return {
       eventType: 'payment_intent.processing',
       payment_intent_id: paymentIntent.id,
+    };
+  }
+
+  /**
+   * Handle setup_intent.succeeded — trial subscription card save (no charge).
+   */
+  private async handleSetupIntentSucceeded(setupIntent: Stripe.SetupIntent) {
+    const metadata = setupIntent.metadata || {};
+
+    if (metadata.payment_flow !== 'subscription_trial_setup') {
+      return {
+        eventType: 'setup_intent.succeeded',
+        setup_intent_id: setupIntent.id,
+        skipped: true,
+      };
+    }
+
+    const paymentMethodId =
+      typeof setupIntent.payment_method === 'string'
+        ? setupIntent.payment_method
+        : setupIntent.payment_method?.id || null;
+
+    if (
+      !paymentMethodId ||
+      !metadata.internal_customer_id ||
+      !metadata.product_id ||
+      !metadata.organization_id ||
+      !metadata.merchant_id
+    ) {
+      this.logger.warn({
+        message: 'setup_intent_succeeded_missing_trial_metadata',
+        setup_intent_id: setupIntent.id,
+      });
+      return {
+        eventType: 'setup_intent.succeeded',
+        setup_intent_id: setupIntent.id,
+        error: 'missing_metadata',
+      };
+    }
+
+    const { error } = await (this.supabase.getClient() as any).rpc(
+      'complete_stripe_trial_setup',
+      {
+        p_merchant_id: metadata.merchant_id,
+        p_organization_id: metadata.organization_id,
+        p_customer_id: metadata.internal_customer_id,
+        p_product_id: metadata.product_id,
+        p_price_id: metadata.price_id || null,
+        p_checkout_session_id: metadata.checkoutSessionId || null,
+        p_stripe_payment_method_id: paymentMethodId,
+      },
+    );
+
+    if (error) {
+      this.logger.error({
+        message: 'complete_stripe_trial_setup_failed',
+        setup_intent_id: setupIntent.id,
+        error: error.message,
+      });
+      throw new Error('Failed to complete Stripe trial setup');
+    }
+
+    return {
+      eventType: 'setup_intent.succeeded',
+      setup_intent_id: setupIntent.id,
+      payment_flow: metadata.payment_flow,
     };
   }
 
