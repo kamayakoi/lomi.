@@ -1,4 +1,8 @@
-import { NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
+import {
+  NotFoundException,
+  ConflictException,
+  BadRequestException,
+} from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { CheckoutSessionsService } from './checkout-sessions.service';
 import { SupabaseService } from '../../utils/supabase/supabase.service';

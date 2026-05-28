@@ -61,7 +61,7 @@ Create a new product with one or more prices. At least one price is required.
 | `metadata` | `object` | No | Optional metadata on the price |
 
 <Callout type="info">
-  For `pay_what_you_want`: `minimum_amount` is required; `amount` is the suggested unit price (defaults to `minimum_amount` if omitted). Ensure `amount >= minimum_amount`, and when `maximum_amount` is set, `amount <= maximum_amount`. For `standard` and `tiered`, omit `minimum_amount` and `maximum_amount`.
+  For `pay_what_you_want`: `minimum_amount` is required; `amount` is the suggested unit price (defaults to `minimum_amount` if omitted). Ensure `amount >= minimum_amount`, and when `maximum_amount` is set, `amount <= maximum_amount`. The server enforces these rules on create and add-price. For `standard` and `tiered`, omit `minimum_amount` and `maximum_amount`.
 </Callout>
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>

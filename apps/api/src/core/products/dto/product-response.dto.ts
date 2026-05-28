@@ -74,7 +74,7 @@ export class ProductResponseDto {
   @ApiProperty({
     example: 'pause',
     description: 'Action to take on failed payment',
-    enum: ['pause', 'cancel', 'retry'],
+    enum: ['pause', 'cancel', 'continue'],
     nullable: true,
     type: String,
   })

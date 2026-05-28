@@ -61,7 +61,7 @@ Crée un produit avec un ou plusieurs tarifs. Au moins un tarif est obligatoire.
 | `metadata` | `object` | Non | Métadonnées sur le tarif |
 
 <Callout type="info">
-  Pour `pay_what_you_want` : `minimum_amount` est obligatoire ; `amount` est le prix unitaire suggéré (par défaut `minimum_amount` si omis). Vérifiez `amount >= minimum_amount`, et si `maximum_amount` est défini, `amount <= maximum_amount`. Pour `standard` et `tiered`, omittez `minimum_amount` et `maximum_amount`.
+  Pour `pay_what_you_want` : `minimum_amount` est obligatoire ; `amount` est le prix unitaire suggéré (par défaut `minimum_amount` si omis). Vérifiez `amount >= minimum_amount`, et si `maximum_amount` est défini, `amount <= maximum_amount`. Le serveur applique ces règles à la création et à l’ajout de tarif. Pour `standard` et `tiered`, omittez `minimum_amount` et `maximum_amount`.
 </Callout>
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>

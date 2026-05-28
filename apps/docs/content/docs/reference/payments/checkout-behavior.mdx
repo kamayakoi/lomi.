@@ -13,9 +13,10 @@ Checkout combines **checkout sessions**, **payment links**, **products/prices**,
 
 ## Payment links
 
-- **Product** links resolve amount from catalog prices (with optional locked price).
+- **Product** links resolve amount from catalog prices. When **`price_id`** is set, the initial checkout session uses that price row’s suggested `amount` (not only the product default).
 - **Instant** links use a fixed amount you supply.
 - Multi-line flows may set **`has_line_items`** in session metadata; totals aggregate line items, optional shipping/tax, and product-linked fees where configured.
+- **Pay-what-you-want products** must use a **single-product** link or session. Multi-item carts reject PWYW line items (`line_items_pwyw_not_supported`).
 
 ## Pay what you want
 
@@ -23,9 +24,13 @@ Flexible pricing is available for **one-time** products only (`pricing_model: pa
 
 - **Per-unit pricing** — the customer chooses a unit price; total = unit × `quantity`.
 - **`amount` on the price** — suggested unit price pre-filled at checkout (defaults to `minimum_amount` if omitted when creating the product).
-- **Bounds** — `minimum_amount` (required) and optional `maximum_amount` cap what the customer may pay per unit.
-- **Payment links** — product links pre-fill the suggested amount; the hosted checkout page lets the buyer adjust within bounds before paying.
+- **Bounds** — `minimum_amount` (required) and optional `maximum_amount` cap what the customer may pay per unit. The API and database **reject** prices where suggested `amount` is outside `[minimum_amount, maximum_amount]`.
+- **Payment links** — product links pre-fill the suggested amount from the linked `price_id` (or default price); the hosted checkout page lets the buyer adjust within bounds before paying.
 - **API sessions** — when creating a checkout session with `product_id`/`price_id`, pass `amount` as the product subtotal or omit it to use the suggested price × quantity. See [Checkout Sessions](/reference/payments/checkout-sessions) and [Products](/reference/payments/products).
+
+<Callout type="warning">
+  **Do not include pay-what-you-want prices in multi-item checkout.** Use a dedicated single-product payment link or checkout session for donations and flexible pricing. Cart APIs return `line_items_pwyw_not_supported`.
+</Callout>
 
 ## Subscription checkout
 

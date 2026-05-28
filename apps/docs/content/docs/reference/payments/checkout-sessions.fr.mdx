@@ -59,6 +59,17 @@ Lorsque `product_id` ou `price_id` pointe vers un tarif avec `pricing_model: pay
 - **Tunnel hébergé** — l’acheteur peut modifier le prix unitaire avant de payer ; validation côté client et serveur.
 - **Flux programmatiques** — définissez `amount` à la création de session si le total est déjà connu.
 
+### Panier multi-produits (`line_items`)
+
+Avec **`line_items`**, chaque ligne doit référencer un tarif **ponctuel** en tarification **standard** (fixe). L’API renvoie **400** avec l’un des codes :
+
+| Code | Signification |
+|------|----------------|
+| `line_items_pwyw_not_supported` | Une ligne utilise `pay_what_you_want` — utilisez une session mono-produit |
+| `line_items_recurring_not_supported` | Une ligne référence un produit récurrent |
+| `line_items_usage_based_not_supported` | Tarification à l’usage (pas encore prise en charge en panier) |
+| `line_items_mixed_product_types` | Mélange ponctuel et récurrent dans un même panier |
+
 ### Produits récurrents (abonnements)
 
 Lorsque `product_id` désigne un produit **récurrent** :

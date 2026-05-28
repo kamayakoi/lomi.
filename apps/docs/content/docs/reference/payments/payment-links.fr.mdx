@@ -21,6 +21,10 @@ Règles de bout en bout (devise, codes promo, sessions) : **[Comportement du tun
   Les liens **produit** pour `product_type: recurring` ouvrent le tunnel en mode abonnement (essais, premier paiement, renouvellements : voir [Comportement du tunnel — Abonnements](/reference/payments/checkout-behavior#abonnements)). Les liens instantanés restent réservés aux montants ponctuels.
 </Callout>
 
+<Callout type="info">
+  Les produits **payez ce que vous voulez** utilisent des liens **mono-produit** uniquement. Indiquez **`price_id`** si le produit a plusieurs tarifs ; le tunnel s’ouvre avec le montant suggéré de ce tarif et l’acheteur peut ajuster dans `minimum_amount` / `maximum_amount`. Les liens multi-produits ne peuvent pas inclure de PWYW.
+</Callout>
+
 ## Créer un lien de paiement
 
 ### Corps de la requête

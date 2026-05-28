@@ -59,6 +59,17 @@ When `product_id` or `price_id` points to a price with `pricing_model: pay_what_
 - **Hosted checkout** — the buyer can change the unit price before paying; validation runs client-side and server-side.
 - **Programmatic flows** — set `amount` at session creation when you already know the chosen total.
 
+### Multi-item checkout (`line_items`)
+
+When you pass **`line_items`**, each row must reference a **one-time** price with **standard** (fixed) pricing. The API returns **400** with one of:
+
+| Code | Meaning |
+|------|---------|
+| `line_items_pwyw_not_supported` | A line uses `pay_what_you_want` pricing — use a single-product session instead |
+| `line_items_recurring_not_supported` | A line references a recurring product |
+| `line_items_usage_based_not_supported` | Usage-based pricing (not yet supported in carts) |
+| `line_items_mixed_product_types` | Mixed one-time and recurring products in one cart |
+
 ### Recurring (subscription) products
 
 When `product_id` refers to a **recurring** product:

@@ -4127,8 +4127,9 @@
               "active",
               "past_due",
               "cancelled",
-              "trialing",
-              "paused"
+              "trial",
+              "paused",
+              "expired"
             ]
           },
           "start_date": {
@@ -4967,7 +4968,7 @@
             "type": "string",
             "example": "pause",
             "description": "Action to take on failed payment",
-            "enum": ["pause", "cancel", "retry"],
+            "enum": ["pause", "cancel", "continue"],
             "nullable": true
           },
           "charge_day": {

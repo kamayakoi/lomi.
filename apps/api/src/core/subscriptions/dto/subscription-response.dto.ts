@@ -41,7 +41,15 @@ export class SubscriptionResponseDto {
   @ApiProperty({
     example: 'active',
     description: 'Subscription status',
-    enum: ['pending', 'active', 'past_due', 'cancelled', 'trialing', 'paused'],
+    enum: [
+      'pending',
+      'active',
+      'past_due',
+      'cancelled',
+      'trial',
+      'paused',
+      'expired',
+    ],
     type: String,
   })
   status: string;

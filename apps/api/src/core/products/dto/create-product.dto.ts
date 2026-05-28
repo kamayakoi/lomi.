@@ -72,7 +72,7 @@ export class CreateProductDto {
   @ApiProperty({
     example: 'pause',
     description: 'Action to take on failed payment (recurring products only)',
-    enum: ['pause', 'cancel', 'retry'],
+    enum: ['pause', 'cancel', 'continue'],
     required: false,
   })
   failed_payment_action?: string;
