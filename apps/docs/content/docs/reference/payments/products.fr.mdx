@@ -30,7 +30,7 @@ Crée un produit avec un ou plusieurs tarifs. Au moins un tarif est obligatoire.
 
 | Champ | Type | Description |
 |-------|------|-------------|
-| `failed_payment_action` | `string` | Action si paiement échoué : `pause`, `cancel`, `retry` |
+| `failed_payment_action` | `string` | Action si paiement échoué : `pause`, `cancel`, `continue` |
 | `charge_day` | `number` | Jour du mois de prélèvement (1–31) |
 | `first_payment_type` | `string` | `initial`, `non_initial`, `prorated` |
 | `trial_enabled` | `boolean` | Activer une période d’essai |
@@ -105,7 +105,7 @@ const subscription = await lomi.products.create({
   ],
   trial_enabled: true,
   trial_period_days: 14,
-  failed_payment_action: 'retry',
+  failed_payment_action: 'continue',
 });
 
 // Pay what you want (one-time only)
@@ -391,7 +391,7 @@ Les champs correspondent à la ressource produit de l’API (voir OpenAPI **Prod
 | `prices` | `array` | Objets tarif (`price_id`, `amount`, `currency_code`, `billing_interval`, `pricing_model`, `minimum_amount`, `maximum_amount`, `is_active`, `is_default`, `metadata`, horodatages) |
 | `fees` | `array` | Lignes de frais associées (si présentes) |
 | `environment` | `string` | `test` ou `live` |
-| `failed_payment_action` | `string` \| `null` | Récurrent : `pause`, `cancel`, `retry` |
+| `failed_payment_action` | `string` \| `null` | Récurrent : `pause`, `cancel`, `continue` |
 | `charge_day` | `number` \| `null` | Jour de prélèvement (1–31) |
 | `first_payment_type` | `string` \| `null` | `initial`, `non_initial`, `prorated` |
 | `trial_enabled` | `boolean` | Essai activé |

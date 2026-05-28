@@ -65,6 +65,18 @@ function createSupabaseE2eMock() {
     }
 
     if (fn === 'create_checkout_session_with_line_items') {
+      const lineItems = args.p_line_items as Array<{ price_id?: string }> | undefined;
+      if (
+        lineItems?.some(
+          (item) => item.price_id === '44444444-4444-4444-4444-444444444444',
+        )
+      ) {
+        return {
+          data: null,
+          error: { message: 'line_items_recurring_not_supported' },
+        };
+      }
+
       return {
         data: {
           checkout_session_id: 'cs_cart_e2e',
@@ -377,6 +389,31 @@ describe('App (e2e)', () => {
       'create_checkout_session_with_line_items',
       expect.objectContaining({
         p_line_items: [{ price_id: priceId, quantity: 1 }],
+      }),
+    );
+  });
+
+  it('POST /checkout-sessions with invalid line_items returns 400', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/checkout-sessions')
+      .set('X-API-KEY', 'valid_e2e_key')
+      .send({
+        currency_code: 'XOF',
+        line_items: [
+          {
+            price_id: '44444444-4444-4444-4444-444444444444',
+            quantity: 1,
+          },
+        ],
+      })
+      .expect(400);
+
+    expect(res.body).toEqual(
+      expect.objectContaining({
+        error: expect.objectContaining({
+          code: 'bad_request',
+          message: expect.stringContaining('recurring'),
+        }),
       }),
     );
   });

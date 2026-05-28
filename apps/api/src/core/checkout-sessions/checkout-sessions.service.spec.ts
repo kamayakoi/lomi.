@@ -1,4 +1,4 @@
-import { NotFoundException, ConflictException } from '@nestjs/common';
+import { NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { CheckoutSessionsService } from './checkout-sessions.service';
 import { SupabaseService } from '../../utils/supabase/supabase.service';
@@ -192,6 +192,44 @@ describe('CheckoutSessionsService', () => {
         p_environment: mockUser.environment,
       }),
     );
+  });
+
+  it('maps line_items_recurring_not_supported RPC error to BadRequestException', async () => {
+    mockSupabaseService.rpc.mockResolvedValue({
+      data: null,
+      error: { message: 'line_items_recurring_not_supported' },
+    });
+
+    await expect(
+      service.create(
+        {
+          currency_code: 'XOF',
+          line_items: [
+            { price_id: '11111111-1111-1111-1111-111111111111', quantity: 1 },
+          ],
+        } as CreateCheckoutSessionDto,
+        mockUser as AuthContext,
+      ),
+    ).rejects.toThrow(BadRequestException);
+  });
+
+  it('maps line_items_pwyw_not_supported RPC error to BadRequestException', async () => {
+    mockSupabaseService.rpc.mockResolvedValue({
+      data: null,
+      error: { message: 'line_items_pwyw_not_supported' },
+    });
+
+    await expect(
+      service.create(
+        {
+          currency_code: 'XOF',
+          line_items: [
+            { price_id: '22222222-2222-2222-2222-222222222222', quantity: 1 },
+          ],
+        } as CreateCheckoutSessionDto,
+        mockUser as AuthContext,
+      ),
+    ).rejects.toThrow(BadRequestException);
   });
 
   it('should findOne return row when scoped to organization', async () => {

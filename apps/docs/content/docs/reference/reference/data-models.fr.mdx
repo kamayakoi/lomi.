@@ -209,7 +209,7 @@ Représente un produit ou service achetable. Renvoyé par les endpoints produits
 | `` `environment` ``           | `` `string` ``         | `` `test` `` ou `` `live` ``.                                                |
 | `` `prices` ``                | `` `array` ``          | Objets **price** imbriqués (voir ci-dessous).                                |
 | `` `fees` ``                  | `` `array` ``          | Lignes de frais associées lorsque renvoyées par l’API.                       |
-| `` `failed_payment_action` `` | `` `string` `` \| null | Récurrent : `` `pause` ``, `` `cancel` ``, `` `retry` ``.                   |
+| `` `failed_payment_action` `` | `` `string` `` \| null | Récurrent : `` `pause` ``, `` `cancel` ``, `` `continue` ``.                   |
 | `` `charge_day` ``            | `` `number` `` \| null | Jour du mois de prélèvement (1–31) pour le récurrent.                        |
 | `` `first_payment_type` ``    | `` `string` `` \| null | `` `initial` ``, `` `non_initial` ``, `` `prorated` ``.                      |
 | `` `trial_enabled` ``         | `` `boolean` ``        | Période d’essai activée.                                                     |

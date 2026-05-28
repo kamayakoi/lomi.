@@ -210,6 +210,10 @@ When line_items is provided:
 - product_id, price_id, and quantity at the root level are ignored
 - amount is auto-calculated from line items
 - Each line item must have a price_id belonging to the organization
+- Only one-time products with standard (non PWYW) pricing are supported
+- Rejected combinations return HTTP 400 with codes:
+  line_items_recurring_not_supported, line_items_pwyw_not_supported,
+  line_items_usage_based_not_supported, line_items_mixed_product_types
 
 Example:
 {

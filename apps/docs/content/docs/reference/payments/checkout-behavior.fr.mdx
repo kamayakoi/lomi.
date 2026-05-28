@@ -60,7 +60,7 @@ Le tunnel hébergé et la vitrine affichent le total résolu côté serveur. Le 
 
 - **Stripe** : prélèvement automatique sur le moyen enregistré à `next_billing_date`.
 - **Mobile money** : sans moyen enregistré, lomi. peut envoyer un **lien de renouvellement manuel** par e-mail.
-- Les échecs peuvent passer le statut en `past_due` ou `paused` selon `failed_payment_action` (`retry`, `pause`, `cancel`).
+- Les échecs peuvent passer le statut en `past_due` ou `paused` selon `failed_payment_action` (`continue`, `pause`, `cancel`).
 - Écoutez **`SUBSCRIPTION_RENEWED`** et **`PAYMENT_FAILED`** (transactions de renouvellement).
 
 ### Abonnements à durée fixe

@@ -258,6 +258,8 @@ Les **échecs de paiement** au renouvellement n’émettent pas de webhook abonn
 
 L’enregistrement de carte en essai (`setup_intent.succeeded`) est interne ; **`SUBSCRIPTION_CREATED`** est émis à la fin de l’inscription, pas au chargement du formulaire carte.
 
+**Notifications client :** les inscriptions en essai ou à 0 € (sans transaction de paiement complétée) déclenchent un **e-mail de confirmation d’inscription** si `customer_notifications.subscription_signups.email` est activé (par défaut : oui). Les inscriptions avec premier paiement reçoivent le reçu de transaction standard.
+
 ---
 
 ## Réponses d’erreur

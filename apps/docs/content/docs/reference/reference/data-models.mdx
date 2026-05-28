@@ -209,7 +209,7 @@ Represents a product or service that can be purchased. Returned by product endpo
 | `` `environment` ``         | `` `string` ``         | `` `test` `` or `` `live` ``.                                               |
 | `` `prices` ``               | `` `array` ``          | Embedded **price** objects (see below).                                     |
 | `` `fees` ``                 | `` `array` ``          | Associated fee rows when returned by the API.                               |
-| `` `failed_payment_action` ``| `` `string` `` \| null | Recurring: `` `pause` ``, `` `cancel` ``, `` `retry` ``.                    |
+| `` `failed_payment_action` ``| `` `string` `` \| null | Recurring: `` `pause` ``, `` `cancel` ``, `` `continue` ``.                    |
 | `` `charge_day` ``           | `` `number` `` \| null | Day of month to charge (1–31) for recurring.                                |
 | `` `first_payment_type` ``   | `` `string` `` \| null | `` `initial` ``, `` `non_initial` ``, `` `prorated` ``.                     |
 | `` `trial_enabled` ``        | `` `boolean` ``        | Trial enabled.                                                              |
