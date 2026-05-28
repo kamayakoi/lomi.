@@ -12,6 +12,10 @@ The Subscriptions API lists and retrieves **subscription instances** (a customer
   SDKs may expose both **`/subscriptions`** helpers and dedicated **`/customer-subscriptions`** methods. For route-specific examples and status transitions, see **[Customer subscriptions](/reference/platform/customer-subscriptions)**. Immutable fields and cancel-only rules follow the generated OpenAPI descriptions for each operation.
 </Callout>
 
+<Callout type="info">
+  For signup flows (trials, first payment types, checkout session amounts), see **[Checkout behavior — Subscription checkout](/reference/payments/checkout-behavior#subscription-checkout)**.
+</Callout>
+
 ## List subscriptions
 
 Retrieve all subscriptions for your organization.
@@ -134,6 +138,34 @@ curl -X GET "https://api.lomi.africa/subscriptions/sub_abc123..." \
 
 ---
 
+## Subscription lifecycle
+
+Subscriptions are created when a customer completes checkout for a **recurring** product (hosted checkout, payment link, storefront subscribe flow, or API session with `product_type: recurring`). Typical status flow:
+
+| Status | Meaning |
+|--------|---------|
+| `pending` | Created but not yet active (rare at signup). |
+| `trial` | Free trial in progress; no charge until trial ends. |
+| `active` | Paid and renewing on schedule. |
+| `past_due` | A renewal payment failed; retries or merchant action may apply. |
+| `paused` | Billing paused (e.g. after failed payment when product is configured to pause). |
+| `cancelled` | Cancelled by merchant or customer. |
+| `expired` | Fixed-term subscription ended or trial converted without payment method. |
+
+**First payment** behavior is controlled on the product via `first_payment_type`:
+
+| Value | First checkout charge |
+|-------|------------------------|
+| `initial` | Full recurring price (or prorated amount if combined with proration rules). |
+| `non_initial` | **$0** at signup; first charge on the first billing date. |
+| `prorated` | Partial amount for the remainder of the current billing period. |
+
+**Trials** (`trial_enabled` + `trial_period_days`): signup charge is **$0**. Stripe saves the card via SetupIntent; mobile money can complete signup without an immediate charge. After the trial, status moves to `active` and billing begins on `next_billing_date`.
+
+**Renewals** run automatically for saved Stripe payment methods. If no method is on file (common for mobile money), lomi. may fall back to a **manual renewal checkout link** for the customer.
+
+---
+
 ## Cancel a subscription
 
 Cancel an active subscription. This is the **only** modification allowed.
@@ -199,29 +231,36 @@ curl -X POST "https://api.lomi.africa/subscriptions/sub_abc123.../cancel" \
 | `customer_id` | `string` | Associated customer |
 | `product_id` | `string` | Associated product |
 | `price_id` | `string` | Associated price |
-| `status` | `string` | `active`, `past_due`, `cancelled`, `trialing` |
+| `status` | `string` | `pending`, `trial`, `active`, `past_due`, `paused`, `cancelled`, `expired` |
 | `amount` | `number` | Recurring amount |
 | `currency_code` | `string` | Currency |
 | `billing_interval` | `string` | `day`, `week`, `month`, `year` |
-| `current_period_start` | `string` | Current period start |
-| `current_period_end` | `string` | Current period end (next billing date) |
+| `next_billing_date` | `string` | Next charge date (ISO 8601) |
+| `start_date` | `string` | Subscription start |
+| `end_date` | `string` | End date for fixed-term or trial (nullable) |
 | `cancel_at_period_end` | `boolean` | Scheduled for cancellation |
 | `cancel_at` | `string` | Scheduled cancellation date |
 | `cancelled_at` | `string` | Actual cancellation timestamp |
-| `trial_start` | `string` | Trial start date |
-| `trial_end` | `string` | Trial end date |
 | `created_at` | `string` | Creation timestamp |
+| `updated_at` | `string` | Last update timestamp |
+
+Field names in API responses may use `subscription_id` instead of `id`. See [Customer subscriptions](/reference/platform/customer-subscriptions) for the canonical list response shape.
 
 ---
 
 ## Webhooks
 
+Subscribe to these **SCREAMING_SNAKE_CASE** events (same as [Webhooks](/reference/payments/webhooks)):
+
 | Event | Description |
 |-------|-------------|
-| `subscription.created` | New subscription created |
-| `subscription.updated` | Subscription renewed or updated |
-| `subscription.cancelled` | Subscription cancelled |
-| `subscription.payment_failed` | Recurring payment failed |
+| `SUBSCRIPTION_CREATED` | New subscription after successful signup (including trial signup). |
+| `SUBSCRIPTION_RENEWED` | A billing cycle renewed successfully. |
+| `SUBSCRIPTION_CANCELLED` | Subscription was cancelled. |
+
+Renewal **payment failures** do not emit a separate subscription webhook. Listen for **`PAYMENT_FAILED`** on the failed renewal transaction, and monitor subscription `status` (`past_due`, `paused`, etc.) via the API.
+
+Trial card setup (`setup_intent.succeeded`) is handled internally; **`SUBSCRIPTION_CREATED`** fires when signup completes, not when the card form first loads.
 
 ---
 

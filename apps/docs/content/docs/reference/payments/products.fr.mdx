@@ -36,6 +36,10 @@ Crée un produit avec un ou plusieurs tarifs. Au moins un tarif est obligatoire.
 | `trial_enabled` | `boolean` | Activer une période d’essai |
 | `trial_period_days` | `number` | Durée de l’essai en jours |
 
+<Callout type="info">
+  **Métadonnées optionnelles** pour les produits récurrents (via `metadata` à la création / mise à jour) : `subscription_length` (`"automatic"` par défaut) et `fixed_charges` (nombre entier de cycles avant expiration). Ce ne sont pas des champs API de premier niveau ; stockez-les dans `metadata`.
+</Callout>
+
 **Champs produit à l’usage :**
 
 | Champ | Type | Description |

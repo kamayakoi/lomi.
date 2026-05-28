@@ -27,6 +27,53 @@ Flexible pricing is available for **one-time** products only (`pricing_model: pa
 - **Payment links** — product links pre-fill the suggested amount; the hosted checkout page lets the buyer adjust within bounds before paying.
 - **API sessions** — when creating a checkout session with `product_id`/`price_id`, pass `amount` as the product subtotal or omit it to use the suggested price × quantity. See [Checkout Sessions](/reference/payments/checkout-sessions) and [Products](/reference/payments/products).
 
+## Subscription checkout
+
+Recurring products (`product_type: recurring`) create a **subscription instance** when signup completes. This applies to hosted checkout, payment links, storefront subscribe flows, and API-created sessions with a recurring `product_id`.
+
+<Callout type="warning">
+  **Do not mix recurring and one-time products in a single cart checkout.** Multi-line `create_checkout_session_with_line_items` is intended for one-time products. Sell subscriptions via a dedicated session or payment link for the recurring product.
+</Callout>
+
+### First payment and trials
+
+Product fields control the **first checkout charge** (see [Products](/reference/payments/products)):
+
+| Setting | Signup charge |
+|---------|----------------|
+| `first_payment_type: initial` | Charge the recurring price (or prorated portion). |
+| `first_payment_type: non_initial` | **$0** at signup; first charge on `next_billing_date`. |
+| `first_payment_type: prorated` | Partial charge for the rest of the current billing period. |
+| `trial_enabled: true` | **$0** for `trial_period_days`; billing starts after the trial. |
+
+Hosted checkout and storefront resolve the display total from server-side signup terms. The **checkout session `amount`** may still reflect the **catalog price** so session creation passes validation (`amount` must be &gt; 0), while the customer is charged **$0** or only a SetupIntent is collected for Stripe trials.
+
+### Payment methods at signup
+
+| Provider | Trial / $0 signup |
+|----------|---------------------|
+| **Stripe (cards)** | SetupIntent saves the card; no charge until trial ends or first billing date. |
+| **Wave / MTN** | Signup completes without an immediate charge when `requires_payment` is false. |
+| **Paid signup** | Normal payment flow; first transaction type is `instalment` and links to the new subscription. |
+
+### Renewals and failures
+
+- **Stripe**: renewals charge the saved payment method on `next_billing_date`.
+- **Mobile money**: if no saved method exists, lomi. may email a **manual renewal checkout link**.
+- Failed renewals may set subscription status to `past_due` or `paused` depending on `failed_payment_action` on the product (`retry`, `pause`, `cancel`).
+- Listen for **`SUBSCRIPTION_RENEWED`** and **`PAYMENT_FAILED`** (renewal transactions), not a separate `subscription.payment_failed` event.
+
+### Fixed-term subscriptions
+
+Optional product **metadata** keys (set via API `metadata` or dashboard):
+
+| Key | Description |
+|-----|-------------|
+| `subscription_length` | `"automatic"` (default) or a fixed term strategy. |
+| `fixed_charges` | Number of billing cycles before the subscription expires. |
+
+See [Subscriptions](/reference/payments/subscriptions) for lifecycle and webhook details.
+
 ## Coupons
 
 - Validation enforces **dates**, **usage limits**, **customer type** (new vs returning), **scope** (org-wide vs specific products), and **quantity** caps.
@@ -45,4 +92,5 @@ When session currency differs from a product price currency, server logic may **
 - [Checkout Sessions](/reference/payments/checkout-sessions)
 - [Payment Links](/reference/payments/payment-links)
 - [Products](/reference/payments/products)
+- [Subscriptions](/reference/payments/subscriptions)
 - [Payment state machine](/reference/reference/payment-state-machine)

@@ -199,6 +199,18 @@ async function processWebhookEvent(event: LomiWebhookEvent): Promise<void> {
       // Ex. : provisionner le service pour l’abonnement
       break;
 
+    case 'SUBSCRIPTION_RENEWED':
+      const renewed = event.data;
+      console.log(`Subscription renewed: ${renewed.subscription_id}`);
+      // Ex. : prolonger l’accès pour la nouvelle période
+      break;
+
+    case 'SUBSCRIPTION_CANCELLED':
+      const cancelledSub = event.data;
+      console.log(`Subscription cancelled: ${cancelledSub.subscription_id}`);
+      // Ex. : révoquer l’accès immédiatement ou en fin de période
+      break;
+
     // Ajouter d’autres cas pour les événements auxquels vous êtes abonné…
 
     default:

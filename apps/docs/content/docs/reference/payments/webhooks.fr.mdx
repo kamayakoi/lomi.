@@ -48,6 +48,10 @@ Lors de la création ou de la mise à jour d’un webhook, vous souscrivez à de
 | `` `REFUND_CREATED` ``         | Une tentative de remboursement est créée.               | `` `Refund` ``          |
 | `` `test.webhook` ``            | Événement de test envoyé via l’API.         | `` `TestPayload` ``     |
 
+<Callout type="info">
+  Les **échecs de paiement au renouvellement** émettent **`PAYMENT_FAILED`** sur la transaction concernée. Il n’existe pas de webhook dédié « échec abonnement ». Utilisez **`SUBSCRIPTION_RENEWED`** pour les cycles réussis. Voir [Abonnements](/reference/payments/subscriptions) et [Comportement du tunnel — Abonnements](/reference/payments/checkout-behavior#abonnements).
+</Callout>
+
 _(La structure précise des charges par type sera documentée sur la ressource concernée — Transactions, Abonnements, etc.)_
 
 Les abonnements et les corps JSON utilisent des noms d’événement en **SCREAMING_SNAKE_CASE** (par ex. `PAYMENT_SUCCEEDED`). Certains outils peuvent afficher des alias avec **points** (par ex. `payment.succeeded`) — utilisez les valeurs ci-dessus pour configurer vos points de terminaison et comparer le champ `event`.

@@ -14,8 +14,12 @@ End-to-end checkout rules (currency, coupons, sessions): **[Checkout behavior](/
 
 | Type | Description |
 |------|-------------|
-| `product` | Links to a specific product. Amount is calculated from product price. |
+| `product` | Links to a specific product. Amount is calculated from product price. **Recurring products** create a subscription when checkout completes. |
 | `instant` | Custom amount payment. Requires `amount` field. |
+
+<Callout type="info">
+  Product links for **`product_type: recurring`** open hosted checkout in subscription mode (trials, first payment types, and renewals follow [Checkout behavior — Subscription checkout](/reference/payments/checkout-behavior#subscription-checkout)). Instant links are for one-time amounts only.
+</Callout>
 
 ## Create a payment link
 

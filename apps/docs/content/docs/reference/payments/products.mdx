@@ -36,6 +36,10 @@ Create a new product with one or more prices. At least one price is required.
 | `trial_enabled` | `boolean` | Enable trial period |
 | `trial_period_days` | `number` | Trial length in days |
 
+<Callout type="info">
+  **Optional metadata** for recurring products (via `metadata` on create/update): `subscription_length` (`"automatic"` by default) and `fixed_charges` (integer number of billing cycles before expiry). These are not top-level API fields; store them in `metadata`.
+</Callout>
+
 **Usage-Based Product Fields:**
 
 | Field | Type | Description |

@@ -119,7 +119,7 @@ Represents a reusable subscription plan definition in historical docs. Prefer th
 | `` `charge_day` ``            | `` `number` ``  | Specific day for charging (day of month/week, depending on frequency) (nullable).             |
 | `` `metadata` ``              | `` `object` ``  | Key-value pairs for storing additional information about the plan (nullable).                 |
 | `` `is_active` ``             | `` `boolean` `` | Whether the plan can be used to create new customer subscriptions.                            |
-| `` `first_payment_type` ``    | `` `string` ``  | Type of the first payment (e.g., `` `initial` ``, `` `prorated` ``) (nullable).               |
+| `` `first_payment_type` ``    | `` `string` ``  | Type of the first payment: `` `initial` ``, `` `non_initial` ``, or `` `prorated` `` (nullable).               |
 | `` `created_at` ``            | `` `string` ``  | Timestamp (ISO 8601) indicating when the plan was created.                                    |
 | `` `updated_at` ``            | `` `string` ``  | Timestamp (ISO 8601) indicating when the plan was last updated.                               |
 

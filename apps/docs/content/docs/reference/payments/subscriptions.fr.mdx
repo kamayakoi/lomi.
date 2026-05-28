@@ -12,6 +12,10 @@ L’API Subscriptions permet de lister et récupérer des **instances d’abonne
   Les SDK peuvent exposer à la fois des helpers **`/subscriptions`** et des méthodes **`/customer-subscriptions`**. Exemples par route et transitions de statut : **[Abonnements clients](/reference/platform/customer-subscriptions)**. Les champs immuables et les règles d’annulation suivent les descriptions OpenAPI de chaque opération.
 </Callout>
 
+<Callout type="info">
+  Pour les parcours d’inscription (essais, types de premier paiement, montants de session), voir **[Comportement du tunnel — Abonnements](/reference/payments/checkout-behavior#abonnements)**.
+</Callout>
+
 ## Lister les abonnements
 
 Récupère tous les abonnements de votre organisation.
@@ -134,6 +138,34 @@ curl -X GET "https://api.lomi.africa/subscriptions/sub_abc123..." \
 
 ---
 
+## Cycle de vie d’un abonnement
+
+Les abonnements sont créés lorsqu’un client finalise le tunnel pour un produit **récurrent** (tunnel hébergé, lien de paiement, vitrine ou session API avec `product_type: recurring`). Statuts typiques :
+
+| Statut | Signification |
+|--------|----------------|
+| `pending` | Créé mais pas encore actif (rare à l’inscription). |
+| `trial` | Essai gratuit en cours ; pas de prélèvement avant la fin de l’essai. |
+| `active` | Payant et renouvelé selon l’échéance. |
+| `past_due` | Échec de renouvellement ; nouvelles tentatives ou action marchande. |
+| `paused` | Facturation en pause (p. ex. après échec si le produit est configuré pour pauser). |
+| `cancelled` | Annulé par le marchand ou le client. |
+| `expired` | Durée fixe terminée ou essai converti sans moyen de paiement. |
+
+Le **premier paiement** est défini sur le produit via `first_payment_type` :
+
+| Valeur | Premier prélèvement au tunnel |
+|--------|-------------------------------|
+| `initial` | Tarif récurrent complet (ou montant au prorata selon les règles). |
+| `non_initial` | **0** à l’inscription ; premier prélèvement à la première échéance. |
+| `prorated` | Montant partiel pour le reste de la période en cours. |
+
+**Essais** (`trial_enabled` + `trial_period_days`) : montant à l’inscription **0**. Stripe enregistre la carte via SetupIntent ; le mobile money peut finaliser sans paiement immédiat. Après l’essai, le statut passe à `active` et la facturation démarre à `next_billing_date`.
+
+**Renouvellements** automatiques avec moyen Stripe enregistré. Sans moyen (fréquent en mobile money), lomi. peut basculer vers un **lien de renouvellement manuel** pour le client.
+
+---
+
 ## Annuler un abonnement
 
 Annule un abonnement actif. C’est la **seule** modification permise.
@@ -195,29 +227,36 @@ curl -X POST "https://api.lomi.africa/subscriptions/sub_abc123.../cancel" \
 | `customer_id` | `string` | Client |
 | `product_id` | `string` | Produit |
 | `price_id` | `string` | Tarif |
-| `status` | `string` | `active`, `past_due`, `cancelled`, `trialing` |
+| `status` | `string` | `pending`, `trial`, `active`, `past_due`, `paused`, `cancelled`, `expired` |
 | `amount` | `number` | Montant récurrent |
 | `currency_code` | `string` | Devise |
 | `billing_interval` | `string` | `day`, `week`, `month`, `year` |
-| `current_period_start` | `string` | Début de période |
-| `current_period_end` | `string` | Fin de période (prochaine échéance) |
+| `next_billing_date` | `string` | Prochaine date de prélèvement (ISO 8601) |
+| `start_date` | `string` | Début de l’abonnement |
+| `end_date` | `string` | Fin pour durée fixe ou essai (nullable) |
 | `cancel_at_period_end` | `boolean` | Annulation planifiée en fin de période |
 | `cancel_at` | `string` | Date d’annulation planifiée |
 | `cancelled_at` | `string` | Annulation effective |
-| `trial_start` | `string` | Début d’essai |
-| `trial_end` | `string` | Fin d’essai |
 | `created_at` | `string` | Création |
+| `updated_at` | `string` | Dernière mise à jour |
+
+Les réponses API peuvent utiliser `subscription_id` plutôt que `id`. Voir **[Abonnements clients](/reference/platform/customer-subscriptions)** pour la forme de liste canonique.
 
 ---
 
 ## Webhooks
 
+Abonnez-vous à ces événements en **SCREAMING_SNAKE_CASE** (comme sur [Webhooks](/reference/payments/webhooks)) :
+
 | Événement | Description |
-|-------|-------------|
-| `subscription.created` | Nouvel abonnement |
-| `subscription.updated` | Renouvellement ou mise à jour |
-| `subscription.cancelled` | Annulation |
-| `subscription.payment_failed` | Échec d’un paiement récurrent |
+|-----------|-------------|
+| `SUBSCRIPTION_CREATED` | Nouvel abonnement après inscription réussie (y compris essai). |
+| `SUBSCRIPTION_RENEWED` | Cycle de facturation renouvelé avec succès. |
+| `SUBSCRIPTION_CANCELLED` | Abonnement annulé. |
+
+Les **échecs de paiement** au renouvellement n’émettent pas de webhook abonnement dédié. Écoutez **`PAYMENT_FAILED`** sur la transaction du renouvellement et surveillez le `status` (`past_due`, `paused`, etc.) via l’API.
+
+L’enregistrement de carte en essai (`setup_intent.succeeded`) est interne ; **`SUBSCRIPTION_CREATED`** est émis à la fin de l’inscription, pas au chargement du formulaire carte.
 
 ---
 

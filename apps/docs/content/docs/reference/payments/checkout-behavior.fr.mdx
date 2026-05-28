@@ -27,6 +27,53 @@ La tarification flexible est disponible pour les produits **ponctuels** uniqueme
 - **Liens de paiement** — les liens produit préremplissent le montant suggéré ; le tunnel hébergé permet à l’acheteur d’ajuster dans les bornes avant de payer.
 - **Sessions API** — à la création d’une session avec `product_id`/`price_id`, passez `amount` comme sous-total produit ou omettez-le pour utiliser le prix suggéré × quantité. Voir [Sessions de paiement](/reference/payments/checkout-sessions) et [Produits](/reference/payments/products).
 
+## Abonnements
+
+Les produits récurrents (`product_type: recurring`) créent une **instance d’abonnement** à la fin de l’inscription. Cela s’applique au tunnel hébergé, aux liens de paiement, à la vitrine (bouton S’abonner) et aux sessions API avec un `product_id` récurrent.
+
+<Callout type="warning">
+  **Ne mélangez pas produits récurrents et ponctuels dans un même panier.** Le flux multi-lignes `create_checkout_session_with_line_items` vise les produits ponctuels. Vendez les abonnements via une session ou un lien dédié au produit récurrent.
+</Callout>
+
+### Premier paiement et essais
+
+Les champs produit définissent le **premier prélèvement au tunnel** (voir [Produits](/reference/payments/products)) :
+
+| Réglage | Montant à l’inscription |
+|---------|-------------------------|
+| `first_payment_type: initial` | Tarif récurrent (ou part au prorata). |
+| `first_payment_type: non_initial` | **0** à l’inscription ; premier prélèvement à `next_billing_date`. |
+| `first_payment_type: prorated` | Montant partiel pour le reste de la période. |
+| `trial_enabled: true` | **0** pendant `trial_period_days` ; facturation après l’essai. |
+
+Le tunnel hébergé et la vitrine affichent le total résolu côté serveur. Le **`amount` de la session** peut refléter le **prix catalogue** pour respecter la validation (`amount` &gt; 0), tandis que le client paie **0** ou enregistre uniquement sa carte (essai Stripe).
+
+### Moyens de paiement à l’inscription
+
+| Prestataire | Essai / inscription à 0 |
+|-------------|-------------------------|
+| **Stripe (cartes)** | SetupIntent enregistre la carte ; pas de prélèvement avant la fin de l’essai ou la première échéance. |
+| **Wave / MTN** | Inscription sans paiement immédiat lorsque `requires_payment` est false. |
+| **Inscription payante** | Flux de paiement normal ; première transaction de type `instalment` liée à l’abonnement. |
+
+### Renouvellements et échecs
+
+- **Stripe** : prélèvement automatique sur le moyen enregistré à `next_billing_date`.
+- **Mobile money** : sans moyen enregistré, lomi. peut envoyer un **lien de renouvellement manuel** par e-mail.
+- Les échecs peuvent passer le statut en `past_due` ou `paused` selon `failed_payment_action` (`retry`, `pause`, `cancel`).
+- Écoutez **`SUBSCRIPTION_RENEWED`** et **`PAYMENT_FAILED`** (transactions de renouvellement).
+
+### Abonnements à durée fixe
+
+Clés **metadata** produit optionnelles (API `metadata` ou tableau de bord) :
+
+| Clé | Description |
+|-----|-------------|
+| `subscription_length` | `"automatic"` (défaut) ou stratégie à durée fixe. |
+| `fixed_charges` | Nombre de cycles de facturation avant expiration. |
+
+Voir [Abonnements](/reference/payments/subscriptions) pour le cycle de vie et les webhooks.
+
 ## Codes promo
 
 - La validation applique les **dates**, **plafonds d’usage**, **type de client** (nouveau ou récurrent), **périmètre** (organisation entière ou produits précis) et plafonds de **quantité**.
@@ -45,4 +92,5 @@ Le tunnel peut **créer automatiquement ou fusionner** des fiches clients lorsqu
 - [Sessions de paiement](/reference/payments/checkout-sessions)
 - [Liens de paiement](/reference/payments/payment-links)
 - [Produits](/reference/payments/products)
+- [Abonnements](/reference/payments/subscriptions)
 - [Machine à états du paiement](/reference/reference/payment-state-machine)

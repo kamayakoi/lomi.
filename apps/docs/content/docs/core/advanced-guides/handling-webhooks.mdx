@@ -199,6 +199,18 @@ async function processWebhookEvent(event: LomiWebhookEvent): Promise<void> {
       // Example: Provision service for new subscription
       break;
 
+    case 'SUBSCRIPTION_RENEWED':
+      const renewed = event.data;
+      console.log(`Subscription renewed: ${renewed.subscription_id}`);
+      // Example: Extend access for the new billing period
+      break;
+
+    case 'SUBSCRIPTION_CANCELLED':
+      const cancelledSub = event.data;
+      console.log(`Subscription cancelled: ${cancelledSub.subscription_id}`);
+      // Example: Revoke access at period end or immediately
+      break;
+
     // Add cases for other events you subscribe to...
 
     default:

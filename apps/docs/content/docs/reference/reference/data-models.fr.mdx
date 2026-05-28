@@ -119,7 +119,7 @@ Représente une définition de plan d’abonnement réutilisable dans la documen
 | `` `charge_day` ``            | `` `number` ``  | Jour de prélèvement (jour du mois ou de la semaine selon la fréquence) (nullable).                             |
 | `` `metadata` ``              | `` `object` ``  | Paires clé-valeur pour des informations supplémentaires sur le plan (nullable).                            |
 | `` `is_active` ``             | `` `boolean` `` | Indique si le plan peut servir à créer de nouveaux abonnements clients.                                      |
-| `` `first_payment_type` ``    | `` `string` ``  | Type du premier paiement (p. ex. `` `initial` ``, `` `prorated` ``) (nullable).                               |
+| `` `first_payment_type` ``    | `` `string` ``  | Type du premier paiement : `` `initial` ``, `` `non_initial` `` ou `` `prorated` `` (nullable).               |
 | `` `created_at` ``            | `` `string` ``  | Horodatage (ISO 8601) de création du plan.                                                                   |
 | `` `updated_at` ``            | `` `string` ``  | Horodatage (ISO 8601) de dernière mise à jour du plan.                                                       |
 

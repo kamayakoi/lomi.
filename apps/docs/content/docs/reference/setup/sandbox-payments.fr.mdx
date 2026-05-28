@@ -295,6 +295,19 @@ Créez des liens en mode **Test** dans le tableau de bord, ou via l’API avec v
 
 </Tabs>
 
+## Tester les abonnements
+
+Utilisez des clés API **test** et les flux de [Paiements en bac à sable](/reference/setup/sandbox-payments).
+
+1. **Créez un produit récurrent** avec `trial_enabled: true` ou `first_payment_type: non_initial` (voir [Produits](/reference/payments/products)).
+2. **Lien de paiement ou session** — ouvrez le tunnel hébergé ou l’URL S’abonner de la vitrine avec le `product_id` récurrent.
+3. **Essai + Stripe** — utilisez `4242 4242 4242 4242` ; le tunnel enregistre la carte via SetupIntent avec **0** dû aujourd’hui. Attendez **`SUBSCRIPTION_CREATED`** à la fin de l’inscription.
+4. **Essai + Wave / MTN** — complétez les coordonnées ; l’inscription doit réussir **sans prélèvement** en mode test.
+5. **Inscription payante** — `first_payment_type: initial` et paiement test normal ; vérifiez `status: active` et une transaction `instalment`.
+6. **Webhooks** — abonnez-vous à `SUBSCRIPTION_CREATED`, `SUBSCRIPTION_RENEWED`, `SUBSCRIPTION_CANCELLED` et `PAYMENT_FAILED` pour les échecs de renouvellement.
+
+Les renouvellements planifiés en test utilisent des dates futures ; inspectez `next_billing_date` via le tableau de bord ou l’API.
+
 ## Webhooks en test
 
 1. Dans le tableau de bord (**Developers → Webhooks**), ajoutez un point de terminaison en mode **Test**.
