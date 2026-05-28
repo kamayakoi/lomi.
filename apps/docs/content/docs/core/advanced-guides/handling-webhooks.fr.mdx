@@ -7,6 +7,27 @@ Pour une introduction générale et la configuration, voir [Configurer les webho
 
 Comportement opérationnel (nouvelles tentatives, doublons, journaux de livraison) : [Fiabilité des webhooks](/core/advanced-guides/webhook-reliability).
 
+## Liste de contrôle
+
+- [ ] Point de terminaison HTTPS acceptant `POST` avec corps JSON
+- [ ] **Secret de signature** webhook (`whsec_…`) du tableau de bord — `LOMI_WEBHOOK_SECRET`, non envoyé par lomi. à la livraison
+- [ ] Middleware conservant le **corps brut** pour le HMAC (voir ci-dessous)
+- [ ] Vérifier `X-Lomi-Signature` **avant** de parser le JSON ou d’appliquer l’auth REST de votre API
+- [ ] Répondre **`200`** / **`204`** en quelques secondes, puis traiter l’événement de façon asynchrone
+- [ ] Dédupliquer sur l’`id` d’événement (les doublons sont normaux)
+
+<Callout type="warn" title="Corps brut : vérifier avant de parser">
+  La signature doit utiliser les **octets exacts** envoyés par lomi. Re-sérialiser le JSON après `express.json()` casse le HMAC.
+
+  **Incorrect :** `app.post('/webhook', express.json(), …)` puis `JSON.stringify(req.body)` pour le MAC.
+
+  **Correct :** `app.post('/webhook', express.raw({ type: 'application/json' }), …)` puis passer `req.body` (`Buffer`) au vérificateur, et `JSON.parse` seulement après validation.
+</Callout>
+
+<Callout type="info" title="Secret de signature ≠ clé API">
+  Les POST webhook utilisent **`X-Lomi-Signature`** (HMAC du corps brut avec le `whsec_…` du point de terminaison). lomi. n’envoie **pas** `X-API-Key` ni `Authorization: Bearer`. Un **401** dans les journaux vient souvent de votre middleware — voir [Secret de signature vs Authorization](#webhook-signing-vs-authorization).
+</Callout>
+
 ## Résumé de la configuration
 
 ### Configurer votre point de terminaison

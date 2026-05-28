@@ -10,8 +10,14 @@ import { Callout } from 'fumadocs-ui/components/callout';
 
 lomi. provides two types of API keys for each environment:
 
-- **Secret Keys** (`lomi_sk_test_…` / `lomi_sk_live_…`): Full access, server-side only. **Never share these.**
-- **Publishable Keys** (`pk_…` where applicable): Limited access, safe for client-side use only when documented for your integration.
+| Key | Prefix (current) | Where to use |
+| --- | --- | --- |
+| **Secret** | `lomi_sk_test_…` / `lomi_sk_live_…` | Servers, scripts, CI — full API access. **Never expose in browsers or mobile apps.** |
+| **Publishable** | `lomi_pk_test_…` / `lomi_pk_live_…` | Client-side card confirmation, Payment Elements — limited operations only. |
+
+<Callout type="warn">
+  **Never put secret keys in frontend code.** Use publishable keys only where the integration guide explicitly allows it (e.g. embedded card flows).
+</Callout>
 
 <Callout type="info">
   Older examples may show `sk_test_` / `sk_live_` prefixes. Current keys issued by the dashboard follow **`lomi_sk_test_`** and **`lomi_sk_live_`** as in [Authentication](/reference/setup/authentication).
@@ -19,18 +25,21 @@ lomi. provides two types of API keys for each environment:
 
 ## Managing environment variables
 
-Set these in your `.env` file or deployment configuration:
+Create a `.env` file at your project root (add `.env` to `.gitignore`). Use **test** keys while integrating against the sandbox API (`https://sandbox.api.lomi.africa`).
 
-```bash
-# Required: Your secret key
+```bash filename=".env.example"
+# Sandbox (recommended while building)
 LOMI_SECRET_KEY=lomi_sk_test_xxxxxxxxxxxxxxxxxxxxxx
+LOMI_PUBLISHABLE_KEY=lomi_pk_test_xxxxxxxxxxxxxxxxxxxxxx
 
-# Required: Your webhook secret
+# Webhook signing secret (from Developers → Webhooks → your endpoint)
 LOMI_WEBHOOK_SECRET=whsec_xxxxxxxxxxxxxxxxxxxxxx
 
-# Optional: Base URL (defaults to https://api.lomi.africa)
-# LOMI_API_URL=https://api.lomi.africa
+# Optional: only if you call the API without the SDK and need an explicit host
+# LOMI_API_URL=https://sandbox.api.lomi.africa
 ```
+
+Copy to `.env` and replace placeholders with values from **Settings → Access tokens** and your webhook endpoint settings. Load `.env` with your framework (`dotenv`, Next.js, Vite, etc.) or your process manager — do not commit real keys.
 
 ## Initialization examples
 

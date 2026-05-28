@@ -26,6 +26,20 @@ Pour les clés API, les URL de base et les limites, voir **[Authentification](/r
 
 L’environnement est déterminé par votre **clé API**, pas par le nom d’hôte : une clé de test crée et lit toujours des données de test.
 
+## Checkout hébergé — démarrage rapide
+
+Paiement carte bac à sable en cinq étapes (recettes complètes dans [Recettes API et checkout hébergé](#recettes-api-et-checkout-hébergé)) :
+
+1. **Créer une session** — `POST https://sandbox.api.lomi.africa/checkout-sessions` avec `lomi_sk_test_…` (`amount`, `currency_code`, `success_url`, `cancel_url` minimum). Voir [API sessions checkout](/api/checkout-sessions/CheckoutSessionsController_create).
+2. **Ouvrir l’URL** — la réponse contient `checkout_url`.
+3. **Payer avec une carte test** — **Carte**, `4242 4242 4242 4242`, expiration `12/34`, CVC `123` ([liste complète](#aide-mémoire--numéros-les-plus-utiles)).
+4. **Finaliser** — transaction `completed` ; le **solde test** augmente.
+5. **Vérifier** — mode **Test** du tableau de bord et webhooks (`"environment": "test"`).
+
+```text
+POST /checkout-sessions  →  { "checkout_url": "https://…" }  →  paiement client  →  webhook + solde test
+```
+
 ## Comment le mode test est choisi
 
 | Ce qui fixe l’environnement | Conséquence |

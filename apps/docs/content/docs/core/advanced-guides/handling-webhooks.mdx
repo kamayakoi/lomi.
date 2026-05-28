@@ -7,6 +7,27 @@ For a general introduction and setup guide, see [Setting up webhooks](/core/fund
 
 Operational behavior (retries, duplicate events, delivery logs): [Webhook reliability](/core/advanced-guides/webhook-reliability).
 
+## Setup checklist
+
+- [ ] HTTPS endpoint that accepts `POST` with a JSON body
+- [ ] Webhook **signing secret** (`whsec_…`) from the dashboard — stored as `LOMI_WEBHOOK_SECRET`, not sent by lomi. on delivery
+- [ ] Middleware that preserves the **raw request body** for HMAC (see below)
+- [ ] Verify `X-Lomi-Signature` **before** parsing JSON or running auth middleware meant for your REST API
+- [ ] Return **`200`** / **`204`** within a few seconds, then process the event asynchronously
+- [ ] Dedupe on top-level event `id` (duplicates are normal)
+
+<Callout type="warn" title="Raw body: verify before you parse">
+  Signature verification must use the **exact bytes** lomi. sent. Re-serializing JSON after `express.json()` changes spacing or key order and breaks HMAC.
+
+  **Wrong:** `app.post('/webhook', express.json(), …)` then `JSON.stringify(req.body)` for the MAC.
+
+  **Correct:** `app.post('/webhook', express.raw({ type: 'application/json' }), …)` and pass `req.body` (a `Buffer`) into your verifier, then `JSON.parse` only after the signature matches.
+</Callout>
+
+<Callout type="info" title="Signing secret ≠ API key">
+  Outbound webhook POSTs use **`X-Lomi-Signature`** (HMAC of the raw body with your endpoint’s `whsec_…` secret). lomi. does **not** send `X-API-Key` or `Authorization: Bearer` on delivery. If you see **401** in delivery logs, disable global API-key middleware on the webhook route — see [Signing secret vs Authorization](#webhook-signing-vs-authorization).
+</Callout>
+
 ## Setup summary
 
 ### Configure your endpoint

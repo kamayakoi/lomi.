@@ -17,6 +17,22 @@ SDK Node.js / TypeScript officiel pour l’API de paiement lomi. Compatible Node
   <Tab value="bun">```bash bun add @lomi./sdk ```</Tab>
 </Tabs>
 
+## Avant de commencer
+
+1. [Créer un compte lomi.](https://dashboard.lomi.africa/signup) et terminer l’onboarding.
+2. Copier une **clé secrète de test** dans **Paramètres → Jetons d’accès** (`lomi_sk_test_…`). Voir [Variables d’environnement](/core/fundamentals/access-tokens).
+3. L’ajouter dans un fichier `.env` (voir [Gestion des variables](/core/fundamentals/access-tokens#gestion-des-variables-denvironnement)).
+4. Installer le SDK (ci-dessous), utiliser `environment: 'test'`, puis exécuter l’exemple [premier appel API](#premier-appel-api-bac-a-sable).
+
+## Environnements et URL de base
+
+Utilisez **`test`** pendant le développement. Le SDK choisit l’hôte API automatiquement :
+
+| `environment` | URL API | Préfixe clé secrète |
+| --- | --- | --- |
+| `'test'` | `https://sandbox.api.lomi.africa` | `lomi_sk_test_…` |
+| `'live'` | `https://api.lomi.africa` | `lomi_sk_live_…` |
+
 ## Démarrage rapide
 
 ```typescript
@@ -24,15 +40,48 @@ import { LomiSDK } from '@lomi./sdk';
 
 const lomi = new LomiSDK({
   apiKey: process.env.LOMI_SECRET_KEY!,
-  environment: 'live', // « test » = bac à sable ; « live » = production
+  environment: 'test', // bac à sable — « live » uniquement en production
 });
 ```
 
-<Callout type="info">
-  **Environnements :**
-  - `'test'` → `https://sandbox.api.lomi.africa`
-  - `'live'` → `https://api.lomi.africa`
-</Callout>
+## Premier appel API (bac à sable)
+
+Exemple exécutable : installer le SDK, définir `LOMI_SECRET_KEY` dans `.env`, puis lister les comptes.
+
+```typescript
+import { LomiSDK, LomiError } from '@lomi./sdk';
+
+const lomi = new LomiSDK({
+  apiKey: process.env.LOMI_SECRET_KEY!,
+  environment: 'test',
+});
+
+async function main() {
+  try {
+    const accounts = await lomi.accounts.list();
+    console.log('Comptes :', accounts);
+  } catch (error) {
+    if (error instanceof LomiError) {
+      console.error(`Erreur API [${error.status}] : ${error.message}`);
+      process.exit(1);
+    }
+    throw error;
+  }
+}
+
+main();
+```
+
+```bash filename=".env"
+LOMI_SECRET_KEY=lomi_sk_test_xxxxxxxxxxxxxxxxxxxxxx
+```
+
+```bash filename="Terminal"
+npm install @lomi./sdk
+npx tsx first-call.ts
+```
+
+Résultat attendu : liste JSON depuis `GET https://sandbox.api.lomi.africa/accounts`. Sans SDK : [Intégration API](/reference/setup/integration).
 
 ---
 

@@ -26,6 +26,20 @@ For API keys, base URLs, and rate limits, see **[Authentication](/reference/setu
 
 Environment is determined by your **API key**, not the hostname: a test key always creates and reads test data, even if you call the production API host by mistake (the key still scopes you to test).
 
+## Hosted checkout quick start
+
+End-to-end sandbox card payment in five steps (full recipes below in [API and hosted checkout recipes](#api-and-hosted-checkout-recipes)):
+
+1. **Create a session** — `POST https://sandbox.api.lomi.africa/checkout-sessions` with `lomi_sk_test_…` (minimum body: `amount`, `currency_code`, `success_url`, `cancel_url`). See [Checkout sessions API](/api/checkout-sessions/CheckoutSessionsController_create).
+2. **Open the URL** — response includes `checkout_url` (hosted payment page for that session).
+3. **Pay with a test card** — select **Card**, enter `4242 4242 4242 4242`, expiry `12/34`, CVC `123` ([full test card list](#quick-reference--most-used-numbers) below).
+4. **Complete** — transaction moves to `completed`; your **test balance** increases (not live funds).
+5. **Verify** — dashboard **Test** mode and webhooks (`environment: "test"` on payloads).
+
+```text
+POST /checkout-sessions  →  { "checkout_url": "https://…" }  →  customer pays  →  webhook + test balance
+```
+
 ## How test mode is chosen
 
 | What sets the environment | What happens next |

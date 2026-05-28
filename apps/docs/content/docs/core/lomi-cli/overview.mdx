@@ -55,6 +55,18 @@ lomi --version
 lomi --help
 ```
 
+### Troubleshooting install
+
+| Symptom | Likely cause | What to do |
+| --- | --- | --- |
+| `lomi: command not found` after `npm install -g` | npm global bin not on `PATH` | Run `npm prefix -g` and add that `bin` directory to your shell `PATH`, or use `npx lomi.cli --version` |
+| Installed but `lomi --version` fails with **glibc** / **version `GLIBC_X.XX' not found** | Prebuilt binary targets a newer glibc than your Linux distro | Install via [Homebrew](#homebrew), download a matching [GitHub Release](https://github.com/lomiafrica/lomi./releases) binary, or [build from source](#from-source) with Rust on the same machine |
+| Binary runs on macOS but not on older Linux CI images | CI runners often ship older glibc | Use the source build in CI, or a newer runner image (glibc ≥ 2.39 for npm-published Linux binaries at time of writing) |
+
+<Callout type="info">
+  npm only needs **Node.js 18+** to download the native binary; the CLI itself does not run on Node. If `npm install -g lomi.cli` succeeds but the binary cannot execute, treat it as a **platform compatibility** issue, not a Node version issue.
+</Callout>
+
 ### Supported platforms
 
 | Platform | Install method |

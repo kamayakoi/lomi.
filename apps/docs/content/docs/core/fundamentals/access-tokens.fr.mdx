@@ -10,8 +10,14 @@ import { Callout } from 'fumadocs-ui/components/callout';
 
 lomi. propose deux types de clés API pour chaque environnement :
 
-- **Clés secrètes** (`lomi_sk_test_…` / `lomi_sk_live_…`) : accès complet, uniquement côté serveur. **Ne les partagez jamais.**
-- **Clés publiables** (`pk_…` le cas échéant) : accès limité ; utilisables côté client uniquement lorsque votre intégration le prévoit explicitement.
+| Clé | Préfixe (actuel) | Usage |
+| --- | --- | --- |
+| **Secrète** | `lomi_sk_test_…` / `lomi_sk_live_…` | Serveurs, scripts, CI — accès API complet. **Jamais dans le navigateur ou une app mobile.** |
+| **Publiable** | `lomi_pk_test_…` / `lomi_pk_live_…` | Confirmation carte côté client, Payment Elements — opérations limitées uniquement. |
+
+<Callout type="warn">
+  **Ne mettez jamais de clé secrète dans le frontend.** Utilisez les clés publiables seulement là où le guide d’intégration l’autorise explicitement.
+</Callout>
 
 <Callout type="info">
   Les anciens exemples peuvent afficher les préfixes `sk_test_` / `sk_live_`. Les clés actuellement délivrées par le tableau de bord suivent **`lomi_sk_test_`** et **`lomi_sk_live_`**, comme dans [Authentification](/reference/setup/authentication).
@@ -19,18 +25,21 @@ lomi. propose deux types de clés API pour chaque environnement :
 
 ## Gestion des variables d’environnement
 
-Définissez-les dans votre fichier `.env` ou votre configuration de déploiement :
+Créez un fichier `.env` à la racine du projet (ajoutez `.env` au `.gitignore`). Utilisez des clés **test** pour le bac à sable (`https://sandbox.api.lomi.africa`).
 
-```bash
-# Required: Your secret key
+```bash filename=".env.example"
+# Bac à sable (recommandé pendant l’intégration)
 LOMI_SECRET_KEY=lomi_sk_test_xxxxxxxxxxxxxxxxxxxxxx
+LOMI_PUBLISHABLE_KEY=lomi_pk_test_xxxxxxxxxxxxxxxxxxxxxx
 
-# Required: Your webhook secret
+# Secret de signature webhook (Développeurs → Webhooks → votre point de terminaison)
 LOMI_WEBHOOK_SECRET=whsec_xxxxxxxxxxxxxxxxxxxxxx
 
-# Optional: Base URL (defaults to https://api.lomi.africa)
-# LOMI_API_URL=https://api.lomi.africa
+# Optionnel : si vous appelez l’API sans SDK
+# LOMI_API_URL=https://sandbox.api.lomi.africa
 ```
+
+Copiez vers `.env` et remplacez les valeurs depuis **Paramètres → Jetons d’accès** et la configuration du webhook. Chargez `.env` avec votre framework (`dotenv`, Next.js, Vite, etc.) — ne commitez pas de vraies clés.
 
 ## Exemples d’initialisation
 

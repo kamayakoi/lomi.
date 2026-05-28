@@ -130,12 +130,19 @@ composer install
 <Step>
 ### Set your environment variables
 
-Configure your API credentials:
+Create a `.env` file in your project (see [Environment variables](/core/fundamentals/access-tokens)). While testing, use **test** keys — the SDK and API scope you to the sandbox automatically:
 
-```bash
-export LOMI_SECRET_KEY=lomi_sk_live_xxxxxxxxxxxxxxxxxxxxxx
-export LOMI_PUBLISHABLE_KEY=lomi_pk_live_xxxxxxxxxxxxxxxxxxxxxx
-````
+```bash filename=".env"
+LOMI_SECRET_KEY=lomi_sk_test_xxxxxxxxxxxxxxxxxxxxxx
+LOMI_PUBLISHABLE_KEY=lomi_pk_test_xxxxxxxxxxxxxxxxxxxxxx
+```
+
+| Key | Prefix | Use on |
+| --- | --- | --- |
+| Secret | `lomi_sk_test_…` / `lomi_sk_live_…` | Server only |
+| Publishable | `lomi_pk_test_…` / `lomi_pk_live_…` | Browser / mobile (card flows only) |
+
+Switch to `lomi_sk_live_…` / `lomi_pk_live_…` when you go live.
 
 </Step>
 
@@ -149,10 +156,10 @@ Initialize the SDK and verify your connection:
 ```typescript
 import { LomiSDK } from '@lomi./sdk';
 
-// Initialize the SDK
+// Initialize the SDK (use 'test' for sandbox while building)
 const lomi = new LomiSDK({
   apiKey: process.env.LOMI_SECRET_KEY!,
-  environment: 'live', // Use 'live' for production
+  environment: 'test',
 });
 
 async function listCustomers() {
