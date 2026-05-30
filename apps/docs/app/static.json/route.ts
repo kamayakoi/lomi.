@@ -33,7 +33,7 @@ export async function GET(): Promise<Response> {
   const results: OramaCloudDocument[] = [];
   const pages = source.getPages('en');
   for (const page of pages) {
-    if (page.data._openapi) continue;
+    if (page.slugs[0] === 'openapi') continue;
 
     const items = getBreadcrumbItems(page.url, source.getPageTree('en'), {
       includePage: false,
