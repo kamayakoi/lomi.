@@ -62,6 +62,21 @@ export class CreatePayoutDto {
   @IsOptional()
   reason?: string;
 
+  @ApiPropertyOptional({
+    description: 'Required when organization has payout PIN enabled',
+  })
+  @IsString()
+  @IsOptional()
+  payout_pin?: string;
+
+  @ApiPropertyOptional({
+    description:
+      'Session token from verify_payout_pin (alternative to payout_pin)',
+  })
+  @IsUUID()
+  @IsOptional()
+  payout_pin_session?: string;
+
   @ApiPropertyOptional({ type: Object })
   @IsObject()
   @IsOptional()

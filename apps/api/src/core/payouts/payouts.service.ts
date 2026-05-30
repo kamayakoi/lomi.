@@ -164,6 +164,13 @@ export class PayoutsService {
     throw new NotFoundException('Payout not found');
   }
 
+  private payoutPinArgs(dto: CreatePayoutDto) {
+    return {
+      p_payout_pin: dto.payout_pin ?? null,
+      p_payout_pin_session: dto.payout_pin_session ?? null,
+    };
+  }
+
   private async createSelfPayout(dto: CreatePayoutDto, user: AuthContext) {
     if (!dto.payout_method_id) {
       throw new BadRequestException(
@@ -289,6 +296,7 @@ export class PayoutsService {
         p_payout_method_id: dto.payout_method_id,
         p_currency_code: dto.currency_code,
         p_provider_code: providerCode,
+        ...this.payoutPinArgs(dto),
       } as never,
     );
 
@@ -323,6 +331,7 @@ export class PayoutsService {
           p_payout_method_id: dto.payout_method_id,
           p_amount: dto.amount,
           p_currency_code: dto.currency_code,
+          ...this.payoutPinArgs(dto),
         } as never,
       );
 
@@ -377,6 +386,8 @@ export class PayoutsService {
         mobilePhoneNumber: destinationPhone,
         ...(dto.metadata ?? {}),
       },
+      payoutPin: dto.payout_pin,
+      payoutPinSession: dto.payout_pin_session,
     });
 
     const payload = result as {
@@ -405,6 +416,8 @@ export class PayoutsService {
       recipientPhone: dto.recipient!.phone,
       description: dto.reason ?? 'Beneficiary payout',
       metadata: dto.metadata ?? {},
+      payoutPin: dto.payout_pin,
+      payoutPinSession: dto.payout_pin_session,
     });
 
     const payload = result as {
@@ -450,6 +463,7 @@ export class PayoutsService {
           api_initiated: true,
         },
         p_status: 'pending',
+        ...this.payoutPinArgs(dto),
       } as never,
     );
 

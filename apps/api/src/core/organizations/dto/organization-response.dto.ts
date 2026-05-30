@@ -151,12 +151,12 @@ export class OrganizationResponseDto {
   industry: string | null;
 
   @ApiProperty({
-    example: '1234',
-    description: 'Organization PIN code for sensitive operations',
+    example: true,
+    description: 'Whether a payout PIN is configured (not the PIN value)',
     required: false,
-    type: String,
+    type: Boolean,
   })
-  pin_code: string | null;
+  has_payout_pin: boolean | null;
 
   @ApiProperty({
     example: false,

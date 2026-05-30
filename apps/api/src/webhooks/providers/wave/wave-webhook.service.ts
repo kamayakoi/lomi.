@@ -855,12 +855,17 @@ export class WaveWebhookService {
       );
 
       // Get transaction data for webhook payload
-      const { data: txnData, error: txnError } = await this.supabase
+      const { data: txnRows, error: txnError } = await this.supabase
         .getClient()
-        .from('transactions')
-        .select('*')
-        .eq('transaction_id', transactionId)
-        .single();
+        .rpc(
+          'get_transaction' as any,
+          {
+            p_transaction_id: transactionId,
+            p_organization_id: organizationId,
+          } as any,
+        );
+
+      const txnData = Array.isArray(txnRows) ? txnRows[0] : txnRows;
 
       if (txnError || !txnData) {
         this.logger.error('Failed to fetch transaction for webhook:', txnError);

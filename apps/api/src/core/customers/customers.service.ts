@@ -8,7 +8,6 @@ import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { Database } from '../../utils/types/api';
 
 type Customer = Database['public']['Tables']['customers']['Row'];
-type CustomerUpdate = Database['public']['Tables']['customers']['Update'];
 
 @Injectable()
 export class CustomersService {
@@ -80,57 +79,45 @@ export class CustomersService {
 
   /**
    * Get single customer by ID
-   * Uses direct query with organization filtering
+   * Uses RPC: get_customer_by_organization
    */
   async findOne(id: string, user: AuthContext) {
-    const { data, error } = (await this.supabase
-      .getClient()
-      .from('customers')
-      .select('*')
-      .eq('customer_id', id)
-      .eq('organization_id', user.organizationId)
-      .eq('is_deleted', false)
-      .single()) as { data: Customer | null; error: any };
+    const { data, error } = await this.supabase.getClient().rpc(
+      'get_customer_by_organization' as any,
+      {
+        p_customer_id: id,
+        p_organization_id: user.organizationId,
+      } as any,
+    );
 
     if (error) {
-      if (error.code === 'PGRST116') {
-        throw new NotFoundException(
-          `Customer with ID ${id} not found or access denied`,
-        );
-      }
       throw new Error(error.message);
     }
 
-    if (!data) {
+    const customer = (Array.isArray(data) ? data[0] : data) as Customer | null;
+
+    if (!customer) {
       throw new NotFoundException(
         `Customer with ID ${id} not found or access denied`,
       );
     }
 
-    // Validate ownership
-    if (data.organization_id !== user.organizationId) {
-      throw new NotFoundException(
-        `Customer with ID ${id} not found or access denied`,
-      );
-    }
-
-    // Filter out admin/internal fields
     return {
-      customer_id: data.customer_id,
-      organization_id: data.organization_id,
-      name: data.name,
-      email: data.email,
-      phone_number: data.phone_number,
-      whatsapp_number: data.whatsapp_number,
-      country: data.country,
-      city: data.city,
-      address: data.address,
-      postal_code: data.postal_code,
-      is_business: data.is_business,
-      metadata: data.metadata,
-      environment: data.environment,
-      created_at: data.created_at,
-      updated_at: data.updated_at,
+      customer_id: customer.customer_id,
+      organization_id: customer.organization_id,
+      name: customer.name,
+      email: customer.email,
+      phone_number: customer.phone_number,
+      whatsapp_number: customer.whatsapp_number,
+      country: customer.country,
+      city: customer.city,
+      address: customer.address,
+      postal_code: customer.postal_code,
+      is_business: customer.is_business,
+      metadata: customer.metadata,
+      environment: customer.environment,
+      created_at: customer.created_at,
+      updated_at: customer.updated_at,
     };
   }
 
@@ -164,15 +151,16 @@ export class CustomersService {
 
     // If metadata was provided, update it separately
     if (createDto.metadata) {
-      const { error: metadataError } = await (
-        this.supabase.getClient().from('customers') as any
-      )
-        .update({ metadata: createDto.metadata } as CustomerUpdate)
-        .eq('customer_id', customerId)
-        .select('*');
+      const { error: metadataError } = await this.supabase.getClient().rpc(
+        'update_customer_metadata' as any,
+        {
+          p_customer_id: customerId,
+          p_organization_id: user.organizationId,
+          p_metadata: createDto.metadata,
+        } as any,
+      );
 
       if (metadataError) {
-        // Log error but don't fail the creation
         console.error('Failed to update customer metadata:', metadataError);
       }
     }
@@ -183,8 +171,7 @@ export class CustomersService {
 
   /**
    * Update an existing customer
-   * Uses RPC: update_customer for basic fields
-   * Direct query for metadata
+   * Uses RPC: update_customer for basic fields, update_customer_metadata for metadata
    */
   async update(id: string, updateDto: UpdateCustomerDto, user: AuthContext) {
     // First verify ownership
@@ -239,13 +226,14 @@ export class CustomersService {
 
     // Update metadata separately if provided
     if (metadata !== undefined) {
-      const { error: metadataError } = await (
-        this.supabase.getClient().from('customers') as any
-      )
-        .update({ metadata } as CustomerUpdate)
-        .eq('customer_id', id)
-        .eq('organization_id', user.organizationId)
-        .select('*');
+      const { error: metadataError } = await this.supabase.getClient().rpc(
+        'update_customer_metadata' as any,
+        {
+          p_customer_id: id,
+          p_organization_id: user.organizationId,
+          p_metadata: metadata,
+        } as any,
+      );
 
       if (metadataError) throw new Error(metadataError.message);
     }

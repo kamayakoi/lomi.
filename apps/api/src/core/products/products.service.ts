@@ -41,18 +41,22 @@ export class ProductsService {
 
   /**
    * Get single product by ID with prices
-   * Uses direct query to get product + prices
+   * Uses RPC: get_product_api, get_product_prices_api, get_product_fees_api
    */
   async findOne(id: string, user: AuthContext) {
-    // Get product details
-    const { data: product, error: productError } = (await this.supabase
+    const { data: productData, error: productError } = await this.supabase
       .getClient()
-      .from('products')
-      .select('*')
-      .eq('product_id', id)
-      .eq('organization_id', user.organizationId)
-      .eq('created_by', user.merchantId)
-      .single()) as { data: Product | null; error: any };
+      .rpc(
+        'get_product_api' as any,
+        {
+          p_product_id: id,
+          p_organization_id: user.organizationId,
+        } as any,
+      );
+
+    const product = (
+      Array.isArray(productData) ? productData[0] : productData
+    ) as Product | null;
 
     if (productError || !product) {
       throw new NotFoundException(
@@ -60,37 +64,41 @@ export class ProductsService {
       );
     }
 
-    // Get associated prices
-    const { data: prices, error: pricesError } = await this.supabase
-      .getClient()
-      .from('prices')
-      .select('*')
-      .eq('product_id', id)
-      .eq('organization_id', user.organizationId)
-      .order('is_default', { ascending: false })
-      .order('created_at', { ascending: true });
+    const { data: pricesData, error: pricesError } = await this.supabase.rpc(
+      'get_product_prices_api',
+      {
+        p_product_id: id,
+        p_organization_id: user.organizationId,
+      },
+    );
+
+    const prices = pricesError
+      ? []
+      : Array.isArray(pricesData)
+        ? pricesData
+        : pricesData
+          ? [pricesData]
+          : [];
 
     if (pricesError) {
       console.error('Error fetching prices:', pricesError);
     }
 
-    // Get associated fees
-    const { data: fees, error: feesError } = await this.supabase
-      .getClient()
-      .from('organization_fee_links')
-      .select(
-        `
-        fee_type_id,
-        organization_fees (
-          fee_type_id,
-          name,
-          percentage,
-          fixed_amount,
-          is_enabled
-        )
-      `,
-      )
-      .eq('product_id', id);
+    const { data: feesData, error: feesError } = await this.supabase.rpc(
+      'get_product_fees_api',
+      {
+        p_product_id: id,
+        p_organization_id: user.organizationId,
+      },
+    );
+
+    const fees = feesError
+      ? []
+      : Array.isArray(feesData)
+        ? feesData
+        : feesData
+          ? [feesData]
+          : [];
 
     if (feesError) {
       console.error('Error fetching fees:', feesError);
@@ -98,8 +106,8 @@ export class ProductsService {
 
     return {
       ...product,
-      prices: prices || [],
-      fees: fees || [],
+      prices,
+      fees,
     };
   }
 
@@ -234,14 +242,23 @@ export class ProductsService {
     if (error) throw new Error(error.message);
 
     // Get the created price
-    const { data: price, error: priceError } = await this.supabase
+    const { data: priceData, error: priceError } = await this.supabase
       .getClient()
-      .from('prices')
-      .select('*')
-      .eq('price_id', priceId)
-      .single();
+      .rpc(
+        'get_price_api' as any,
+        {
+          p_price_id: priceId,
+          p_organization_id: user.organizationId,
+        } as any,
+      );
 
-    if (priceError) throw new Error(priceError.message);
+    const price = (Array.isArray(priceData) ? priceData[0] : priceData) as {
+      product_id: string;
+    } | null;
+
+    if (priceError || !price) {
+      throw new Error(priceError?.message ?? 'Price not found');
+    }
 
     return price;
   }
@@ -255,15 +272,21 @@ export class ProductsService {
     await this.findOne(productId, user);
 
     // Verify price belongs to this product
-    const { data: price, error: priceError } = await this.supabase
+    const { data: priceData, error: priceError } = await this.supabase
       .getClient()
-      .from('prices')
-      .select('product_id')
-      .eq('price_id', priceId)
-      .eq('product_id', productId)
-      .single();
+      .rpc(
+        'get_price_api' as any,
+        {
+          p_price_id: priceId,
+          p_organization_id: user.organizationId,
+        } as any,
+      );
 
-    if (priceError || !price) {
+    const price = (Array.isArray(priceData) ? priceData[0] : priceData) as {
+      product_id: string;
+    } | null;
+
+    if (priceError || !price || price.product_id !== productId) {
       throw new NotFoundException(
         `Price with ID ${priceId} not found for this product`,
       );

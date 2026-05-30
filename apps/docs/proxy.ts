@@ -1,6 +1,6 @@
 /* @proprietary license */
 
-import { NextResponse, type NextRequest } from "next/server";
+import { NextResponse, type NextRequest } from 'next/server';
 
 /**
  * Docs locale (EN/FR) is resolved in server components via `getDocsLocale()` from the
@@ -16,6 +16,6 @@ export default async function proxy(_request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|mp3)$).*)",
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|mp3)$).*)',
   ],
 };

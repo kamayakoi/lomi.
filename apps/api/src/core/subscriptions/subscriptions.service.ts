@@ -146,13 +146,17 @@ export class SubscriptionsService {
     // First verify the customer belongs to this organization
     const { data: customer, error: customerError } = await this.supabase
       .getClient()
-      .from('customers')
-      .select('organization_id')
-      .eq('customer_id', customerId)
-      .eq('organization_id', user.organizationId)
-      .single();
+      .rpc(
+        'get_customer_by_organization' as any,
+        {
+          p_customer_id: customerId,
+          p_organization_id: user.organizationId,
+        } as any,
+      );
 
-    if (customerError || !customer) {
+    const customerRow = Array.isArray(customer) ? customer[0] : customer;
+
+    if (customerError || !customerRow) {
       throw new NotFoundException(
         `Customer with ID ${customerId} not found or access denied`,
       );

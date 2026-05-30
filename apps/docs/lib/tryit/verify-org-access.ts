@@ -10,27 +10,26 @@ export async function userCanUseTestKeyForOrg(
   userId: string,
   organizationId: string,
 ): Promise<boolean> {
-  const { data: link } = await supabase
-    .from('merchant_organization_links')
-    .select('organization_id')
-    .eq('merchant_id', userId)
-    .eq('organization_id', organizationId)
-    .maybeSingle();
+  const { data: hasAccess, error: accessError } = await supabase.rpc(
+    'check_user_organization_access',
+    {
+      p_user_id: userId,
+      p_organization_id: organizationId,
+    },
+  );
 
-  if (!link) {
+  if (accessError || !hasAccess) {
     return false;
   }
 
-  const { data: key } = await supabase
-    .from('api_keys')
-    .select('api_key')
-    .eq('organization_id', organizationId)
-    .eq('environment', 'test')
-    .eq('key_type', 'secret')
-    .eq('is_active', true)
-    .is('deleted_at', null)
-    .limit(1)
-    .maybeSingle();
+  const { data: hasTestKey, error: keyError } = await supabase.rpc(
+    'organization_has_active_test_secret_key',
+    { p_organization_id: organizationId },
+  );
 
-  return !!key;
+  if (keyError) {
+    return false;
+  }
+
+  return !!hasTestKey;
 }
