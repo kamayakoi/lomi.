@@ -5,7 +5,6 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { SupabaseService } from '../../utils/supabase/supabase.service';
 import { AuthContext } from '../common/decorators/current-user.decorator';
 import { environmentFromAuth } from '../common/auth-environment';
@@ -26,10 +25,7 @@ type PayoutMethodRow = {
 export class PayoutsService {
   private readonly logger = new Logger(PayoutsService.name);
 
-  constructor(
-    private readonly configService: ConfigService,
-    private readonly supabaseService: SupabaseService,
-  ) {}
+  constructor(private readonly supabaseService: SupabaseService) {}
 
   async create(dto: CreatePayoutDto, user: AuthContext) {
     if (dto.rail === 'mtn') {
@@ -164,11 +160,9 @@ export class PayoutsService {
     throw new NotFoundException('Payout not found');
   }
 
-  private payoutPinArgs(dto: CreatePayoutDto) {
-    return {
-      p_payout_pin: dto.payout_pin ?? null,
-      p_payout_pin_session: dto.payout_pin_session ?? null,
-    };
+  /** API payouts skip dashboard payout PIN (authorized by API key + permissions). */
+  private apiPayoutArgs() {
+    return { p_bypass_payout_pin: true as const };
   }
 
   private async createSelfPayout(dto: CreatePayoutDto, user: AuthContext) {
@@ -296,7 +290,7 @@ export class PayoutsService {
         p_payout_method_id: dto.payout_method_id,
         p_currency_code: dto.currency_code,
         p_provider_code: providerCode,
-        ...this.payoutPinArgs(dto),
+        ...this.apiPayoutArgs(),
       } as never,
     );
 
@@ -331,7 +325,7 @@ export class PayoutsService {
           p_payout_method_id: dto.payout_method_id,
           p_amount: dto.amount,
           p_currency_code: dto.currency_code,
-          ...this.payoutPinArgs(dto),
+          ...this.apiPayoutArgs(),
         } as never,
       );
 
@@ -386,8 +380,6 @@ export class PayoutsService {
         mobilePhoneNumber: destinationPhone,
         ...(dto.metadata ?? {}),
       },
-      payoutPin: dto.payout_pin,
-      payoutPinSession: dto.payout_pin_session,
     });
 
     const payload = result as {
@@ -416,8 +408,6 @@ export class PayoutsService {
       recipientPhone: dto.recipient!.phone,
       description: dto.reason ?? 'Beneficiary payout',
       metadata: dto.metadata ?? {},
-      payoutPin: dto.payout_pin,
-      payoutPinSession: dto.payout_pin_session,
     });
 
     const payload = result as {
@@ -463,7 +453,7 @@ export class PayoutsService {
           api_initiated: true,
         },
         p_status: 'pending',
-        ...this.payoutPinArgs(dto),
+        ...this.apiPayoutArgs(),
       } as never,
     );
 
@@ -496,30 +486,24 @@ export class PayoutsService {
     path: string,
     body: Record<string, unknown>,
   ): Promise<unknown> {
-    const projectRef = this.configService.get<string>('SUPABASE_PROJECT_REF');
-    const anonKey = this.configService.get<string>('SUPABASE_PUBLISHABLE_KEY');
+    const { data, error } = await this.supabaseService
+      .getClient()
+      .functions.invoke('wave', {
+        body: { path, method: 'POST', body },
+      });
 
-    if (!projectRef || !anonKey) {
-      throw new InternalServerErrorException('Payment configuration missing');
+    if (error) {
+      this.logger.error(`Wave edge ${path} failed: ${error.message}`);
+      throw new InternalServerErrorException(
+        `Payout failed: ${error.message}`,
+      );
     }
 
-    const edgeFunctionUrl = `https://${projectRef}.supabase.co/functions/v1/wave`;
-
-    const response = await fetch(edgeFunctionUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${anonKey}`,
-      },
-      body: JSON.stringify({ path, method: 'POST', body }),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      this.logger.error(`Wave edge ${path} failed: ${errorText}`);
-      throw new BadRequestException(`Payout failed: ${errorText}`);
+    const response = data as { error?: string } | null;
+    if (response?.error) {
+      throw new BadRequestException(response.error);
     }
 
-    return response.json();
+    return data;
   }
 }

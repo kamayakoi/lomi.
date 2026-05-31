@@ -1,6 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BadRequestException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { PayoutsService } from './payouts.service';
 import { SupabaseService } from '../../utils/supabase/supabase.service';
 
@@ -20,11 +19,15 @@ describe('PayoutsService', () => {
 
   const supabaseRpc = jest.fn();
   const supabaseGetClientRpc = jest.fn();
+  const functionsInvoke = jest.fn();
 
   const supabaseMock = {
     rpc: supabaseRpc,
     getClient: jest.fn(() => ({
       rpc: supabaseGetClientRpc,
+      functions: {
+        invoke: functionsInvoke,
+      },
     })),
   };
 
@@ -36,26 +39,11 @@ describe('PayoutsService', () => {
           provide: SupabaseService,
           useValue: supabaseMock,
         },
-        {
-          provide: ConfigService,
-          useValue: {
-            get: jest.fn((key: string) => {
-              if (key === 'SUPABASE_PROJECT_REF') return 'testref';
-              if (key === 'SUPABASE_PUBLISHABLE_KEY') return 'testkey';
-              return undefined;
-            }),
-          },
-        },
       ],
     }).compile();
 
     service = module.get(PayoutsService);
     jest.clearAllMocks();
-    global.fetch = jest.fn();
-  });
-
-  afterEach(() => {
-    jest.restoreAllMocks();
   });
 
   it('rejects beneficiary bank payouts', async () => {
@@ -115,7 +103,7 @@ describe('PayoutsService', () => {
       ),
     ).rejects.toThrow(/Wave payouts are not available in test mode/);
 
-    expect(global.fetch).not.toHaveBeenCalled();
+    expect(functionsInvoke).not.toHaveBeenCalled();
   });
 
   it('rejects self Wave payouts in test mode', async () => {
@@ -148,7 +136,7 @@ describe('PayoutsService', () => {
       ),
     ).rejects.toThrow(/Wave payouts are not available in test mode/);
 
-    expect(global.fetch).not.toHaveBeenCalled();
+    expect(functionsInvoke).not.toHaveBeenCalled();
   });
 
   it('requires recipient for beneficiary Wave payouts', async () => {
@@ -166,12 +154,12 @@ describe('PayoutsService', () => {
   });
 
   it('calls Wave edge for live beneficiary Wave payouts', async () => {
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({
+    functionsInvoke.mockResolvedValueOnce({
+      data: {
         payoutId: 'payout-uuid',
         status: 'processing',
-      }),
+      },
+      error: null,
     });
 
     const result = await service.create(
@@ -186,25 +174,22 @@ describe('PayoutsService', () => {
       liveUser,
     );
 
-    expect(global.fetch).toHaveBeenCalledTimes(1);
-    const [url, options] = (global.fetch as jest.Mock).mock.calls[0] as [
-      string,
-      RequestInit,
-    ];
-    expect(url).toBe('https://testref.supabase.co/functions/v1/wave');
-    const body = JSON.parse(options.body as string) as {
-      path: string;
-      body: Record<string, unknown>;
-    };
-    expect(body.path).toBe('/beneficiary-payout');
-    expect(body.body).toMatchObject({
-      merchantId: 'merchant-1',
-      organizationId: 'org-1',
-      amount: 1000,
-      currency: 'XOF',
-      recipientName: 'Ada Lovelace',
-      recipientPhone: '+221771234567',
-      description: 'Invoice #12',
+    expect(functionsInvoke).toHaveBeenCalledTimes(1);
+    expect(functionsInvoke).toHaveBeenCalledWith('wave', {
+      body: {
+        path: '/beneficiary-payout',
+        method: 'POST',
+        body: {
+          merchantId: 'merchant-1',
+          organizationId: 'org-1',
+          amount: 1000,
+          currency: 'XOF',
+          recipientName: 'Ada Lovelace',
+          recipientPhone: '+221771234567',
+          description: 'Invoice #12',
+          metadata: {},
+        },
+      },
     });
     expect(result).toMatchObject({
       success: true,
