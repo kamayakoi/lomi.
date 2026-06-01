@@ -494,9 +494,7 @@ export class PayoutsService {
 
     if (error) {
       this.logger.error(`Wave edge ${path} failed: ${error.message}`);
-      throw new InternalServerErrorException(
-        `Payout failed: ${error.message}`,
-      );
+      throw new InternalServerErrorException(`Payout failed: ${error.message}`);
     }
 
     const response = data as { error?: string } | null;
