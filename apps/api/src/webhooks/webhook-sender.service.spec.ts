@@ -2,9 +2,19 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { WebhookSenderService, Webhook } from './webhook-sender.service';
 import { SupabaseService } from '../utils/supabase/supabase.service';
 import axios from 'axios';
+import { resolveSafeMerchantWebhookTarget } from './merchant-webhook-url';
 
 jest.mock('axios');
+jest.mock('./merchant-webhook-url', () => ({
+  ...jest.requireActual('./merchant-webhook-url'),
+  resolveSafeMerchantWebhookTarget: jest.fn(),
+}));
+
 const mockedAxios = axios as jest.Mocked<typeof axios>;
+const mockedResolveSafeTarget =
+  resolveSafeMerchantWebhookTarget as jest.MockedFunction<
+    typeof resolveSafeMerchantWebhookTarget
+  >;
 
 describe('WebhookSenderService', () => {
   let service: WebhookSenderService;
@@ -49,17 +59,25 @@ describe('WebhookSenderService', () => {
     const data = { id: 'tx_123' };
 
     it('should send webhook successfully', async () => {
+      mockedResolveSafeTarget.mockResolvedValue({
+        url: webhook.url,
+        hostname: 'example.com',
+        port: 443,
+        pinnedAddresses: ['93.184.216.34'],
+      });
       mockedAxios.post.mockResolvedValue({ status: 200, data: 'OK' });
       mockSupabaseService.rpc.mockResolvedValue({ data: null, error: null });
 
       const result = await service.sendWebhook(webhook, event, data);
 
       expect(result).toBe(true);
+      expect(mockedResolveSafeTarget).toHaveBeenCalledWith(webhook.url);
       expect(mockedAxios.post).toHaveBeenCalledTimes(1);
       expect(mockedAxios.post).toHaveBeenCalledWith(
         webhook.url,
         expect.any(String),
         expect.objectContaining({
+          maxRedirects: 0,
           headers: expect.objectContaining({
             'X-Lomi-Event': event,
             'X-Lomi-Signature': expect.any(String),
@@ -76,6 +94,12 @@ describe('WebhookSenderService', () => {
     });
 
     it('should retry on failure', async () => {
+      mockedResolveSafeTarget.mockResolvedValue({
+        url: webhook.url,
+        hostname: 'example.com',
+        port: 443,
+        pinnedAddresses: ['93.184.216.34'],
+      });
       mockedAxios.post
         .mockRejectedValueOnce({ response: { status: 500 } })
         .mockResolvedValueOnce({ status: 200, data: 'OK' });
@@ -88,6 +112,12 @@ describe('WebhookSenderService', () => {
     });
 
     it('should fail after max retries', async () => {
+      mockedResolveSafeTarget.mockResolvedValue({
+        url: webhook.url,
+        hostname: 'example.com',
+        port: 443,
+        pinnedAddresses: ['93.184.216.34'],
+      });
       mockedAxios.post.mockRejectedValue({ response: { status: 500 } });
       mockSupabaseService.rpc.mockResolvedValue({ data: null, error: null });
 
@@ -112,6 +142,17 @@ describe('WebhookSenderService', () => {
 
     it('should not send if event is not subscribed', async () => {
       const result = await service.sendWebhook(webhook, 'PAYMENT_FAILED', data);
+      expect(result).toBe(false);
+      expect(mockedAxios.post).not.toHaveBeenCalled();
+    });
+
+    it('should block unsafe webhook URLs before sending', async () => {
+      mockedResolveSafeTarget.mockRejectedValue(
+        new Error('Webhook URL resolves to a private address'),
+      );
+
+      const result = await service.sendWebhook(webhook, event, data);
+
       expect(result).toBe(false);
       expect(mockedAxios.post).not.toHaveBeenCalled();
     });

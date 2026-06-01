@@ -10,6 +10,10 @@ import { CreateWebhookBodyDto } from './dto/create-webhook-body.dto';
 import { UpdateWebhookDto } from './dto/update-webhook.dto';
 import { AuthContext } from '../core/common/decorators/current-user.decorator';
 import { Database } from '../utils/types/api';
+import {
+  resolveSafeMerchantWebhookTarget,
+  UnsafeWebhookUrlError,
+} from './merchant-webhook-url';
 
 @Injectable()
 export class WebhooksService {
@@ -42,7 +46,20 @@ export class WebhooksService {
     return rest as T;
   }
 
+  private async assertSafeWebhookUrl(url: string): Promise<void> {
+    try {
+      await resolveSafeMerchantWebhookTarget(url);
+    } catch (error) {
+      const message =
+        error instanceof UnsafeWebhookUrlError
+          ? error.message
+          : 'Invalid webhook URL';
+      throw new BadRequestException(message);
+    }
+  }
+
   async create(createDto: CreateWebhookBodyDto, user: AuthContext) {
+    await this.assertSafeWebhookUrl(createDto.url);
     const authorizedEvents = this.normalizeEvents(createDto.authorized_events);
     const metadata =
       createDto.metadata ??
@@ -131,6 +148,7 @@ export class WebhooksService {
     };
 
     if (updateDto.url !== undefined) {
+      await this.assertSafeWebhookUrl(updateDto.url);
       params.p_url = updateDto.url;
     }
     if (authorizedEvents !== undefined) {

@@ -5,6 +5,11 @@ import * as crypto from 'crypto';
 import { WebhookEvent } from '../utils/types/api';
 import { resolveMerchantWebhookRelayEnvironment } from '../utils/payment-environment';
 import { Queue } from 'bullmq';
+import {
+  buildSafeMerchantWebhookAxiosConfig,
+  resolveSafeMerchantWebhookTarget,
+  UnsafeWebhookUrlError,
+} from './merchant-webhook-url';
 
 export interface Webhook {
   id: string;
@@ -134,8 +139,45 @@ export class WebhookSenderService {
 
     const started = Date.now();
 
+    let safeTarget;
     try {
-      const response = await axios.post(webhook.url, payloadString, {
+      safeTarget = await resolveSafeMerchantWebhookTarget(webhook.url);
+    } catch (error) {
+      const message =
+        error instanceof UnsafeWebhookUrlError
+          ? error.message
+          : 'Webhook URL failed outbound safety checks';
+
+      this.logger.warn(
+        `Blocked webhook delivery for ${webhook.id}: ${message}`,
+      );
+
+      if (context?.dispatchId && context.attemptNumber != null) {
+        await this.supabase.rpc('record_webhook_delivery_attempt', {
+          p_dispatch_id: context.dispatchId,
+          p_attempt_number: context.attemptNumber,
+          p_response_status: 0,
+          p_response_body: message,
+          p_error_message: 'blocked_webhook_url',
+          p_request_duration_ms: Date.now() - started,
+        });
+        await this.supabase.rpc('mark_webhook_dispatch_dead_letter', {
+          p_dispatch_id: context.dispatchId,
+          p_reason: 'blocked_webhook_url',
+        });
+      }
+
+      return {
+        success: false,
+        shouldRetry: false,
+        lastResponseBody: message,
+        deadLetterReason: 'blocked_webhook_url',
+      };
+    }
+
+    try {
+      const response = await axios.post(safeTarget.url, payloadString, {
+        ...buildSafeMerchantWebhookAxiosConfig(safeTarget),
         headers: {
           'Content-Type': 'application/json',
           'X-Lomi-Signature': signature,
