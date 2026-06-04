@@ -41,7 +41,10 @@ export function UsageMeter({
       <p className="mt-1 text-sm text-gray-500">{description}</p>
       <div className="mt-5 space-y-4">
         {items.map((item) => {
-          const percent = Math.min(Math.round((item.used / item.limit) * 100), 100);
+          const percent = Math.min(
+            Math.round((item.used / item.limit) * 100),
+            100,
+          );
           return (
             <div key={item.label} className="space-y-2">
               <div className="flex items-center justify-between gap-4 text-sm">
@@ -53,7 +56,10 @@ export function UsageMeter({
               </div>
               <div className="h-2 overflow-hidden rounded-full bg-gray-100">
                 <div
-                  className={cn('h-full rounded-full transition-all', usageTone(percent))}
+                  className={cn(
+                    'h-full rounded-full transition-all',
+                    usageTone(percent),
+                  )}
                   style={{ width: `${percent}%` }}
                 />
               </div>

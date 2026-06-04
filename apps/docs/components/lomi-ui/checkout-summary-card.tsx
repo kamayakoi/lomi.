@@ -53,7 +53,10 @@ export function CheckoutSummaryCard({
 
       <div className="mt-5 space-y-3">
         {items.map((item) => (
-          <div key={item.name} className="flex items-start justify-between gap-4">
+          <div
+            key={item.name}
+            className="flex items-start justify-between gap-4"
+          >
             <div>
               <p className="text-sm font-medium text-gray-100">{item.name}</p>
               {item.quantity ? (

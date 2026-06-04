@@ -243,7 +243,9 @@ export async function resolveSafeMerchantWebhookTarget(
   };
 }
 
-function createPinnedHttpsAgent(target: SafeMerchantWebhookTarget): https.Agent {
+function createPinnedHttpsAgent(
+  target: SafeMerchantWebhookTarget,
+): https.Agent {
   const allowed = new Set(target.pinnedAddresses);
 
   return new https.Agent({

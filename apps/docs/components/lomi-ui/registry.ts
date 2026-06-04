@@ -95,9 +95,13 @@ export const lomiUiRegistry: {
         },
       ],
       assetFiles: paymentChannelAssets.filter((asset) =>
-        ['wave.webp', 'mtn.webp', 'orange.webp', 'spi.webp', 'pi_spi.webp'].some(
-          (file) => asset.path.endsWith(file),
-        ),
+        [
+          'wave.webp',
+          'mtn.webp',
+          'orange.webp',
+          'spi.webp',
+          'pi_spi.webp',
+        ].some((file) => asset.path.endsWith(file)),
       ),
     },
     {

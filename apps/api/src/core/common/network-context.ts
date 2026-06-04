@@ -78,9 +78,7 @@ export function namespaceNetworkIdempotency(
     return idempotency;
   }
 
-  const rawKeyHash = createHash('sha256')
-    .update(idempotency.key)
-    .digest('hex');
+  const rawKeyHash = createHash('sha256').update(idempotency.key).digest('hex');
   const bodyHash = createHash('sha256')
     .update(
       JSON.stringify({

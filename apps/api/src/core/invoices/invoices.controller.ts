@@ -91,7 +91,9 @@ export class InvoicesController {
   }
 
   @Post(':id/checkout-session')
-  @ApiOperation({ summary: 'Créer ou récupérer une session de paiement de facture' })
+  @ApiOperation({
+    summary: 'Créer ou récupérer une session de paiement de facture',
+  })
   @ApiParam({ name: 'id', type: String })
   createCheckoutSession(
     @Param('id') id: string,

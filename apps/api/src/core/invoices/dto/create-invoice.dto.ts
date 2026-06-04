@@ -19,10 +19,16 @@ export class InvoiceLineItemDto {
   @ApiProperty({ example: 5000, required: false })
   amount?: number;
 
-  @ApiProperty({ example: '123e4567-e89b-12d3-a456-426614174000', required: false })
+  @ApiProperty({
+    example: '123e4567-e89b-12d3-a456-426614174000',
+    required: false,
+  })
   product_id?: string;
 
-  @ApiProperty({ example: '321e4567-e89b-12d3-a456-426614174000', required: false })
+  @ApiProperty({
+    example: '321e4567-e89b-12d3-a456-426614174000',
+    required: false,
+  })
   price_id?: string;
 
   @ApiProperty({ required: false, additionalProperties: true })
@@ -61,13 +67,22 @@ export class CreateInvoiceDto {
   @ApiProperty({ example: 'Consulting services', required: false })
   description?: string;
 
-  @ApiProperty({ example: '123e4567-e89b-12d3-a456-426614174000', required: false })
+  @ApiProperty({
+    example: '123e4567-e89b-12d3-a456-426614174000',
+    required: false,
+  })
   product_id?: string;
 
-  @ApiProperty({ example: '321e4567-e89b-12d3-a456-426614174000', required: false })
+  @ApiProperty({
+    example: '321e4567-e89b-12d3-a456-426614174000',
+    required: false,
+  })
   price_id?: string;
 
-  @ApiProperty({ example: '654e7890-e89b-12d3-a456-426614174000', required: false })
+  @ApiProperty({
+    example: '654e7890-e89b-12d3-a456-426614174000',
+    required: false,
+  })
   subscription_id?: string;
 
   @ApiProperty({ type: [InvoiceLineItemDto], required: false })

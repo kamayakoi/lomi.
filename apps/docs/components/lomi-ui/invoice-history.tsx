@@ -73,7 +73,10 @@ export function InvoiceHistory({
           <tbody className="divide-y divide-gray-100">
             {invoices.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-5 py-10 text-center text-gray-500">
+                <td
+                  colSpan={5}
+                  className="px-5 py-10 text-center text-gray-500"
+                >
                   No invoices yet
                 </td>
               </tr>

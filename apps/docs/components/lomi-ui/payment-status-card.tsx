@@ -109,7 +109,10 @@ export function PaymentStatusCard({
 
       {primaryAction ? (
         primaryAction.href ? (
-          <a href={primaryAction.href} className={cn('mt-4 w-full', actionClass)}>
+          <a
+            href={primaryAction.href}
+            className={cn('mt-4 w-full', actionClass)}
+          >
             {primaryAction.label}
           </a>
         ) : (

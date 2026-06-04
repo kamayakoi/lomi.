@@ -4,7 +4,10 @@ import { BadRequestException } from '@nestjs/common';
 import { WebhooksService } from './webhooks.service';
 import { SupabaseService } from '../utils/supabase/supabase.service';
 import { AuthContext } from '../core/common/decorators/current-user.decorator';
-import { resolveSafeMerchantWebhookTarget, UnsafeWebhookUrlError } from './merchant-webhook-url';
+import {
+  resolveSafeMerchantWebhookTarget,
+  UnsafeWebhookUrlError,
+} from './merchant-webhook-url';
 
 jest.mock('./merchant-webhook-url', () => ({
   ...jest.requireActual('./merchant-webhook-url'),

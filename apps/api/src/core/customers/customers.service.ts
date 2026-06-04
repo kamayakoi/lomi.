@@ -115,9 +115,10 @@ export class CustomersService {
 
       if (error) throw new Error(error.message);
 
-      const customer = (Array.isArray(data) ? data[0] : data) as
-        | Record<string, unknown>
-        | null;
+      const customer = (Array.isArray(data) ? data[0] : data) as Record<
+        string,
+        unknown
+      > | null;
 
       if (!customer) {
         throw new NotFoundException(

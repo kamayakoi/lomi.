@@ -629,12 +629,10 @@ export class RefundsService {
       throw new BadRequestException(error.message);
     }
 
-    const row = data as
-      | {
-          accepted_by_merchant_id?: string | null;
-          member_organization_id?: string | null;
-        }
-      | null;
+    const row = data as {
+      accepted_by_merchant_id?: string | null;
+      member_organization_id?: string | null;
+    } | null;
 
     if (row?.accepted_by_merchant_id) {
       return row.accepted_by_merchant_id;

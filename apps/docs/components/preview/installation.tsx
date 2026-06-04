@@ -38,10 +38,7 @@ export function Installation({ name }: { name: string }) {
       </TabsList>
 
       <TabsContent value="npx">
-        <CodeBlock
-          code={`npx shadcn@latest add ${registryUrl}`}
-          lang="bash"
-        />
+        <CodeBlock code={`npx shadcn@latest add ${registryUrl}`} lang="bash" />
       </TabsContent>
 
       <TabsContent value="pnpm">
@@ -59,10 +56,7 @@ export function Installation({ name }: { name: string }) {
       </TabsContent>
 
       <TabsContent value="bun">
-        <CodeBlock
-          code={`bunx shadcn@latest add ${registryUrl}`}
-          lang="bash"
-        />
+        <CodeBlock code={`bunx shadcn@latest add ${registryUrl}`} lang="bash" />
       </TabsContent>
     </Tabs>
   );
