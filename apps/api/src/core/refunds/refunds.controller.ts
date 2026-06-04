@@ -18,6 +18,7 @@ import {
   ApiParam,
 } from '@nestjs/swagger';
 import { ApiKeyGuard } from '../common/guards/api-key.guard';
+import { ApiLomiAccountHeader } from '../common/decorators/api-lomi-account-header.decorator';
 import {
   CurrentUser,
   type AuthContext,
@@ -31,6 +32,7 @@ import {
 
 @ApiTags('Remboursements')
 @ApiSecurity('api-key')
+@ApiLomiAccountHeader()
 @UseGuards(ApiKeyGuard)
 @Controller('refunds')
 export class RefundsController {

@@ -12,6 +12,7 @@ import { CardChargeService } from './card-charge.service';
 import { CreateWaveChargeDto } from './dto/create-charge.dto';
 import { CreateMtnChargeDto } from './dto/create-mtn-charge.dto';
 import { ApiKeyGuard } from '../common/guards/api-key.guard';
+import { ApiLomiAccountHeader } from '../common/decorators/api-lomi-account-header.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import type { AuthContext } from '../common/decorators/current-user.decorator';
 import { CreateCardChargeDto } from './dto/create-card-charge.dto';
@@ -19,6 +20,7 @@ import { CardChargeResponseDto } from './dto/card-charge-response.dto';
 
 @ApiTags('Encaissements')
 @ApiSecurity('api-key')
+@ApiLomiAccountHeader()
 @Controller('charge')
 @UseGuards(ApiKeyGuard)
 export class ChargesController {

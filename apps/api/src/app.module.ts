@@ -30,6 +30,7 @@ import { ChargesModule } from './core/charges/charges.module';
 import { MerchantsModule } from './core/merchants/merchants.module';
 import { ProvidersModule } from './core/providers/providers.module';
 import { CustomerSubscriptionsModule } from './core/customer-subscriptions/customer-subscriptions.module';
+import { InvoicesModule } from './core/invoices/invoices.module';
 
 const logger = new Logger('RedisConfig');
 
@@ -136,6 +137,7 @@ const logger = new Logger('RedisConfig');
     MerchantsModule,
     ProvidersModule,
     CustomerSubscriptionsModule,
+    InvoicesModule,
     AgentModule,
   ],
 

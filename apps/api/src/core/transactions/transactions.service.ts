@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { SupabaseService } from '../../utils/supabase/supabase.service';
 import { AuthContext } from '../common/decorators/current-user.decorator';
 import { environmentFromAuth } from '../common/auth-environment';
+import { isNetworkRequest } from '../common/network-context';
 
 @Injectable()
 export class TransactionsService {
@@ -24,6 +25,32 @@ export class TransactionsService {
     endDate?: string,
     isPos?: boolean,
   ) {
+    if (isNetworkRequest(user)) {
+      const { data, error } = await this.supabase.getClient().rpc(
+        'fetch_network_transactions_for_api' as any,
+        {
+          p_network_membership_id: user.networkMembershipId,
+          p_provider_code: providerCode || null,
+          p_status: status || null,
+          p_type: type || null,
+          p_currency: currency || null,
+          p_payment_method: paymentMethod || null,
+          p_page: page,
+          p_page_size: pageSize,
+          p_start_date: startDate || null,
+          p_end_date: endDate || null,
+          p_is_pos: isPos !== undefined ? isPos : null,
+          p_environment: environmentFromAuth(user),
+          p_read_scope:
+            user.networkCapabilityKey === 'transaction.read' ? 'all' : 'own',
+        } as any,
+      );
+
+      if (error) throw new Error(error.message);
+
+      return data || [];
+    }
+
     const { data, error } = await this.supabase.getClient().rpc(
       'fetch_transactions' as any,
       {
@@ -52,6 +79,34 @@ export class TransactionsService {
    * Uses RPC: get_transaction (with organization_id filter)
    */
   async findOne(id: string, user: AuthContext) {
+    if (isNetworkRequest(user)) {
+      const { data, error } = await this.supabase.getClient().rpc(
+        'get_network_transaction_for_api' as any,
+        {
+          p_network_membership_id: user.networkMembershipId,
+          p_transaction_id: id,
+          p_environment: environmentFromAuth(user),
+          p_read_scope:
+            user.networkCapabilityKey === 'transaction.read' ? 'all' : 'own',
+        } as any,
+      );
+
+      if (error) {
+        throw new Error(`RPC Error: ${error.message || 'Unknown error'}`);
+      }
+
+      const dataArray = Array.isArray(data) ? data : [data];
+      const transaction = dataArray[0] as any;
+
+      if (!transaction || !transaction.transaction_id) {
+        throw new NotFoundException(
+          `Transaction with ID ${id} not found or access denied`,
+        );
+      }
+
+      return transaction;
+    }
+
     const { data, error } = await this.supabase.getClient().rpc(
       'get_transaction' as any,
       {

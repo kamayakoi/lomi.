@@ -785,6 +785,16 @@
         "operationId": "TransactionsController_findAll",
         "parameters": [
           {
+            "name": "Lomi-Account",
+            "required": false,
+            "in": "header",
+            "description": "Optional lomi. Network account id (acct_...). When present, the API key acts as the Operator and the request targets the connected Member Account.",
+            "schema": {
+              "type": "string",
+              "example": "acct_1234567890"
+            }
+          },
+          {
             "name": "isPos",
             "required": false,
             "in": "query",
@@ -918,6 +928,16 @@
         "operationId": "TransactionsController_findOne",
         "parameters": [
           {
+            "name": "Lomi-Account",
+            "required": false,
+            "in": "header",
+            "description": "Optional lomi. Network account id (acct_...). When present, the API key acts as the Operator and the request targets the connected Member Account.",
+            "schema": {
+              "type": "string",
+              "example": "acct_1234567890"
+            }
+          },
+          {
             "name": "id",
             "required": true,
             "in": "path",
@@ -959,6 +979,15 @@
         "description": "Renvoie tous les clients de l'organisation du marchand authentifié. Filtres possibles : recherche, type de client et statut d'activité.",
         "operationId": "CustomersController_findAll",
         "parameters": [
+          {
+            "name": "Lomi-Account",
+            "required": false,
+            "in": "header",
+            "description": "Optional lomi. Network Member Account id (`acct_...`).",
+            "schema": {
+              "type": "string"
+            }
+          },
           {
             "name": "pageSize",
             "required": false,
@@ -1063,7 +1092,17 @@
       "post": {
         "description": "Crée un client dans votre organisation. Il est automatiquement rattaché à votre organisation.",
         "operationId": "CustomersController_create",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "Lomi-Account",
+            "required": false,
+            "in": "header",
+            "description": "Optional lomi. Network Member Account id (`acct_...`).",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -1152,6 +1191,15 @@
         "operationId": "CustomersController_findOne",
         "parameters": [
           {
+            "name": "Lomi-Account",
+            "required": false,
+            "in": "header",
+            "description": "Optional lomi. Network Member Account id (`acct_...`).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "id",
             "required": true,
             "in": "path",
@@ -1191,6 +1239,15 @@
         "description": "Met à jour un client. N'envoyez que les champs à modifier. Réponse 404 si le client n'existe pas ou n'est pas accessible avec cette clé API.",
         "operationId": "CustomersController_update",
         "parameters": [
+          {
+            "name": "Lomi-Account",
+            "required": false,
+            "in": "header",
+            "description": "Optional lomi. Network Member Account id (`acct_...`).",
+            "schema": {
+              "type": "string"
+            }
+          },
           {
             "name": "id",
             "required": true,
@@ -1381,6 +1438,15 @@
         "description": "Renvoie les transactions d'un client. Réponse 404 si le client n'existe pas ou n'est pas accessible avec cette clé API.",
         "operationId": "CustomersController_getTransactions",
         "parameters": [
+          {
+            "name": "Lomi-Account",
+            "required": false,
+            "in": "header",
+            "description": "Optional lomi. Network Member Account id (`acct_...`).",
+            "schema": {
+              "type": "string"
+            }
+          },
           {
             "name": "id",
             "required": true,
@@ -1707,7 +1773,18 @@
       "post": {
         "description": "Rembourse une transaction terminée (carte ou mobile money). Le solde marchand est mis à jour immédiatement. Prise en charge des remboursements totaux et partiels.",
         "operationId": "RefundsController_create",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "Lomi-Account",
+            "required": false,
+            "in": "header",
+            "description": "Optional lomi. Network account id (acct_...). When present, the API key acts as the Operator and the request targets the connected Member Account.",
+            "schema": {
+              "type": "string",
+              "example": "acct_1234567890"
+            }
+          }
+        ],
         "responses": {
           "201": {
             "description": "Remboursement enregistré",
@@ -1734,6 +1811,16 @@
       "get": {
         "operationId": "RefundsController_findAll",
         "parameters": [
+          {
+            "name": "Lomi-Account",
+            "required": false,
+            "in": "header",
+            "description": "Optional lomi. Network account id (acct_...). When present, the API key acts as the Operator and the request targets the connected Member Account.",
+            "schema": {
+              "type": "string",
+              "example": "acct_1234567890"
+            }
+          },
           {
             "name": "offset",
             "required": false,
@@ -1793,6 +1880,16 @@
       "get": {
         "operationId": "RefundsController_findOne",
         "parameters": [
+          {
+            "name": "Lomi-Account",
+            "required": false,
+            "in": "header",
+            "description": "Optional lomi. Network account id (acct_...). When present, the API key acts as the Operator and the request targets the connected Member Account.",
+            "schema": {
+              "type": "string",
+              "example": "acct_1234567890"
+            }
+          },
           {
             "name": "id",
             "required": true,
@@ -2219,7 +2316,18 @@
       "post": {
         "description": "Crée une page de paiement hébergée pour que le client finalise son achat. La session expire après 60 minutes par défaut. Renvoie un identifiant de session et une URL de redirection.",
         "operationId": "CheckoutSessionsController_create",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "Lomi-Account",
+            "required": false,
+            "in": "header",
+            "description": "Optional lomi. Network account id (acct_...). When present, the API key acts as the Operator and the request targets the connected Member Account.",
+            "schema": {
+              "type": "string",
+              "example": "acct_1234567890"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "description": "Charge utile de session : indiquez `amount` (et champs produit optionnels) ou `line_items` pour un panier multi-produits.",
@@ -2390,6 +2498,16 @@
         "operationId": "CheckoutSessionsController_findAll",
         "parameters": [
           {
+            "name": "Lomi-Account",
+            "required": false,
+            "in": "header",
+            "description": "Optional lomi. Network account id (acct_...). When present, the API key acts as the Operator and the request targets the connected Member Account.",
+            "schema": {
+              "type": "string",
+              "example": "acct_1234567890"
+            }
+          },
+          {
             "name": "offset",
             "required": false,
             "in": "query",
@@ -2452,6 +2570,16 @@
         "description": "Renvoie le détail d’une session (statut, client et produits associés).",
         "operationId": "CheckoutSessionsController_findOne",
         "parameters": [
+          {
+            "name": "Lomi-Account",
+            "required": false,
+            "in": "header",
+            "description": "Optional lomi. Network account id (acct_...). When present, the API key acts as the Operator and the request targets the connected Member Account.",
+            "schema": {
+              "type": "string",
+              "example": "acct_1234567890"
+            }
+          },
           {
             "name": "id",
             "required": true,
@@ -3173,7 +3301,18 @@
     "/charge/wave": {
       "post": {
         "operationId": "ChargesController_createWaveCharge",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "Lomi-Account",
+            "required": false,
+            "in": "header",
+            "description": "Optional lomi. Network account id (acct_...). When present, the API key acts as the Operator and the request targets the connected Member Account.",
+            "schema": {
+              "type": "string",
+              "example": "acct_1234567890"
+            }
+          }
+        ],
         "responses": {
           "201": {
             "description": "Encaissement initié (corps JSON renvoyé par la fonction edge Wave)",
@@ -3202,7 +3341,18 @@
     "/charge/mtn": {
       "post": {
         "operationId": "ChargesController_createMtnCharge",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "Lomi-Account",
+            "required": false,
+            "in": "header",
+            "description": "Optional lomi. Network account id (acct_...). When present, the API key acts as the Operator and the request targets the connected Member Account.",
+            "schema": {
+              "type": "string",
+              "example": "acct_1234567890"
+            }
+          }
+        ],
         "responses": {
           "201": {
             "description": "Encaissement MTN initié (RequestToPay)",
@@ -3229,7 +3379,18 @@
       "post": {
         "description": "Crée un encaissement carte embarqué et renvoie le client_secret pour votre interface de paiement.",
         "operationId": "ChargesController_createCardCharge",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "Lomi-Account",
+            "required": false,
+            "in": "header",
+            "description": "Optional lomi. Network account id (acct_...). When present, the API key acts as the Operator and the request targets the connected Member Account.",
+            "schema": {
+              "type": "string",
+              "example": "acct_1234567890"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -3266,6 +3427,16 @@
         "operationId": "ChargesController_getCardCharge",
         "parameters": [
           {
+            "name": "Lomi-Account",
+            "required": false,
+            "in": "header",
+            "description": "Optional lomi. Network account id (acct_...). When present, the API key acts as the Operator and the request targets the connected Member Account.",
+            "schema": {
+              "type": "string",
+              "example": "acct_1234567890"
+            }
+          },
+          {
             "name": "id",
             "required": true,
             "in": "path",
@@ -3298,6 +3469,16 @@
       "post": {
         "operationId": "ChargesController_cancelCardCharge",
         "parameters": [
+          {
+            "name": "Lomi-Account",
+            "required": false,
+            "in": "header",
+            "description": "Optional lomi. Network account id (acct_...). When present, the API key acts as the Operator and the request targets the connected Member Account.",
+            "schema": {
+              "type": "string",
+              "example": "acct_1234567890"
+            }
+          },
           {
             "name": "id",
             "required": true,

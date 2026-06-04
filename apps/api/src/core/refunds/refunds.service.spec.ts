@@ -35,6 +35,18 @@ describe('RefundsService', () => {
     status: 'completed',
   };
 
+  const networkUser: AuthContext = {
+    ...user,
+    isNetworkRequest: true,
+    actorOrganizationId: '11111111-1111-4111-8111-111111111111',
+    targetOrganizationId: user.organizationId,
+    lomiAccount: 'acct_member',
+    networkAccountId: '22222222-2222-4222-8222-222222222222',
+    networkMembershipId: '33333333-3333-4333-8333-333333333333',
+    publicAccountId: 'acct_member',
+    networkCapabilityKey: 'transaction.read_own',
+  };
+
   function buildService(
     rpcImpl: (name: string, args: Record<string, unknown>) => unknown,
   ) {
@@ -308,6 +320,73 @@ describe('RefundsService', () => {
 
     await expect(service.findOne('missing', user)).rejects.toThrow(
       NotFoundException,
+    );
+
+    restore();
+  });
+
+  it('lists Network refunds through the Network-scoped RPC', async () => {
+    const { service, rpc, restore } = buildService((name) => {
+      if (name === 'fetch_network_refunds_for_api') {
+        return {
+          data: [{ refund_id: 'ref-network', transaction_id: 'tx-network' }],
+          error: null,
+        };
+      }
+      return { data: null, error: null };
+    });
+
+    const result = await service.findAll(
+      networkUser,
+      'completed',
+      undefined,
+      undefined,
+      25,
+      5,
+    );
+
+    expect(result.data).toHaveLength(1);
+    expect(rpc).toHaveBeenCalledWith(
+      'fetch_network_refunds_for_api',
+      expect.objectContaining({
+        p_network_membership_id: networkUser.networkMembershipId,
+        p_status: 'completed',
+        p_limit: 25,
+        p_offset: 5,
+        p_read_scope: 'own',
+      }),
+    );
+
+    restore();
+  });
+
+  it('gets a Network refund with all scope when transaction.read is granted', async () => {
+    const allScopeUser = {
+      ...networkUser,
+      networkCapabilityKey: 'transaction.read',
+    };
+    const { service, rpc, restore } = buildService((name) => {
+      if (name === 'get_network_refund_for_api') {
+        return {
+          data: [{ refund_id: 'ref-network', transaction_id: 'tx-network' }],
+          error: null,
+        };
+      }
+      return { data: null, error: null };
+    });
+
+    const result = await service.findOne('ref-network', allScopeUser);
+
+    expect((result.data as { refund_id: string }).refund_id).toBe(
+      'ref-network',
+    );
+    expect(rpc).toHaveBeenCalledWith(
+      'get_network_refund_for_api',
+      expect.objectContaining({
+        p_network_membership_id: networkUser.networkMembershipId,
+        p_refund_id: 'ref-network',
+        p_read_scope: 'all',
+      }),
     );
 
     restore();

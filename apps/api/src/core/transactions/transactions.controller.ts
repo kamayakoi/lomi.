@@ -18,6 +18,7 @@ import {
 import { TransactionsService } from './transactions.service';
 import { TransactionResponseDto } from './dto/transaction-response.dto';
 import { ApiKeyGuard } from '../common/guards/api-key.guard';
+import { ApiLomiAccountHeader } from '../common/decorators/api-lomi-account-header.decorator';
 import {
   CurrentUser,
   type AuthContext,
@@ -25,6 +26,7 @@ import {
 
 @ApiTags('Transactions')
 @ApiSecurity('api-key')
+@ApiLomiAccountHeader()
 @UseGuards(ApiKeyGuard)
 @Controller('transactions')
 export class TransactionsController {

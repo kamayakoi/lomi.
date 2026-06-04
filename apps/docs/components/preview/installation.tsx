@@ -9,18 +9,21 @@ import {
 import { CodeBlock } from '@/components/ui/code-block';
 
 export function Installation({ name }: { name: string }) {
+  const registryUrl = `https://docs.lomi.africa/r/${name}.json`;
   const tabs = [
-    { name: 'lomi. CLI', value: 'lomi.-cli' },
-    { name: 'Shadcn CLI', value: 'shadcn' },
+    { name: 'npx', value: 'npx' },
+    { name: 'pnpm', value: 'pnpm' },
+    { name: 'yarn', value: 'yarn' },
+    { name: 'bun', value: 'bun' },
   ];
 
   return (
-    <Tabs className="my-6">
+    <Tabs className="my-6" defaultValue="npx">
       <TabsList className="flex flex-col gap-3 text-sm items-start p-3 bg-fd-card text-fd-card-foreground rounded-sm border not-prose sm:flex-row">
         <div className="me-auto">
           <p className="font-medium">Install to your codebase</p>
           <p className="mt-1 text-fd-muted-foreground">
-            Easier customisation & control.
+            Copy the component source with shadcn.
           </p>
         </div>
         {tabs.map((tab) => (
@@ -34,12 +37,32 @@ export function Installation({ name }: { name: string }) {
         ))}
       </TabsList>
 
-      <TabsContent value="fumadocs-cli">
-        <CodeBlock code={`npx @lomi./cli@latest add ${name}`} lang="bash" />
+      <TabsContent value="npx">
+        <CodeBlock
+          code={`npx shadcn@latest add ${registryUrl}`}
+          lang="bash"
+        />
       </TabsContent>
 
-      <TabsContent value="shadcn">
-        <CodeBlock code={`npx shadcn@latest add /r/${name}.json`} lang="bash" />
+      <TabsContent value="pnpm">
+        <CodeBlock
+          code={`pnpm dlx shadcn@latest add ${registryUrl}`}
+          lang="bash"
+        />
+      </TabsContent>
+
+      <TabsContent value="yarn">
+        <CodeBlock
+          code={`yarn dlx shadcn@latest add ${registryUrl}`}
+          lang="bash"
+        />
+      </TabsContent>
+
+      <TabsContent value="bun">
+        <CodeBlock
+          code={`bunx shadcn@latest add ${registryUrl}`}
+          lang="bash"
+        />
       </TabsContent>
     </Tabs>
   );

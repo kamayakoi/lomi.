@@ -4,8 +4,13 @@ description: Collect money via Wave, MTN, or embedded card (POST /charge/*).
 ---
 
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
+import { Callout } from 'fumadocs-ui/components/callout';
 
 The Charges API allows you to initiate direct payments with specific providers. This is useful when you want to build a custom checkout experience or charge a customer directly without redirecting them to a hosted checkout page immediately (though some providers like Wave may still return a checkout URL).
+
+<Callout type="info">
+  lomi. Network Operators can add `Lomi-Account: acct_...` to create card, Wave, or MTN charges for a connected Member Account. The membership must have `payment.create`.
+</Callout>
 
 ## Create a Wave Charge
 
@@ -159,6 +164,21 @@ const res = await lomi.charges.createCardCharge({
 ```
 
 See [Create card charge](/api/charge/ChargesController_createCardCharge) and [lomi Payment Elements](/reference/payments/lomi-payment-elements).
+
+Network example:
+
+```bash
+curl -X POST "https://api.lomi.africa/charge/card" \
+  -H "X-API-KEY: $LOMI_OPERATOR_API_KEY" \
+  -H "Lomi-Account: acct_1234567890" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "amount": 10000,
+    "currency_code": "XOF",
+    "customer_email": "buyer@example.com",
+    "customer_name": "Buyer Name"
+  }'
+```
 
 ## MTN direct charge
 

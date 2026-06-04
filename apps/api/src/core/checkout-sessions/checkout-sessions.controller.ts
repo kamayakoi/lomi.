@@ -24,6 +24,7 @@ import { CheckoutSessionsService } from './checkout-sessions.service';
 import { CreateCheckoutSessionDto } from './dto/create-checkout-session.dto';
 import { CheckoutSessionResponseDto } from './dto/checkout-session-response.dto';
 import { ApiKeyGuard } from '../common/guards/api-key.guard';
+import { ApiLomiAccountHeader } from '../common/decorators/api-lomi-account-header.decorator';
 import {
   CurrentUser,
   type AuthContext,
@@ -39,6 +40,7 @@ import {
 
 @ApiTags('Sessions de paiement')
 @ApiSecurity('api-key')
+@ApiLomiAccountHeader()
 @UseGuards(ApiKeyGuard)
 @Controller('checkout-sessions')
 export class CheckoutSessionsController {

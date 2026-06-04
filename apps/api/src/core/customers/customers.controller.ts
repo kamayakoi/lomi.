@@ -30,6 +30,7 @@ import { CustomerResponseDto } from './dto/customer-response.dto';
 import { PortalLaunchSessionResponseDto } from './dto/portal-launch-session-response.dto';
 import { TransactionResponseDto } from '../transactions/dto/transaction-response.dto';
 import { ApiKeyGuard } from '../common/guards/api-key.guard';
+import { ApiLomiAccountHeader } from '../common/decorators/api-lomi-account-header.decorator';
 import {
   CurrentUser,
   type AuthContext,
@@ -37,6 +38,7 @@ import {
 
 @ApiTags('Clients')
 @ApiSecurity('api-key')
+@ApiLomiAccountHeader()
 @ApiExtraModels(
   CustomerResponseDto,
   TransactionResponseDto,

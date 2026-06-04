@@ -10,6 +10,10 @@ import { SupabaseService } from '../../utils/supabase/supabase.service';
 import { normalizePaymentEnvironment } from '../../utils/payment-environment';
 import { StripeClientsService } from '../../utils/stripe/stripe-clients.service';
 import { AuthContext } from '../common/decorators/current-user.decorator';
+import {
+  buildNetworkProviderMetadata,
+  recordNetworkContext,
+} from '../common/network-context';
 import { CreateCardChargeDto } from './dto/create-card-charge.dto';
 import {
   assertOptionalUuid,
@@ -145,7 +149,7 @@ export class CardChargeService {
       metadata,
     });
 
-    await this.createPendingTransaction(
+    const transactionId = await this.createPendingTransaction(
       createDto,
       user,
       paymentEnv,
@@ -154,6 +158,19 @@ export class CardChargeService {
       resolvedCustomerId,
       paymentIntent.id,
     );
+
+    await recordNetworkContext(this.supabase, user, {
+      transactionId,
+      amount,
+      currencyCode: sourceCurrency,
+      capabilityKey: 'payment.create',
+      enqueuePaymentCreated: true,
+      paymentEventIdempotencyKey: `network_payment_${paymentIntent.id}`,
+      metadata: {
+        stripe_payment_intent_id: paymentIntent.id,
+        source: 'api_charge_card',
+      },
+    });
 
     return {
       success: true,
@@ -336,6 +353,7 @@ export class CardChargeService {
       original_amount_xof: String(converted.original_amount_xof),
       stripe_amount_cents: String(converted.stripe_amount_cents),
       stripe_charge_currency: converted.stripe_currency,
+      ...buildNetworkProviderMetadata(user),
     };
 
     if (createDto.payment_reference) {
@@ -402,9 +420,9 @@ export class CardChargeService {
     merchantChargeAmount: number,
     customerId: string,
     paymentIntentId: string,
-  ): Promise<void> {
+  ): Promise<string> {
     try {
-      const { error } = await this.supabase.getClient().rpc(
+      const { data, error } = await this.supabase.getClient().rpc(
         'create_stripe_transaction' as any,
         {
           p_merchant_id: user.merchantId,
@@ -434,6 +452,19 @@ export class CardChargeService {
           `Failed to register pending transaction: ${error.message}`,
         );
       }
+
+      if (typeof data !== 'string') {
+        this.logger.error({
+          message: 'create_stripe_transaction_missing_id',
+          organization_id: user.organizationId,
+          payment_intent_id: paymentIntentId,
+        });
+        throw new BadRequestException(
+          'Failed to register pending transaction: missing transaction id',
+        );
+      }
+
+      return data;
     } catch (error: unknown) {
       if (error instanceof BadRequestException) {
         throw error;

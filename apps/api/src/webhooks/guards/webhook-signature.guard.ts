@@ -13,8 +13,8 @@ export class WebhookSignatureGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const signature = request.headers['x-merchant-signature'];
-    const webhookId = request.headers['x-webhook-id'];
+    const signature = firstHeaderValue(request.headers['x-merchant-signature']);
+    const webhookId = firstHeaderValue(request.headers['x-webhook-id']);
 
     if (!signature || !webhookId) {
       throw new UnauthorizedException('Missing signature or webhook ID');
@@ -36,16 +36,17 @@ export class WebhookSignatureGuard implements CanActivate {
     }
 
     // Verify signature
-    const rawBody = JSON.stringify(request.body);
+    const rawBody = getRawRequestBody(request);
     const expectedSignature = crypto
       .createHmac('sha256', verificationToken)
       .update(rawBody)
       .digest('hex');
 
-    const isValid = crypto.timingSafeEqual(
-      Buffer.from(signature),
-      Buffer.from(expectedSignature),
-    );
+    const signatureBuffer = Buffer.from(signature, 'hex');
+    const expectedBuffer = Buffer.from(expectedSignature, 'hex');
+    const isValid =
+      signatureBuffer.length === expectedBuffer.length &&
+      crypto.timingSafeEqual(signatureBuffer, expectedBuffer);
 
     if (!isValid) {
       throw new UnauthorizedException('Invalid webhook signature');
@@ -58,4 +59,27 @@ export class WebhookSignatureGuard implements CanActivate {
 
     return true;
   }
+}
+
+function firstHeaderValue(value: unknown): string | undefined {
+  if (Array.isArray(value)) {
+    return typeof value[0] === 'string' ? value[0] : undefined;
+  }
+  return typeof value === 'string' ? value : undefined;
+}
+
+function getRawRequestBody(request: any): Buffer {
+  if (Buffer.isBuffer(request.rawBody)) {
+    return request.rawBody;
+  }
+  if (typeof request.rawBody === 'string') {
+    return Buffer.from(request.rawBody);
+  }
+  if (Buffer.isBuffer(request.body)) {
+    return request.body;
+  }
+  if (typeof request.body === 'string') {
+    return Buffer.from(request.body);
+  }
+  return Buffer.from(JSON.stringify(request.body ?? {}));
 }

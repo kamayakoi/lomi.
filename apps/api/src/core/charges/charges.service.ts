@@ -10,6 +10,10 @@ import { CreateWaveChargeDto } from './dto/create-charge.dto';
 import { CreateMtnChargeDto } from './dto/create-mtn-charge.dto';
 import { AuthContext } from '../common/decorators/current-user.decorator';
 import { environmentFromAuth } from '../common/auth-environment';
+import {
+  isNetworkRequest,
+  recordNetworkContext,
+} from '../common/network-context';
 import { getMtnCountryConfig } from './mtn-country';
 import { randomUUID } from 'crypto';
 
@@ -140,6 +144,22 @@ export class ChargesService {
         throw new BadRequestException(edgeResponse.error);
       }
 
+      const transactionId = extractTransactionId(edgeResponse);
+      if (transactionId) {
+        await recordNetworkContext(this.supabaseService, user, {
+          transactionId,
+          amount,
+          currencyCode: currency,
+          capabilityKey: 'payment.create',
+          enqueuePaymentCreated: true,
+          paymentEventIdempotencyKey: `network_payment_${transactionId}`,
+          metadata: {
+            provider: 'WAVE',
+            source: 'api_direct_charge',
+          },
+        });
+      }
+
       return edgeResponse;
     } catch (error) {
       this.logger.error(`Wave charge failed: ${error.message}`);
@@ -168,16 +188,24 @@ export class ChargesService {
       paymentEnvironment === 'test' ? 'development' : 'production';
     const { targetEnvironment } = getMtnCountryConfig(countryCode ?? 'CI');
 
-    const { data: providers, error: providerError } = await this.supabaseService
-      .getClient()
-      .rpc(
-        'fetch_organization_providers_settings_api' as never,
-        {
-          p_merchant_id: merchantId,
-          p_organization_id: organizationId,
-          p_provider_code: 'MTN',
-        } as never,
-      );
+    const networkRequest = isNetworkRequest(user);
+    const { data: providers, error: providerError } = networkRequest
+      ? await this.supabaseService.getClient().rpc(
+          'fetch_network_provider_settings_for_api' as never,
+          {
+            p_network_membership_id: user.networkMembershipId,
+            p_provider_code: 'MTN',
+            p_environment: paymentEnvironment,
+          } as never,
+        )
+      : await this.supabaseService.getClient().rpc(
+          'fetch_organization_providers_settings_api' as never,
+          {
+            p_merchant_id: merchantId,
+            p_organization_id: organizationId,
+            p_provider_code: 'MTN',
+          } as never,
+        );
 
     const mtnProvider = Array.isArray(providers)
       ? (providers as { provider_code: string; is_connected: boolean }[]).find(
@@ -289,6 +317,23 @@ export class ChargesService {
       );
     }
 
+    await recordNetworkContext(this.supabaseService, user, {
+      transactionId,
+      amount: totalAmount,
+      currencyCode: currency,
+      capabilityKey: 'payment.create',
+      enqueuePaymentCreated: true,
+      paymentEventIdempotencyKey: referenceId
+        ? `network_payment_mtn_${referenceId}`
+        : `network_payment_${transactionId}`,
+      metadata: {
+        provider: 'MTN',
+        reference_id: referenceId ?? null,
+        external_id: externalId,
+        source: 'api_direct_charge',
+      },
+    });
+
     return {
       success: true,
       data: {
@@ -300,4 +345,25 @@ export class ChargesService {
       },
     };
   }
+}
+
+function extractTransactionId(value: unknown): string | null {
+  if (!value || typeof value !== 'object') {
+    return null;
+  }
+
+  const record = value as Record<string, unknown>;
+  const direct = record.transactionId ?? record.transaction_id;
+  if (typeof direct === 'string') {
+    return direct;
+  }
+
+  const data = record.data;
+  if (data && typeof data === 'object') {
+    const nested = data as Record<string, unknown>;
+    const nestedId = nested.transactionId ?? nested.transaction_id;
+    return typeof nestedId === 'string' ? nestedId : null;
+  }
+
+  return null;
 }

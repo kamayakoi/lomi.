@@ -2,6 +2,10 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { SupabaseService } from '../../utils/supabase/supabase.service';
 import { CreateCheckoutSessionDto } from './dto/create-checkout-session.dto';
 import { AuthContext } from '../common/decorators/current-user.decorator';
+import {
+  namespaceNetworkIdempotency,
+  recordNetworkContext,
+} from '../common/network-context';
 import type { CurrencyCode, Json } from '../../utils/types/api';
 import { throwMappedSupabaseRpcError } from '../../utils/supabase-rpc-errors';
 
@@ -24,6 +28,8 @@ export class CheckoutSessionsService {
     user: AuthContext,
     idempotency?: CheckoutIdempotencyContext,
   ) {
+    const scopedIdempotency = namespaceNetworkIdempotency(user, idempotency);
+
     if (createDto.line_items && createDto.line_items.length > 0) {
       const rpcArgs = {
         p_organization_id: user.organizationId,
@@ -48,10 +54,10 @@ export class CheckoutSessionsService {
         p_expiration_minutes: 60,
         p_require_billing_address: createDto.require_billing_address ?? false,
         p_payment_link_id: createDto.payment_link_id || null,
-        ...(idempotency
+        ...(scopedIdempotency
           ? {
-              p_idempotency_key: idempotency.key,
-              p_idempotency_body_hash: idempotency.bodyHash,
+              p_idempotency_key: scopedIdempotency.key,
+              p_idempotency_body_hash: scopedIdempotency.bodyHash,
             }
           : {}),
       };
@@ -69,7 +75,44 @@ export class CheckoutSessionsService {
       }
 
       if (error) throwMappedSupabaseRpcError(error.message);
+      await this.recordNetworkCheckoutSession(data, user);
       return data;
+    }
+
+    const blockingInvoice = await this.findBlockingInvoice(createDto, user);
+    if (blockingInvoice) {
+      const { data: checkout, error: checkoutError } = await this.supabase
+        .getClient()
+        .rpc(
+          'create_invoice_checkout_session' as any,
+          {
+            p_invoice_id: blockingInvoice.invoice_id,
+            p_created_by: user.merchantId,
+            p_expiration_minutes: 60 * 24 * 7,
+          } as any,
+        );
+
+      if (checkoutError) throw new Error(checkoutError.message);
+
+      const checkoutPayload =
+        checkout && typeof checkout === 'object'
+          ? (checkout as Record<string, unknown>)
+          : {};
+
+      return {
+        payment_required: true,
+        reason: 'invoice_payment_required',
+        blocking_invoice: {
+          invoice_id: blockingInvoice.invoice_id,
+          invoice_number: blockingInvoice.invoice_number,
+          amount_remaining: blockingInvoice.amount_remaining,
+          currency_code: blockingInvoice.currency_code,
+          checkout_url:
+            checkoutPayload.checkout_url ??
+            blockingInvoice.checkout_url ??
+            blockingInvoice.payment_url,
+        },
+      };
     }
 
     const rpcArgs = {
@@ -99,10 +142,10 @@ export class CheckoutSessionsService {
       p_allow_coupon_code: createDto.allow_coupon_code ?? false,
       p_require_billing_address: createDto.require_billing_address ?? false,
       p_payment_link_id: createDto.payment_link_id || null,
-      ...(idempotency
+      ...(scopedIdempotency
         ? {
-            p_idempotency_key: idempotency.key,
-            p_idempotency_body_hash: idempotency.bodyHash,
+            p_idempotency_key: scopedIdempotency.key,
+            p_idempotency_body_hash: scopedIdempotency.bodyHash,
           }
         : {}),
     };
@@ -117,6 +160,7 @@ export class CheckoutSessionsService {
     }
 
     if (error) throwMappedSupabaseRpcError(error.message);
+    await this.recordNetworkCheckoutSession(data, user);
     return data;
   }
 
@@ -157,4 +201,79 @@ export class CheckoutSessionsService {
 
     return session;
   }
+
+  private async recordNetworkCheckoutSession(
+    data: unknown,
+    user: AuthContext,
+  ): Promise<void> {
+    const checkoutSessionId = extractCheckoutSessionId(data);
+    if (!checkoutSessionId) {
+      return;
+    }
+
+    await recordNetworkContext(this.supabase, user, {
+      checkoutSessionId,
+      capabilityKey: 'payment.create',
+      metadata: {
+        source: 'api_checkout_session',
+      },
+    });
+  }
+
+  private async findBlockingInvoice(
+    createDto: CreateCheckoutSessionDto,
+    user: AuthContext,
+  ): Promise<BlockingInvoice | null> {
+    if (createDto.metadata?.['payment_flow'] === 'invoice_payment') {
+      return null;
+    }
+
+    if (!createDto.customer_id && !createDto.subscription_id) {
+      return null;
+    }
+
+    const { data, error } = await this.supabase.getClient().rpc(
+      'get_blocking_customer_obligations' as any,
+      {
+        p_organization_id: user.organizationId,
+        p_customer_id: createDto.customer_id || null,
+        p_product_id: createDto.product_id || null,
+        p_subscription_id: createDto.subscription_id || null,
+        p_environment: user.environment,
+      } as any,
+    );
+
+    if (error) throw new Error(error.message);
+
+    const obligations = Array.isArray(data) ? data : [];
+    const invoice = obligations[0] as Partial<BlockingInvoice> | undefined;
+    if (!invoice?.invoice_id) {
+      return null;
+    }
+
+    return invoice as BlockingInvoice;
+  }
+}
+
+type BlockingInvoice = {
+  invoice_id: string;
+  invoice_number: string | null;
+  amount_remaining: number;
+  currency_code: string;
+  payment_url: string | null;
+  checkout_url: string | null;
+};
+
+function extractCheckoutSessionId(data: unknown): string | null {
+  if (!data || typeof data !== 'object') {
+    return null;
+  }
+
+  const row = Array.isArray(data) ? data[0] : data;
+  if (!row || typeof row !== 'object') {
+    return null;
+  }
+
+  const value = (row as Record<string, unknown>).checkout_session_id;
+  return typeof value === 'string' ? value : null;
 }

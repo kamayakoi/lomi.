@@ -80,6 +80,60 @@ describe('CheckoutSessionsService', () => {
     );
   });
 
+  it('returns invoice payment required when customer has blocking debt', async () => {
+    const createDto: CreateCheckoutSessionDto = {
+      amount: 1000,
+      currency_code: 'XOF',
+      customer_id: 'customer-1',
+      product_id: 'product-1',
+    } as CreateCheckoutSessionDto;
+
+    mockSupabaseClient.rpc
+      .mockResolvedValueOnce({
+        data: [
+          {
+            invoice_id: 'invoice-1',
+            invoice_number: 'INV-001',
+            amount_remaining: 500,
+            currency_code: 'XOF',
+            checkout_url: null,
+            payment_url: null,
+          },
+        ],
+        error: null,
+      })
+      .mockResolvedValueOnce({
+        data: {
+          checkout_session_id: 'invoice-session-1',
+          checkout_url:
+            'https://checkout.lomi.africa/checkout/invoice-session-1',
+        },
+        error: null,
+      });
+
+    const result = await service.create(createDto, mockUser as AuthContext);
+
+    expect(result).toEqual({
+      payment_required: true,
+      reason: 'invoice_payment_required',
+      blocking_invoice: {
+        invoice_id: 'invoice-1',
+        invoice_number: 'INV-001',
+        amount_remaining: 500,
+        currency_code: 'XOF',
+        checkout_url: 'https://checkout.lomi.africa/checkout/invoice-session-1',
+      },
+    });
+    expect(mockSupabaseClient.rpc).toHaveBeenCalledWith(
+      'get_blocking_customer_obligations',
+      expect.objectContaining({
+        p_organization_id: mockUser.organizationId,
+        p_customer_id: 'customer-1',
+        p_product_id: 'product-1',
+      }),
+    );
+  });
+
   it('forwards idempotency fields to create_checkout_session RPC', async () => {
     const createDto: CreateCheckoutSessionDto = {
       amount: 1000,

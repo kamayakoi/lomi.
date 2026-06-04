@@ -54,18 +54,29 @@ describe('ApiKeyGuard', () => {
 
     await expect(guard.canActivate(createMockContext(req))).resolves.toBe(true);
     expect(supabase.rpc).toHaveBeenCalledWith(
-      'verify_api_key',
+      'verify_api_key_context',
       expect.objectContaining({
         p_api_key: 'sk_test_abc',
         p_endpoint: '/checkout-sessions',
         p_request_method: 'POST',
         p_ip_address: '192.168.1.1',
+        p_lomi_account: null,
+        p_required_capability: null,
       }),
     );
     expect(req.user).toEqual({
+      apiKey: 'sk_test_abc',
       merchantId: 'm2',
+      actorOrganizationId: 'o2',
+      targetOrganizationId: 'o2',
       organizationId: 'o2',
       environment: 'live',
+      isNetworkRequest: false,
+      lomiAccount: null,
+      networkAccountId: null,
+      networkMembershipId: null,
+      publicAccountId: null,
+      networkCapabilityKey: null,
     });
   });
 
@@ -91,19 +102,147 @@ describe('ApiKeyGuard', () => {
 
     await expect(guard.canActivate(createMockContext(req))).resolves.toBe(true);
     expect(supabase.rpc).toHaveBeenCalledWith(
-      'verify_api_key',
+      'verify_api_key_context',
       expect.objectContaining({
         p_api_key: 'secret',
         p_endpoint: '/payment-requests',
         p_request_method: 'POST',
         p_ip_address: '127.0.0.1',
+        p_lomi_account: null,
+        p_required_capability: null,
       }),
     );
     expect(req.user).toEqual({
+      apiKey: 'secret',
       merchantId: 'm1',
+      actorOrganizationId: 'o1',
+      targetOrganizationId: 'o1',
       organizationId: 'o1',
       environment: 'test',
+      isNetworkRequest: false,
+      lomiAccount: null,
+      networkAccountId: null,
+      networkMembershipId: null,
+      publicAccountId: null,
+      networkCapabilityKey: null,
     });
+  });
+
+  it('authorizes supported Network requests with required capability', async () => {
+    supabase.rpc.mockResolvedValue({
+      data: [
+        {
+          is_valid: true,
+          merchant_id: 'm_operator',
+          actor_organization_id: 'org_operator',
+          target_organization_id: 'org_member',
+          organization_id: 'org_member',
+          environment: 'live',
+          is_network_request: true,
+          network_account_id: 'net_acct_1',
+          network_membership_id: 'net_mem_1',
+          public_account_id: 'acct_123',
+          network_capability_key: 'payment.create',
+        },
+      ],
+      error: null,
+    });
+
+    const req: any = {
+      headers: { 'x-api-key': 'sk_live_network', 'lomi-account': 'acct_123' },
+      url: '/charge/card',
+      method: 'POST',
+      ip: '127.0.0.1',
+    };
+
+    await expect(guard.canActivate(createMockContext(req))).resolves.toBe(true);
+    expect(supabase.rpc).toHaveBeenCalledWith(
+      'verify_api_key_context',
+      expect.objectContaining({
+        p_lomi_account: 'acct_123',
+        p_required_capability: 'payment.create',
+      }),
+    );
+    expect(req.user).toEqual({
+      apiKey: 'sk_live_network',
+      merchantId: 'm_operator',
+      actorOrganizationId: 'org_operator',
+      targetOrganizationId: 'org_member',
+      organizationId: 'org_member',
+      environment: 'live',
+      isNetworkRequest: true,
+      lomiAccount: 'acct_123',
+      networkAccountId: 'net_acct_1',
+      networkMembershipId: 'net_mem_1',
+      publicAccountId: 'acct_123',
+      networkCapabilityKey: 'payment.create',
+    });
+  });
+
+  it('authorizes Network customer reads with customer.read', async () => {
+    supabase.rpc.mockResolvedValue({
+      data: [
+        {
+          is_valid: true,
+          merchant_id: 'm_operator',
+          actor_organization_id: 'org_operator',
+          target_organization_id: 'org_member',
+          organization_id: 'org_member',
+          environment: 'live',
+          is_network_request: true,
+          network_account_id: 'net_acct_1',
+          network_membership_id: 'net_mem_1',
+          public_account_id: 'acct_123',
+          network_capability_key: 'customer.read',
+        },
+      ],
+      error: null,
+    });
+
+    const req: any = {
+      headers: { 'x-api-key': 'sk_live_network', 'lomi-account': 'acct_123' },
+      url: '/customers',
+      method: 'GET',
+      ip: '127.0.0.1',
+    };
+
+    await expect(guard.canActivate(createMockContext(req))).resolves.toBe(true);
+    expect(supabase.rpc).toHaveBeenCalledWith(
+      'verify_api_key_context',
+      expect.objectContaining({
+        p_lomi_account: 'acct_123',
+        p_required_capability: 'customer.read',
+      }),
+    );
+    expect(req.user.networkCapabilityKey).toBe('customer.read');
+  });
+
+  it('rejects Network checkout-session reads until Network-aware read RPCs exist', async () => {
+    const ctx = createMockContext({
+      headers: { 'x-api-key': 'sk_live_network', 'lomi-account': 'acct_123' },
+      url: '/checkout-sessions',
+      method: 'GET',
+      ip: '127.0.0.1',
+    });
+
+    await expect(guard.canActivate(ctx)).rejects.toThrow(
+      'Network requests are not supported for this endpoint',
+    );
+    expect(supabase.rpc).not.toHaveBeenCalled();
+  });
+
+  it('rejects Lomi-Account on endpoints not enabled for Network', async () => {
+    const ctx = createMockContext({
+      headers: { 'x-api-key': 'sk', 'lomi-account': 'acct_123' },
+      url: '/accounts',
+      method: 'GET',
+      ip: '127.0.0.1',
+    });
+
+    await expect(guard.canActivate(ctx)).rejects.toThrow(
+      'Network requests are not supported for this endpoint',
+    );
+    expect(supabase.rpc).not.toHaveBeenCalled();
   });
 
   it('rejects when verify_api_key returns invalid', async () => {

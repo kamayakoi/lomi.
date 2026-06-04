@@ -63,7 +63,9 @@ describe('merchant-webhook-url', () => {
         parseMerchantWebhookUrl('https://localhost/webhook'),
       ).toThrow(UnsafeWebhookUrlError);
       expect(() =>
-        parseMerchantWebhookUrl('https://metadata.google.internal/computeMetadata/v1/'),
+        parseMerchantWebhookUrl(
+          'https://metadata.google.internal/computeMetadata/v1/',
+        ),
       ).toThrow(UnsafeWebhookUrlError);
     });
   });
@@ -72,7 +74,7 @@ describe('merchant-webhook-url', () => {
     it('accepts public hostnames that resolve to public addresses', async () => {
       mockedLookup.mockResolvedValue([
         { address: '93.184.216.34', family: 4 },
-      ] as LookupAddress[]);
+      ] as unknown as LookupAddress);
 
       const target = await resolveSafeMerchantWebhookTarget(
         'https://example.com/webhooks/lomi',
@@ -85,7 +87,7 @@ describe('merchant-webhook-url', () => {
     it('rejects hostnames that resolve to private addresses', async () => {
       mockedLookup.mockResolvedValue([
         { address: '10.0.0.8', family: 4 },
-      ] as LookupAddress[]);
+      ] as unknown as LookupAddress);
 
       await expect(
         resolveSafeMerchantWebhookTarget('https://attacker.example/webhook'),
@@ -96,7 +98,7 @@ describe('merchant-webhook-url', () => {
       mockedLookup.mockResolvedValue([
         { address: '93.184.216.34', family: 4 },
         { address: '10.0.0.8', family: 4 },
-      ] as LookupAddress[]);
+      ] as unknown as LookupAddress);
 
       await expect(
         resolveSafeMerchantWebhookTarget('https://dual.example/webhook'),

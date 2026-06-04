@@ -366,6 +366,14 @@ export const EXPOSED_FUNCTIONS = [
   'create_checkout_session_with_line_items',
   'list_checkout_sessions',
   'get_checkout_session_api',
+  // Invoices
+  'create_invoice_receivable',
+  'list_customer_invoices_api',
+  'get_customer_invoice_api',
+  'update_customer_invoice_api',
+  'create_invoice_checkout_session',
+  'mark_invoice_paid_from_transaction',
+  'get_blocking_customer_obligations',
   // Payment links
   'create_payment_link',
   'list_payment_links',

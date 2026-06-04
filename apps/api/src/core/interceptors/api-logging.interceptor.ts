@@ -55,6 +55,7 @@ export class ApiLoggingInterceptor implements NestInterceptor {
 
       const apiKey =
         request.headers['x-api-key'] ||
+        request.headers['x-lomi-api-key'] ||
         (request.headers.authorization &&
         request.headers.authorization.startsWith('Bearer ')
           ? request.headers.authorization.substring(7)
@@ -62,7 +63,7 @@ export class ApiLoggingInterceptor implements NestInterceptor {
 
       if (user && user.organizationId && apiKey) {
         // Cast to any because the types are not yet generated for the new RPC
-        const rpcName = 'log_api_interaction' as any;
+        const rpcName = 'log_api_interaction_context' as any;
 
         const endpointPath = urlWithoutQuery(request.url);
         const heavyPayloadPaths = isCheckoutSessionsPath(endpointPath);
@@ -80,7 +81,10 @@ export class ApiLoggingInterceptor implements NestInterceptor {
         // Don't await this to avoid blocking the response
         this.supabase
           .rpc(rpcName, {
-            p_organization_id: user.organizationId,
+            p_actor_organization_id:
+              user.actorOrganizationId || user.organizationId,
+            p_target_organization_id:
+              user.targetOrganizationId || user.organizationId,
             p_api_key: apiKey,
             p_endpoint: endpointPath,
             p_request_method: request.method,
@@ -88,6 +92,8 @@ export class ApiLoggingInterceptor implements NestInterceptor {
             p_response_status: statusCode,
             p_response_payload: responsePayload,
             p_response_time: durationMs,
+            p_network_account_id: user.networkAccountId || null,
+            p_network_membership_id: user.networkMembershipId || null,
           })
           .then(({ error }) => {
             if (error) {

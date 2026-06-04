@@ -12,6 +12,10 @@ The Transactions API provides read-only access to transaction history for your o
   **Behavior:** how statuses transition, when balances credit, and how expiration works — see **[Payment state machine](/reference/reference/payment-state-machine)** and **[Balance and settlement](/reference/platform/balance-and-settlement)**.
 </Callout>
 
+<Callout type="info">
+  lomi. Network Operators can add `Lomi-Account: acct_...` to read transactions for a connected Member Account when the membership has `transaction.read`.
+</Callout>
+
 ## List transactions
 
 Retrieve all transactions with advanced filtering options.
@@ -88,6 +92,14 @@ curl -X GET "https://api.lomi.africa/transactions?status=completed&provider=WAVE
 </Tab>
 
 </Tabs>
+
+Network transaction read:
+
+```bash
+curl -X GET "https://api.lomi.africa/transactions?status=completed" \
+  -H "X-API-KEY: $LOMI_OPERATOR_API_KEY" \
+  -H "Lomi-Account: acct_1234567890"
+```
 
 ### Response
 

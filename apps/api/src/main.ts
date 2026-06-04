@@ -8,12 +8,25 @@ import { buildSwaggerDocumentBase } from './swagger.config';
 
 async function bootstrap() {
   const expressApp = express();
+  const isProduction = process.env.NODE_ENV === 'production';
 
   expressApp.use((req: express.Request & { id?: string }, res, next) => {
     const id =
       (req.headers['x-request-id'] as string | undefined) || randomUUID();
     req.id = id;
     res.setHeader('X-Request-Id', id);
+    next();
+  });
+
+  expressApp.use((_req, res, next) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('Referrer-Policy', 'no-referrer');
+    res.setHeader('Cross-Origin-Resource-Policy', 'same-site');
+    res.setHeader(
+      'Permissions-Policy',
+      'camera=(), microphone=(), geolocation=(), payment=()',
+    );
     next();
   });
 
@@ -41,14 +54,21 @@ async function bootstrap() {
   // Enable CORS
   const allowedOrigins = process.env.CORS_ALLOWED_ORIGINS
     ? process.env.CORS_ALLOWED_ORIGINS.split(',').map((origin) => origin.trim())
-    : '*';
+    : isProduction
+      ? [
+          'https://lomi.africa',
+          'https://www.lomi.africa',
+          'https://dashboard.lomi.africa',
+          'https://api.lomi.africa',
+        ]
+      : '*';
 
   app.enableCors({
     origin: allowedOrigins,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
     allowedHeaders:
-      'X-API-KEY,X-Request-Id,Idempotency-Key,X-Lomi-Signature,X-Lomi-Event,X-Webhook-ID,X-Merchant-Signature,Content-Type,Authorization',
+      'X-API-KEY,X-Lomi-API-Key,Lomi-Account,X-Request-Id,Idempotency-Key,X-Lomi-Signature,X-Lomi-Event,X-Webhook-ID,X-Merchant-Signature,Content-Type,Authorization',
     exposedHeaders:
       'X-Request-Id,Retry-After,X-RateLimit-Limit,X-RateLimit-Policy,X-RateLimit-Window-Seconds',
   });

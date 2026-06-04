@@ -2,6 +2,10 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { SupabaseService } from '../../utils/supabase/supabase.service';
 import { AuthContext } from '../common/decorators/current-user.decorator';
 import { environmentFromAuth } from '../common/auth-environment';
+import {
+  isNetworkRequest,
+  upsertNetworkCustomerMetadata,
+} from '../common/network-context';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { CreatePortalLaunchSessionDto } from './dto/create-portal-launch-session.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
@@ -28,6 +32,37 @@ export class CustomersService {
   ) {
     const offset = (page - 1) * pageSize;
 
+    if (isNetworkRequest(user)) {
+      const { data, error } = await this.supabase.getClient().rpc(
+        'fetch_network_customers_for_api' as any,
+        {
+          p_network_membership_id: user.networkMembershipId,
+          p_search_term: searchTerm || null,
+          p_customer_type: customerType || 'all',
+          p_activity_status: activityStatus || 'all',
+          p_offset: offset,
+          p_limit: pageSize,
+          p_environment: environmentFromAuth(user),
+        } as any,
+      );
+
+      if (error) throw new Error(error.message);
+
+      const customers = (data as any[]) ?? [];
+      const totalCount =
+        customers.length > 0 ? Number(customers[0].total_count) : 0;
+
+      return {
+        customers: customers.map((c) => this.formatCustomer(c)),
+        pagination: {
+          page,
+          pageSize,
+          totalCount,
+          totalPages: Math.ceil(totalCount / pageSize),
+        },
+      };
+    }
+
     const { data, error } = await this.supabase.getClient().rpc(
       'fetch_customers_with_status' as any,
       {
@@ -51,23 +86,9 @@ export class CustomersService {
       customers.length > 0 ? Number(customers[0].total_count) : 0;
 
     return {
-      customers: customers.map((c) => ({
-        customer_id: c.customer_id,
-        organization_id: user.organizationId,
-        name: c.name,
-        email: c.email,
-        phone_number: c.phone_number,
-        whatsapp_number: c.whatsapp_number,
-        country: c.country,
-        city: c.city,
-        address: c.address,
-        postal_code: c.postal_code,
-        is_business: c.is_business,
-        metadata: null, // RPC doesn't return metadata
-        environment: c.environment,
-        created_at: c.created_at,
-        updated_at: c.updated_at,
-      })),
+      customers: customers.map((c) =>
+        this.formatCustomer({ ...c, organization_id: user.organizationId }),
+      ),
       pagination: {
         page,
         pageSize,
@@ -82,6 +103,31 @@ export class CustomersService {
    * Uses RPC: get_customer_by_organization
    */
   async findOne(id: string, user: AuthContext) {
+    if (isNetworkRequest(user)) {
+      const { data, error } = await this.supabase.getClient().rpc(
+        'get_network_customer_for_api' as any,
+        {
+          p_network_membership_id: user.networkMembershipId,
+          p_customer_id: id,
+          p_environment: environmentFromAuth(user),
+        } as any,
+      );
+
+      if (error) throw new Error(error.message);
+
+      const customer = (Array.isArray(data) ? data[0] : data) as
+        | Record<string, unknown>
+        | null;
+
+      if (!customer) {
+        throw new NotFoundException(
+          `Customer with ID ${id} not found or access denied`,
+        );
+      }
+
+      return this.formatCustomer(customer);
+    }
+
     const { data, error } = await this.supabase.getClient().rpc(
       'get_customer_by_organization' as any,
       {
@@ -102,23 +148,7 @@ export class CustomersService {
       );
     }
 
-    return {
-      customer_id: customer.customer_id,
-      organization_id: customer.organization_id,
-      name: customer.name,
-      email: customer.email,
-      phone_number: customer.phone_number,
-      whatsapp_number: customer.whatsapp_number,
-      country: customer.country,
-      city: customer.city,
-      address: customer.address,
-      postal_code: customer.postal_code,
-      is_business: customer.is_business,
-      metadata: customer.metadata,
-      environment: customer.environment,
-      created_at: customer.created_at,
-      updated_at: customer.updated_at,
-    };
+    return this.formatCustomer(customer);
   }
 
   /**
@@ -130,6 +160,7 @@ export class CustomersService {
       'create_customer' as any,
       {
         p_merchant_id: user.merchantId,
+        ...(isNetworkRequest(user) ? { p_merchant_id: null } : {}),
         p_organization_id: user.organizationId,
         p_name: createDto.name,
         p_email: createDto.email || null,
@@ -148,6 +179,19 @@ export class CustomersService {
 
     // RPC returns customer_id
     const customerId = data as string;
+
+    if (isNetworkRequest(user)) {
+      const tagged = await upsertNetworkCustomerMetadata(
+        this.supabase,
+        user,
+        customerId,
+        createDto.metadata,
+      );
+
+      if (tagged) {
+        return this.formatCustomer(tagged);
+      }
+    }
 
     // If metadata was provided, update it separately
     if (createDto.metadata) {
@@ -224,8 +268,18 @@ export class CustomersService {
       if (error) throw new Error(error.message);
     }
 
-    // Update metadata separately if provided
-    if (metadata !== undefined) {
+    if (isNetworkRequest(user)) {
+      const tagged = await upsertNetworkCustomerMetadata(
+        this.supabase,
+        user,
+        id,
+        metadata,
+      );
+
+      if (tagged) {
+        return this.formatCustomer(tagged);
+      }
+    } else if (metadata !== undefined) {
       const { error: metadataError } = await this.supabase.getClient().rpc(
         'update_customer_metadata' as any,
         {
@@ -269,6 +323,21 @@ export class CustomersService {
   async getTransactions(id: string, user: AuthContext) {
     // First verify ownership
     await this.findOne(id, user);
+
+    if (isNetworkRequest(user)) {
+      const { data, error } = await this.supabase.getClient().rpc(
+        'fetch_network_customer_transactions_for_api' as any,
+        {
+          p_network_membership_id: user.networkMembershipId,
+          p_customer_id: id,
+          p_environment: environmentFromAuth(user),
+        } as any,
+      );
+
+      if (error) throw new Error(error.message);
+
+      return data || [];
+    }
 
     const { data, error } = await this.supabase.getClient().rpc(
       'fetch_customer_transactions' as any,
@@ -378,6 +447,26 @@ export class CustomersService {
         totalCount: total,
         totalPages: limit > 0 ? Math.ceil(total / limit) : 0,
       },
+    };
+  }
+
+  private formatCustomer(row: any) {
+    return {
+      customer_id: row.customer_id,
+      organization_id: row.organization_id,
+      name: row.name,
+      email: row.email,
+      phone_number: row.phone_number,
+      whatsapp_number: row.whatsapp_number,
+      country: row.country,
+      city: row.city,
+      address: row.address,
+      postal_code: row.postal_code,
+      is_business: row.is_business,
+      metadata: row.metadata ?? null,
+      environment: row.environment,
+      created_at: row.created_at,
+      updated_at: row.updated_at,
     };
   }
 }

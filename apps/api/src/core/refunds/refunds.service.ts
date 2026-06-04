@@ -8,6 +8,11 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { SupabaseService } from '../../utils/supabase/supabase.service';
 import { AuthContext } from '../common/decorators/current-user.decorator';
+import {
+  isNetworkRequest,
+  recordNetworkContext,
+  recordNetworkOperatorFeeReversal,
+} from '../common/network-context';
 import { CreateRefundDto } from './dto/create-refund.dto';
 import {
   calculateRefundProcessingFee,
@@ -56,6 +61,7 @@ export class RefundsService {
       dto.transaction_id,
       user.organizationId,
     );
+    await this.assertNetworkRefundAccess(dto.transaction_id, user);
     this.assertRefundable(tx, dto.amount);
 
     const gross = Number(tx.gross_amount);
@@ -75,27 +81,63 @@ export class RefundsService {
       dto.amount,
       isFullRefund,
     );
+    const refundMerchantId = await this.resolveRefundMerchantId(user);
+
+    let result: { refund_id?: string; [key: string]: unknown };
 
     if (tx.provider_code === 'STRIPE' && tx.payment_method_code === 'CARDS') {
-      return this.createCardRefund(dto, user, feePercentage);
-    }
-
-    if (tx.provider_code === 'WAVE') {
-      if (isFullRefund) {
-        return this.createMobileMoneyFullRefund(dto, user, tx, feePercentage);
-      }
-      return this.createMobileMoneyPartialRefund(
+      result = await this.createCardRefund(
         dto,
         user,
-        tx,
-        feeAmount,
         feePercentage,
+        refundMerchantId,
+      );
+    } else if (tx.provider_code === 'WAVE') {
+      result = isFullRefund
+        ? await this.createMobileMoneyFullRefund(
+            dto,
+            user,
+            tx,
+            feePercentage,
+            refundMerchantId,
+          )
+        : await this.createMobileMoneyPartialRefund(
+            dto,
+            user,
+            tx,
+            feeAmount,
+            feePercentage,
+            refundMerchantId,
+          );
+    } else {
+      throw new BadRequestException(
+        'Refunds are not supported for this transaction type',
       );
     }
 
-    throw new BadRequestException(
-      'Refunds are not supported for this transaction type',
-    );
+    await recordNetworkContext(this.supabaseService, user, {
+      refundId: result.refund_id ?? null,
+      amount: dto.amount,
+      currencyCode: tx.currency_code,
+      capabilityKey: 'refund.create',
+      metadata: {
+        source: 'api_refund',
+        transaction_id: dto.transaction_id,
+        refund_type: dto.refund_type ?? null,
+      },
+    });
+
+    await recordNetworkOperatorFeeReversal(this.supabaseService, user, {
+      refundId: result.refund_id ?? null,
+      transactionId: dto.transaction_id,
+      refundAmount: dto.amount,
+      metadata: {
+        source: 'api_refund',
+        refund_type: dto.refund_type ?? null,
+      },
+    });
+
+    return result;
   }
 
   async findAll(
@@ -106,6 +148,28 @@ export class RefundsService {
     limit = 50,
     offset = 0,
   ) {
+    if (isNetworkRequest(user)) {
+      const { data, error } = await this.supabaseService.getClient().rpc(
+        'fetch_network_refunds_for_api' as never,
+        {
+          p_network_membership_id: user.networkMembershipId,
+          p_status: status ?? null,
+          p_start_date: startDate ?? null,
+          p_end_date: endDate ?? null,
+          p_limit: limit,
+          p_offset: offset,
+          p_environment: user.environment,
+          p_read_scope: this.networkReadScope(user),
+        } as never,
+      );
+
+      if (error) {
+        throw new BadRequestException(error.message);
+      }
+
+      return { success: true, data: data ?? [] };
+    }
+
     const { data, error } = await this.supabaseService.getClient().rpc(
       'list_refunds' as never,
       {
@@ -126,6 +190,32 @@ export class RefundsService {
   }
 
   async findOne(refundId: string, user: AuthContext) {
+    if (isNetworkRequest(user)) {
+      const { data, error } = await this.supabaseService.getClient().rpc(
+        'get_network_refund_for_api' as never,
+        {
+          p_network_membership_id: user.networkMembershipId,
+          p_refund_id: refundId,
+          p_environment: user.environment,
+          p_read_scope: this.networkReadScope(user),
+        } as never,
+      );
+
+      if (error) {
+        throw new BadRequestException(error.message);
+      }
+
+      const rows = Array.isArray(data) ? data : [];
+      const row = rows[0];
+      if (!row) {
+        throw new NotFoundException(
+          `Refund with ID ${refundId} not found or access denied`,
+        );
+      }
+
+      return { success: true, data: row };
+    }
+
     const { data, error } = await this.supabaseService.getClient().rpc(
       'get_refund' as never,
       {
@@ -147,6 +237,10 @@ export class RefundsService {
     }
 
     return { success: true, data: row };
+  }
+
+  private networkReadScope(user: AuthContext): 'all' | 'own' {
+    return user.networkCapabilityKey === 'transaction.read' ? 'all' : 'own';
   }
 
   private resolveIsFullRefund(dto: CreateRefundDto, gross: number): boolean {
@@ -194,6 +288,36 @@ export class RefundsService {
     if (amount > Number(tx.gross_amount) + 0.01) {
       throw new BadRequestException(
         'Refund amount exceeds transaction gross amount',
+      );
+    }
+  }
+
+  private async assertNetworkRefundAccess(
+    transactionId: string,
+    user: AuthContext,
+  ) {
+    if (!isNetworkRequest(user)) {
+      return;
+    }
+
+    const { data, error } = await this.supabaseService.getClient().rpc(
+      'get_network_transaction_for_api' as never,
+      {
+        p_network_membership_id: user.networkMembershipId,
+        p_transaction_id: transactionId,
+        p_environment: user.environment,
+        p_read_scope: 'own',
+      } as never,
+    );
+
+    if (error) {
+      throw new BadRequestException(error.message);
+    }
+
+    const rows = Array.isArray(data) ? data : [];
+    if (!rows[0]) {
+      throw new NotFoundException(
+        `Transaction with ID ${transactionId} not found or access denied`,
       );
     }
   }
@@ -246,11 +370,12 @@ export class RefundsService {
     dto: CreateRefundDto,
     user: AuthContext,
     feePercentage: number,
+    refundMerchantId: string,
   ) {
     const { data, error } = await this.supabaseService.getClient().rpc(
       'create_manual_refund_request_api' as never,
       {
-        p_merchant_id: user.merchantId,
+        p_merchant_id: refundMerchantId,
         p_organization_id: user.organizationId,
         p_transaction_id: dto.transaction_id,
         p_refund_amount: dto.amount,
@@ -286,11 +411,12 @@ export class RefundsService {
     user: AuthContext,
     tx: TransactionRow,
     feePercentage: number,
+    refundMerchantId: string,
   ) {
     const { data, error } = await this.supabaseService.getClient().rpc(
       'create_wave_refund_request_api' as never,
       {
-        p_merchant_id: user.merchantId,
+        p_merchant_id: refundMerchantId,
         p_organization_id: user.organizationId,
         p_transaction_id: dto.transaction_id,
         p_refund_amount: dto.amount,
@@ -366,6 +492,7 @@ export class RefundsService {
     tx: TransactionRow,
     feeAmount: number,
     feePercentage: number,
+    refundMerchantId: string,
   ) {
     if (!tx.customer_id) {
       throw new BadRequestException(
@@ -409,7 +536,7 @@ export class RefundsService {
         ? `${dto.reason} (partial refund via payout)`
         : 'Partial refund via payout',
       providerCode: tx.provider_code,
-      merchantId: user.merchantId,
+      merchantId: refundMerchantId,
       feeAmount,
       metadata: {
         processing_fee: feeAmount,
@@ -484,6 +611,62 @@ export class RefundsService {
     }
 
     return customer;
+  }
+
+  private async resolveRefundMerchantId(user: AuthContext): Promise<string> {
+    if (!isNetworkRequest(user)) {
+      return user.merchantId;
+    }
+
+    const { data, error } = await this.supabaseService
+      .getClient()
+      .from('network_memberships' as never)
+      .select('accepted_by_merchant_id, member_organization_id' as never)
+      .eq('network_membership_id' as never, user.networkMembershipId as never)
+      .maybeSingle();
+
+    if (error) {
+      throw new BadRequestException(error.message);
+    }
+
+    const row = data as
+      | {
+          accepted_by_merchant_id?: string | null;
+          member_organization_id?: string | null;
+        }
+      | null;
+
+    if (row?.accepted_by_merchant_id) {
+      return row.accepted_by_merchant_id;
+    }
+
+    if (!row?.member_organization_id) {
+      throw new BadRequestException('Network membership not found');
+    }
+
+    const { data: linkData, error: linkError } = await this.supabaseService
+      .getClient()
+      .from('merchant_organization_links' as never)
+      .select('merchant_id' as never)
+      .eq('organization_id' as never, row.member_organization_id as never)
+      .eq('team_status' as never, 'active' as never)
+      .limit(1)
+      .maybeSingle();
+
+    if (linkError) {
+      throw new BadRequestException(linkError.message);
+    }
+
+    const fallback = (linkData as { merchant_id?: string | null } | null)
+      ?.merchant_id;
+
+    if (!fallback) {
+      throw new BadRequestException(
+        'Network member organization has no merchant available for refund ledger attribution',
+      );
+    }
+
+    return fallback;
   }
 
   /** Records refund row only — balance already handled by beneficiary payout. */

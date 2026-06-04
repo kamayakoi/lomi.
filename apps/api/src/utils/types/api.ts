@@ -3461,6 +3461,12 @@ export type Database = {
         | 'bubble';
       invoice_status: 'sent' | 'paid' | 'overdue' | 'cancelled' | 'draft';
       link_type: 'instant' | 'product';
+      onboarding_status:
+        | 'pending'
+        | 'completed'
+        | 'failed'
+        | 'skipped'
+        | 'in_progress';
       organization_status: 'active' | 'inactive' | 'suspended';
       organization_verification_status: 'unverified' | 'starter' | 'verified';
       payment_method_code:

@@ -20,6 +20,10 @@ The Checkout Sessions API allows you to create secure, temporary sessions for cu
   Sessions created with a **test** API key (or linked to a test payment link) run in test mode. For manual QA—test cards, Wave, MTN MoMo—see **[Sandbox payments](/reference/setup/sandbox-payments)**.
 </Callout>
 
+<Callout type="info">
+  lomi. Network Operators can add `Lomi-Account: acct_...` to create a checkout session for a connected Member Account. The hosted checkout page uses the Member Account branding and providers.
+</Callout>
+
 ## Create a checkout session
 
 Creates a new checkout session and returns a URL to redirect your customer to.
@@ -197,6 +201,21 @@ curl -X POST "https://api.lomi.africa/checkout-sessions" \
 </Tab>
 
 </Tabs>
+
+Network checkout session:
+
+```bash
+curl -X POST "https://api.lomi.africa/checkout-sessions" \
+  -H "X-API-KEY: $LOMI_OPERATOR_API_KEY" \
+  -H "Lomi-Account: acct_1234567890" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "amount": 10000,
+    "currency_code": "XOF",
+    "title": "Order #12345",
+    "success_url": "https://example.com/success"
+  }'
+```
 
 ### Response
 

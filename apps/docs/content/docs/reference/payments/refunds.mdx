@@ -14,6 +14,10 @@ List and retrieve refunds with **`GET /refunds`** and **`GET /refunds/{id}`**.
   Card refunds are recorded immediately on your account. Our team completes the customer credit on the card network separately.
 </Callout>
 
+<Callout type="info">
+  lomi. Network Operators can add `Lomi-Account: acct_...` to refund a connected Member Account transaction when the membership has `refund.create`.
+</Callout>
+
 ## Create a refund
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>
@@ -67,6 +71,20 @@ curl -X POST "https://api.lomi.africa/refunds" \
 </Tab>
 
 </Tabs>
+
+Network refund:
+
+```bash
+curl -X POST "https://api.lomi.africa/refunds" \
+  -H "X-API-KEY: $LOMI_OPERATOR_API_KEY" \
+  -H "Lomi-Account: acct_1234567890" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "transaction_id": "123e4567-e89b-12d3-a456-426614174000",
+    "amount": 5000,
+    "reason": "duplicate_charge"
+  }'
+```
 
 ## Payload reference
 

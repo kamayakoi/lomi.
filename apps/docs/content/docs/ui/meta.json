@@ -1,0 +1,7 @@
+{
+  "title": "Lomi UI",
+  "description": "Copy-paste checkout UI components for Lomi payment flows.",
+  "root": true,
+  "icon": "PanelsTopLeft",
+  "pages": ["index", "quick-start", "theming", "components"]
+}
