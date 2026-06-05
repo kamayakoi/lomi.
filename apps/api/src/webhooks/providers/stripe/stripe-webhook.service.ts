@@ -283,6 +283,33 @@ export class StripeWebhookService {
       // Continue processing - don't fail the entire webhook
     }
 
+    if (!txnData) {
+      try {
+        const { data, error } = await (this.supabase.getClient() as any).rpc(
+          'get_transaction_by_stripe_intent',
+          {
+            p_payment_intent_id: paymentIntent.id,
+          },
+        );
+
+        if (error) {
+          this.logger.warn({
+            message: 'get_transaction_by_stripe_intent_failed',
+            payment_intent_id: paymentIntent.id,
+            error: error.message,
+          });
+        } else {
+          txnData = data;
+        }
+      } catch (lookupError: any) {
+        this.logger.warn({
+          message: 'get_transaction_by_stripe_intent_exception',
+          payment_intent_id: paymentIntent.id,
+          error: lookupError?.message || 'Unknown error',
+        });
+      }
+    }
+
     if (txnData && metadata.organization_id) {
       this.wideEvent.logEvent({
         eventName: 'stripe_payment_confirmed',
