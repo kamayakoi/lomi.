@@ -1,0 +1,21 @@
+---
+title: 'Webhooks'
+description: 'Create webhook endpoints, send test events, inspect delivery logs, and retry failed deliveries.'
+index: true
+---
+
+Webhooks are the operational source of truth for events that finish outside the browser redirect path. This section includes endpoint management and delivery-log operations.
+
+## What belongs here
+
+- Create and update webhook endpoints.
+- Send a test event to validate your handler.
+- List delivery logs when debugging.
+- Retry a failed delivery from a known log.
+- Remove endpoints that should no longer receive events.
+
+## Reliability notes
+
+Verify signatures with the raw request body, store processed event IDs, and make fulfillment idempotent. Redirects are useful for customer experience, but webhooks are safer for final reconciliation.
+
+<DocsCategory />

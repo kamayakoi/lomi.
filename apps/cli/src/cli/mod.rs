@@ -13,7 +13,28 @@ pub const CLI_AUTH_BASE: &str =
 /// Public Supabase anon key (same as dashboard client). Override via LOMI_SUPABASE_ANON_KEY.
 pub const SUPABASE_ANON_KEY: &str = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1kc3d2b2t4cm5mZ2dydWpzZmpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA1MTA0NTIsImV4cCI6MjA4NTg3MDQ1Mn0.vWQoCk2mBTUPWVpzcu3WmKv9xwXoj0bv8SCRrEdJxpM";
 pub const DOCS_URL: &str = "https://docs.lomi.africa";
+pub const LOMI_UI_REGISTRY_URL: &str = "https://docs.lomi.africa/r/registry.json";
+pub const LOMI_UI_INDEX_URL: &str = "https://docs.lomi.africa/r/index.json";
 pub const DEFAULT_DEV_PORT: u16 = 4242;
+
+pub fn lomi_ui_registry_url() -> String {
+    std::env::var("LOMI_UI_REGISTRY_URL").unwrap_or_else(|_| LOMI_UI_REGISTRY_URL.to_string())
+}
+
+pub fn lomi_ui_index_url() -> String {
+    std::env::var("LOMI_UI_INDEX_URL").unwrap_or_else(|_| {
+        lomi_ui_registry_url()
+            .replace("/registry.json", "/index.json")
+    })
+}
+
+pub fn lomi_ui_item_url(name: &str) -> String {
+    let registry_url = lomi_ui_registry_url();
+    let base = registry_url
+        .trim_end_matches("registry.json")
+        .trim_end_matches('/');
+    format!("{base}/{name}.json")
+}
 
 #[derive(Clone, Args, Debug)]
 pub struct CommonOptions {

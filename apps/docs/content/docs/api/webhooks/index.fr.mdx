@@ -1,0 +1,21 @@
+---
+title: 'Webhooks'
+description: 'Créez des endpoints webhook, envoyez des événements de test, inspectez les journaux de livraison et relancez les échecs.'
+index: true
+---
+
+Les webhooks sont la source opérationnelle pour les événements qui se terminent en dehors du chemin de redirection navigateur. Cette section inclut la gestion des endpoints et les journaux de livraison.
+
+## Ce qui appartient à cette section
+
+- Créer et mettre à jour des endpoints webhook.
+- Envoyer un événement de test pour valider votre handler.
+- Lister les journaux de livraison en debug.
+- Relancer une livraison échouée à partir d’un journal connu.
+- Supprimer les endpoints qui ne doivent plus recevoir d’événements.
+
+## Notes de fiabilité
+
+Vérifiez les signatures avec le corps brut, stockez les IDs d’événements traités et rendez la livraison idempotente. Les redirections sont utiles pour l’expérience client, mais les webhooks sont plus sûrs pour la réconciliation finale.
+
+<DocsCategory />

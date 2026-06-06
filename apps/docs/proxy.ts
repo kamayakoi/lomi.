@@ -1,6 +1,6 @@
 /* @proprietary license */
 
-import { NextResponse, type NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 
 /**
  * Docs locale (EN/FR) is resolved in server components via `getDocsLocale()` from the
@@ -10,7 +10,7 @@ import { NextResponse, type NextRequest } from 'next/server';
  * Do not call Supabase auth.getSession() here: docs has no /auth or /workspace routes,
  * and reading shared *.lomi.africa cookies can trigger refresh_token rate limits.
  */
-export default async function proxy(_request: NextRequest) {
+export default async function proxy() {
   return NextResponse.next();
 }
 

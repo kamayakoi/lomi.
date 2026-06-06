@@ -1,0 +1,44 @@
+---
+title: 'Which payment integration should I choose?'
+description: 'Choose between hosted checkout, payment links, payment requests, direct charges, subscriptions, ecommerce extensions, and UI components.'
+---
+
+Choose the simplest integration that gives your customer the right payment experience. You can combine multiple lomi. products later.
+
+## Start here
+
+| If you need | Use | Why |
+| --- | --- | --- |
+| A complete checkout page | [Hosted checkout](/build/checkout) | Fastest production path for apps and stores |
+| A URL you can share anywhere | [Payment links](/build/payment-links) | Good for invoices, services, events, and no-code sales |
+| A backend-created payment request | [Payment requests](/build/payment-requests) | Good when your app controls the order flow |
+| Mobile money-first collection | [Mobile money](/build/mobile-money) | Good for Wave, MTN MoMo, Orange Money, and SPI-heavy flows |
+| Embedded card collection | [Cards](/build/cards) | Good when you own the UI and need card entry inside your app |
+| Recurring billing | [Subscriptions](/build/subscriptions) | Good for SaaS, memberships, and recurring services |
+| Store plugin checkout | [E-commerce extensions](/build/ecommerce-extensions) | Good for WooCommerce, Magento, PrestaShop, and Shopify |
+| Copy-paste checkout UI | [Lomi UI](/build/lomi-ui) | Good when you want UI primitives inside your app |
+
+![Placeholder integration picker](/placeholder.webp)
+
+## Recommended first choice
+
+Most teams should start with hosted checkout. It keeps sensitive collection flows on lomi., supports multiple payment methods, and gives you a production-ready customer flow without building payment UI from scratch.
+
+Use direct charges or embedded elements only when your product needs full control over the payment interface.
+
+## What must every integration include?
+
+Every serious integration should include:
+
+- Test and live environment separation.
+- Server-side secret key usage.
+- A customer-visible success, cancel, pending, and failure state.
+- Webhook handling for final reconciliation.
+- Idempotency for create-style payment operations when retries are possible.
+
+## Next steps
+
+- [Make a test payment](/start/first-payment)
+- [Hosted checkout](/build/checkout)
+- [Webhooks](/build/webhooks)
+- [API Reference](/api)

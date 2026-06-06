@@ -8,6 +8,7 @@ use std::process::Command;
 use crate::auth::session::ensure_authenticated;
 use crate::cli::{self, CommonOptions, DOCS_URL};
 use crate::commands::install_rules::{self, InstallRulesArgs};
+use crate::commands::ui;
 use crate::config::{Environment, GlobalConfig, Language};
 
 #[derive(Args, Debug)]
@@ -39,9 +40,22 @@ pub struct InitArgs {
     /// Skip agent rules install prompt
     #[arg(long)]
     pub skip_rules_install: bool,
+
+    /// Project template (default, express, nextjs)
+    #[arg(long, default_value = "default")]
+    pub template: String,
+
+    /// Install a Lomi UI component after scaffold (skips interactive picker)
+    #[arg(long)]
+    pub with_ui: Option<String>,
+
+    /// Skip Lomi UI install prompt
+    #[arg(long)]
+    pub skip_ui_install: bool,
 }
 
 pub async fn run(common: &CommonOptions, args: InitArgs) -> Result<()> {
+    let _template = &args.template;
     print_logo();
     cli::banner::print_intro("Initializing lomi. project");
 
@@ -185,6 +199,45 @@ pub async fn run(common: &CommonOptions, args: InitArgs) -> Result<()> {
             let mut config = GlobalConfig::load()?;
             config.settings.has_seen_rules_install_prompt = true;
             config.save()?;
+        }
+    }
+
+    if !args.skip_ui_install {
+        if let Some(component) = &args.with_ui {
+            cli::output::print_info(&format!("Installing Lomi UI component: {component}"));
+            ui::install_for_init(&project_dir, component, args.yes, false).await?;
+            cli::output::print_success(&format!("Installed Lomi UI component: {component}"));
+        } else if !args.yes {
+            let install_ui = cli::prompts::confirm(
+                "Install a Lomi UI checkout component?",
+                false,
+            )?;
+
+            if install_ui {
+                let index = crate::ui::registry::fetch_index().await?;
+                let names: Vec<String> =
+                    index.items.iter().map(|item| item.name.clone()).collect();
+
+                if names.is_empty() {
+                    cli::output::print_dim("No Lomi UI components available in registry.");
+                } else {
+                    let default = names
+                        .iter()
+                        .find(|name| **name == "payment-provider-selector")
+                        .cloned()
+                        .or_else(|| names.first().cloned())
+                        .unwrap_or_default();
+
+                    let component = cli::prompts::select(
+                        "Which component should we install?",
+                        names,
+                        default,
+                    )?;
+
+                    ui::install_for_init(&project_dir, &component, false, false).await?;
+                    cli::output::print_success(&format!("Installed Lomi UI component: {component}"));
+                }
+            }
         }
     }
 
@@ -398,21 +451,11 @@ if (!webhookSecret) {{
   process.exit(1);
 }}
 
-function verifySignature(rawBody: string, signatureHeader: string, secret: string) {{
-  const parts = signatureHeader.split(',');
-  const timestampPart = parts.find((part) => part.startsWith('t='));
-  const signaturePart = parts.find((part) => part.startsWith('s='));
-  if (!timestampPart || !signaturePart) throw new Error('Invalid signature header');
-
-  const timestamp = timestampPart.split('=')[1];
-  const signature = signaturePart.split('=')[1];
-  const signedPayload = `${{timestamp}}.${{rawBody}}`;
-  const expected = crypto.createHmac('sha256', secret).update(signedPayload).digest('hex');
-
+function verifySignature(rawBody: string, signature: string, secret: string) {{
+  const expected = crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
   if (!crypto.timingSafeEqual(Buffer.from(signature, 'hex'), Buffer.from(expected, 'hex'))) {{
     throw new Error('Signature mismatch');
   }}
-
   return JSON.parse(rawBody);
 }}
 
@@ -430,11 +473,12 @@ const server = http.createServer(async (req, res) => {{
   const rawBody = Buffer.concat(chunks).toString('utf8');
 
   try {{
-    const signature = req.headers['lomi-signature'] as string;
-    if (!signature) throw new Error('Missing lomi-signature header');
+    const signature = req.headers['x-lomi-signature'] as string;
+    if (!signature) throw new Error('Missing X-Lomi-Signature header');
 
     const event = verifySignature(rawBody, signature, webhookSecret);
-    console.log('Verified webhook:', event.type);
+    const eventType = (req.headers['x-lomi-event'] as string) || event.event;
+    console.log('Verified webhook:', eventType);
 
     res.writeHead(200, {{ 'Content-Type': 'application/json' }});
     res.end(JSON.stringify({{ received: true }}));
@@ -462,21 +506,11 @@ if (!webhookSecret) {{
   process.exit(1);
 }}
 
-function verifySignature(rawBody, signatureHeader, secret) {{
-  const parts = signatureHeader.split(',');
-  const timestampPart = parts.find((part) => part.startsWith('t='));
-  const signaturePart = parts.find((part) => part.startsWith('s='));
-  if (!timestampPart || !signaturePart) throw new Error('Invalid signature header');
-
-  const timestamp = timestampPart.split('=')[1];
-  const signature = signaturePart.split('=')[1];
-  const signedPayload = `${{timestamp}}.${{rawBody}}`;
-  const expected = crypto.createHmac('sha256', secret).update(signedPayload).digest('hex');
-
+function verifySignature(rawBody, signature, secret) {{
+  const expected = crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
   if (!crypto.timingSafeEqual(Buffer.from(signature, 'hex'), Buffer.from(expected, 'hex'))) {{
     throw new Error('Signature mismatch');
   }}
-
   return JSON.parse(rawBody);
 }}
 
@@ -494,11 +528,12 @@ const server = http.createServer(async (req, res) => {{
   const rawBody = Buffer.concat(chunks).toString('utf8');
 
   try {{
-    const signature = req.headers['lomi-signature'];
-    if (!signature) throw new Error('Missing lomi-signature header');
+    const signature = req.headers['x-lomi-signature'];
+    if (!signature) throw new Error('Missing X-Lomi-Signature header');
 
     const event = verifySignature(rawBody, signature, webhookSecret);
-    console.log('Verified webhook:', event.type);
+    const eventType = req.headers['x-lomi-event'] || event.event;
+    console.log('Verified webhook:', eventType);
 
     res.writeHead(200, {{ 'Content-Type': 'application/json' }});
     res.end(JSON.stringify({{ received: true }}));
@@ -530,6 +565,7 @@ server.listen(PORT, () => console.log(`Webhook server listening on http://localh
         format!(
             r#"# lomi. environment variables
 LOMI_API_KEY={api_key}
+# Run `lomi listen` to receive your webhook secret, or copy from the dashboard
 LOMI_WEBHOOK_SECRET=whsec_your_webhook_secret_here
 LOMI_API_URL={api_url}
 "#

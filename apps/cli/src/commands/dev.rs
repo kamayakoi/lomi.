@@ -31,9 +31,9 @@ pub struct DevArgs {
     #[arg(long, default_value = ".env")]
     pub env_file: String,
 
-    /// Verify webhook signatures using LOMI_WEBHOOK_SECRET
-    #[arg(long, default_value_t = false)]
-    pub verify_signature: bool,
+    /// Verify webhook signatures using LOMI_WEBHOOK_SECRET (auto-enabled when secret is set)
+    #[arg(long)]
+    pub verify_signature: Option<bool>,
 
     /// Skip agent rules install prompt
     #[arg(long)]
@@ -49,6 +49,10 @@ pub async fn run(common: &CommonOptions, args: DevArgs) -> Result<()> {
 
     load_dotenv(&args.env_file);
 
+    let verify_signature = args
+        .verify_signature
+        .unwrap_or_else(|| std::env::var("LOMI_WEBHOOK_SECRET").is_ok());
+
     cli::banner::print_intro("Starting lomi. development server");
     cli::output::divider();
     println!(
@@ -62,7 +66,7 @@ pub async fn run(common: &CommonOptions, args: DevArgs) -> Result<()> {
     cli::output::divider();
 
     let state = Arc::new(AppState {
-        verify_signature: args.verify_signature,
+        verify_signature,
     });
 
     let app = Router::new()
@@ -79,7 +83,12 @@ pub async fn run(common: &CommonOptions, args: DevArgs) -> Result<()> {
         format!("http://localhost:{}/webhook", args.port).green()
     );
     println!(
-        "{} Point your lomi. webhook endpoint to this URL during development",
+        "{} For cloud relay without ngrok, use: {}",
+        "○".bright_black(),
+        format!("lomi listen http://localhost:{}/webhook", args.port).green()
+    );
+    println!(
+        "{} Or point your dashboard webhook endpoint to this URL",
         "○".bright_black()
     );
     println!("{} Docs: {}", "○".bright_black(), DOCS_URL.bright_blue());
@@ -170,16 +179,45 @@ async fn handle_webhook(
     }
 
     let raw_body = String::from_utf8_lossy(&body);
+    let header_pairs: Vec<(String, String)> = headers
+        .iter()
+        .filter_map(|(k, v)| v.to_str().ok().map(|s| (k.as_str().to_string(), s.to_string())))
+        .collect();
+
+    let event_type = headers
+        .get("x-lomi-event")
+        .and_then(|v| v.to_str().ok())
+        .map(|s| s.to_string());
+
+    if let Some(event) = &event_type {
+        println!("  {} {}", "Event:".blue(), event.yellow().bold());
+    }
+
     if state.verify_signature {
-        if let Err(message) = verify_signature(&raw_body, &headers) {
-            println!("  {} {}", "Signature:".red(), message);
-            return Err(StatusCode::BAD_REQUEST);
+        match crate::webhook::verify_from_headers(&raw_body, &header_pairs) {
+            Ok(verified_event) => {
+                let label = verified_event.unwrap_or_else(|| "unknown".to_string());
+                println!(
+                    "  {} {} ({})",
+                    "Signature:".green(),
+                    "verified".green(),
+                    label.bright_black()
+                );
+            }
+            Err(message) => {
+                println!("  {} {}", "Signature:".red(), message);
+                return Err(StatusCode::BAD_REQUEST);
+            }
         }
-        println!("  {} {}", "Signature:".green(), "verified");
     }
 
     match serde_json::from_str::<serde_json::Value>(&raw_body) {
         Ok(json) => {
+            if event_type.is_none() {
+                if let Some(event) = json.get("event").and_then(|v| v.as_str()) {
+                    println!("  {} {}", "Event:".blue(), event.yellow().bold());
+                }
+            }
             println!("  {}:", "Payload".blue());
             println!("{}", serde_json::to_string_pretty(&json).unwrap_or_default());
         }
@@ -187,44 +225,6 @@ async fn handle_webhook(
     }
 
     Ok((StatusCode::OK, r#"{"received":true}"#.to_string()))
-}
-
-fn verify_signature(raw_body: &str, headers: &HeaderMap) -> Result<(), String> {
-    use hmac::{Hmac, Mac};
-    use sha2::Sha256;
-
-    let secret = std::env::var("LOMI_WEBHOOK_SECRET")
-        .map_err(|_| "LOMI_WEBHOOK_SECRET not set".to_string())?;
-    let signature_header = headers
-        .get("lomi-signature")
-        .and_then(|v| v.to_str().ok())
-        .ok_or_else(|| "Missing lomi-signature header".to_string())?;
-
-    let mut timestamp = None;
-    let mut signature = None;
-    for part in signature_header.split(',') {
-        if let Some(value) = part.strip_prefix("t=") {
-            timestamp = Some(value);
-        } else if let Some(value) = part.strip_prefix("s=") {
-            signature = Some(value);
-        }
-    }
-
-    let timestamp = timestamp.ok_or_else(|| "Invalid signature header".to_string())?;
-    let signature = signature.ok_or_else(|| "Invalid signature header".to_string())?;
-    let signed_payload = format!("{timestamp}.{raw_body}");
-
-    type HmacSha256 = Hmac<Sha256>;
-    let mut mac = HmacSha256::new_from_slice(secret.as_bytes())
-        .map_err(|_| "Invalid webhook secret".to_string())?;
-    mac.update(signed_payload.as_bytes());
-    let expected = hex::encode(mac.finalize().into_bytes());
-
-    if expected != signature {
-        return Err("Signature mismatch".to_string());
-    }
-
-    Ok(())
 }
 
 async fn shutdown_signal() {

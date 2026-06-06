@@ -1,0 +1,276 @@
+---
+title: Subscriptions
+description: Manage recurring customer subscriptions.
+---
+
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
+import { Callout } from 'fumadocs-ui/components/callout';
+
+The Subscriptions API lists and retrieves **subscription instances** (a customer on a recurring plan). These are typically created when customers buy recurring products through Checkout Sessions or Payment Links.
+
+![Placeholder subscription detail](/placeholder.webp)
+
+<Callout type="info">
+  SDKs may expose both **`/subscriptions`** helpers and dedicated **`/customer-subscriptions`** methods. For route-specific examples and status transitions, see **[Subscriptions](/api/subscriptions)**. Immutable fields and cancel-only rules follow the OpenAPI descriptions for each operation.
+</Callout>
+
+<Callout type="info">
+  For signup flows (trials, first payment types, checkout session amounts), see **[Checkout behavior — Subscription checkout](/build/payments/checkout-behavior#subscription-checkout)**.
+</Callout>
+
+## List subscriptions
+
+Retrieve all subscriptions for your organization.
+
+### Query Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `page` | `number` | Page number (default: `1`) |
+| `pageSize` | `number` | Items per page (default: `50`) |
+
+<Tabs items={["TypeScript", "Python", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+import { LomiSDK } from '@lomi./sdk';
+
+const lomi = new LomiSDK({
+  apiKey: process.env.LOMI_API_KEY!,
+  environment: 'live',
+});
+
+const subscriptions = await lomi.subscriptions.list({
+  page: 1,
+  pageSize: 20,
+});
+
+subscriptions.forEach(sub => {
+  console.log(`${sub.id}: ${sub.status} - ${sub.amount} ${sub.currency_code}`);
+});
+```
+</Tab>
+
+<Tab value="Python">
+```python
+from lomi import LomiClient
+import os
+
+client = LomiClient(
+    api_key=os.environ["LOMI_API_KEY"],
+    environment="test"
+)
+
+subscriptions = client.subscriptions.list(page=1, pageSize=20)
+
+for sub in subscriptions:
+    print(f"{sub['id']}: {sub['status']}")
+```
+</Tab>
+
+<Tab value="cURL">
+```bash
+curl -X GET "https://api.lomi.africa/subscriptions?page=1&pageSize=20" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+</Tab>
+
+</Tabs>
+
+---
+
+## Get subscriptions for a customer
+
+Retrieve all subscriptions for a specific customer.
+
+<Tabs items={["TypeScript", "Python", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+const customerSubs = await lomi.subscriptions.findByCustomer('cus_abc123...');
+```
+</Tab>
+
+<Tab value="Python">
+```python
+customer_subs = client.subscriptions.get_by_customer('cus_abc123...')
+```
+</Tab>
+
+<Tab value="cURL">
+```bash
+curl -X GET "https://api.lomi.africa/subscriptions/customer/cus_abc123..." \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+</Tab>
+
+</Tabs>
+
+---
+
+## Get a subscription
+
+Retrieve details of a specific subscription.
+
+<Tabs items={["TypeScript", "Python", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+const subscription = await lomi.subscriptions.get('sub_abc123...');
+console.log(`Status: ${subscription.status}`);
+console.log(`Next billing: ${subscription.current_period_end}`);
+```
+</Tab>
+
+<Tab value="Python">
+```python
+subscription = client.subscriptions.get('sub_abc123...')
+print(f"Status: {subscription['status']}")
+```
+</Tab>
+
+<Tab value="cURL">
+```bash
+curl -X GET "https://api.lomi.africa/subscriptions/sub_abc123..." \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+</Tab>
+
+</Tabs>
+
+---
+
+## Subscription lifecycle
+
+Subscriptions are created when a customer completes checkout for a **recurring** product (hosted checkout, payment link, storefront subscribe flow, or API session with `product_type: recurring`). Typical status flow:
+
+| Status | Meaning |
+|--------|---------|
+| `pending` | Created but not yet active (rare at signup). |
+| `trial` | Free trial in progress; no charge until trial ends. |
+| `active` | Paid and renewing on schedule. |
+| `past_due` | A renewal payment failed; retries or merchant action may apply. |
+| `paused` | Billing paused (e.g. after failed payment when product is configured to pause). |
+| `cancelled` | Cancelled by merchant or customer. |
+| `expired` | Fixed-term subscription ended or trial converted without payment method. |
+
+**First payment** behavior is controlled on the product via `first_payment_type`:
+
+| Value | First checkout charge |
+|-------|------------------------|
+| `initial` | Full recurring price (or prorated amount if combined with proration rules). |
+| `non_initial` | **$0** at signup; first charge on the first billing date. |
+| `prorated` | Partial amount for the remainder of the current billing period. |
+
+**Trials** (`trial_enabled` + `trial_period_days`): signup charge is **$0**. the card processor saves the card for later billing; mobile money can complete signup without an immediate charge. After the trial, status moves to `active` and billing begins on `next_billing_date`.
+
+**Renewals** run automatically for saved card payment methods. If no method is on file (common for mobile money), lomi. may fall back to a **manual renewal checkout link** for the customer.
+
+---
+
+## Cancel a subscription
+
+Cancel an active subscription. This is the **only** modification allowed.
+
+### Request Body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `cancel_at_period_end` | `boolean` | No | If `true`, cancel at end of billing period. If `false`, cancel immediately (default). |
+| `reason` | `string` | No | Cancellation reason |
+
+<Tabs items={["TypeScript", "Python", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+// Cancel immediately
+const cancelled = await lomi.subscriptions.cancel('sub_abc123...');
+
+// Cancel at period end
+const scheduledCancel = await lomi.subscriptions.cancel('sub_abc123...', {
+  cancel_at_period_end: true,
+  reason: 'Customer requested cancellation',
+});
+
+console.log(`Subscription will cancel at: ${scheduledCancel.cancel_at}`);
+```
+</Tab>
+
+<Tab value="Python">
+```python
+# Cancel immediately
+cancelled = client.subscriptions.cancel('sub_abc123...')
+
+# Cancel at period end
+scheduled_cancel = client.subscriptions.cancel('sub_abc123...', {
+    "cancel_at_period_end": True,
+    "reason": "Customer requested cancellation"
+})
+```
+</Tab>
+
+<Tab value="cURL">
+```bash
+curl -X POST "https://api.lomi.africa/subscriptions/sub_abc123.../cancel" \
+  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "cancel_at_period_end": true,
+    "reason": "Customer requested cancellation"
+  }'
+```
+</Tab>
+
+</Tabs>
+
+---
+
+## Subscription Object
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `string` | Unique subscription identifier |
+| `customer_id` | `string` | Associated customer |
+| `product_id` | `string` | Associated product |
+| `price_id` | `string` | Associated price |
+| `status` | `string` | `pending`, `trial`, `active`, `past_due`, `paused`, `cancelled`, `expired` |
+| `amount` | `number` | Recurring amount |
+| `currency_code` | `string` | Currency |
+| `billing_interval` | `string` | `day`, `week`, `month`, `year` |
+| `next_billing_date` | `string` | Next charge date (ISO 8601) |
+| `start_date` | `string` | Subscription start |
+| `end_date` | `string` | End date for fixed-term or trial (nullable) |
+| `cancel_at_period_end` | `boolean` | Scheduled for cancellation |
+| `cancel_at` | `string` | Scheduled cancellation date |
+| `cancelled_at` | `string` | Actual cancellation timestamp |
+| `created_at` | `string` | Creation timestamp |
+| `updated_at` | `string` | Last update timestamp |
+
+Field names in API responses may use `subscription_id` instead of `id`. See [Subscriptions](/api/subscriptions) for the canonical list response shape.
+
+---
+
+## Webhooks
+
+Subscribe to these **SCREAMING_SNAKE_CASE** events (same as [Webhooks](/build/webhooks)):
+
+| Event | Description |
+|-------|-------------|
+| `SUBSCRIPTION_CREATED` | New subscription after successful signup (including trial signup). |
+| `SUBSCRIPTION_RENEWED` | A billing cycle renewed successfully. |
+| `SUBSCRIPTION_CANCELLED` | Subscription was cancelled. |
+
+Renewal **payment failures** do not emit a separate subscription webhook. Listen for **`PAYMENT_FAILED`** on the failed renewal transaction, and monitor subscription `status` (`past_due`, `paused`, etc.) via the API.
+
+Trial card setup (`setup_intent.succeeded`) is handled internally; **`SUBSCRIPTION_CREATED`** fires when signup completes, not when the card form first loads.
+
+**Customer notifications:** Trial and $0 signups (no completed payment transaction) trigger a **subscription signup confirmation** email when `customer_notifications.subscription_signups.email` is enabled (default: on). Paid initial signups receive the standard transaction receipt instead.
+
+---
+
+## Error Responses
+
+| Status | Description |
+|--------|-------------|
+| `401` | Invalid or missing API key |
+| `404` | Subscription or customer not found |

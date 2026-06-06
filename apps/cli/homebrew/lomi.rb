@@ -3,23 +3,23 @@
 class Lomi < Formula
   desc "CLI for lomi.'s payment infrastructure"
   homepage "https://lomi.africa"
-  version "3.0.0"
+  version "3.1.0"
   license "MIT"
 
   on_macos do
     on_intel do
-      url "https://github.com/lomiafrica/lomi./releases/download/cli-v3.0.0/lomi-x86_64-apple-darwin"
+      url "https://github.com/lomiafrica/lomi./releases/download/cli-v3.1.0/lomi-x86_64-apple-darwin"
       sha256 "REPLACE_ON_RELEASE"
     end
     on_arm do
-      url "https://github.com/lomiafrica/lomi./releases/download/cli-v3.0.0/lomi-aarch64-apple-darwin"
+      url "https://github.com/lomiafrica/lomi./releases/download/cli-v3.1.0/lomi-aarch64-apple-darwin"
       sha256 "REPLACE_ON_RELEASE"
     end
   end
 
   on_linux do
     on_intel do
-      url "https://github.com/lomiafrica/lomi./releases/download/cli-v3.0.0/lomi-x86_64-unknown-linux-gnu"
+      url "https://github.com/lomiafrica/lomi./releases/download/cli-v3.1.0/lomi-x86_64-unknown-linux-gnu"
       sha256 "REPLACE_ON_RELEASE"
     end
   end

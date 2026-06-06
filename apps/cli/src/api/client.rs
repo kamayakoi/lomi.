@@ -99,6 +99,15 @@ impl ApiClient {
     pub fn base_url(&self) -> &str {
         &self.base_url
     }
+
+    pub fn headers(&self) -> HeaderMap {
+        let mut headers = HeaderMap::new();
+        headers.insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));
+        if let Ok(value) = HeaderValue::from_str(&self.token) {
+            headers.insert("X-API-KEY", value);
+        }
+        headers
+    }
 }
 
 pub async fn health_check(auth: &AuthContext) -> Result<()> {
@@ -108,6 +117,7 @@ pub async fn health_check(auth: &AuthContext) -> Result<()> {
     let _: String = client.get_text("/").await?;
 
     // Auth: verify the CLI token against a protected route
-    let _: serde_json::Value = client.get("/accounts").await?;
+    let _: serde_json::Value = client.get("/me").await?;
+    let _: serde_json::Value = client.get("/accounts/balance").await?;
     Ok(())
 }

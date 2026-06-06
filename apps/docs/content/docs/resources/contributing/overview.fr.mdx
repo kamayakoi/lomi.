@@ -1,0 +1,252 @@
+---
+title: 'Contribuer'
+description: 'Principes directeurs et bonnes pratiques pour vos contributions au projet lomi.'
+---
+
+Merci de vouloir améliorer lomi. Corrections, nouvelles fonctionnalités, documentation ou signalements : chaque contribution compte.
+
+## Comment contribuer
+
+Plusieurs façons d’aider :
+
+- **Signaler des bugs** : ouvrez une issue sur [GitHub Issues](https://github.com/lomiafrica/lomi./issues).
+- **Proposer des évolutions** : partagez vos idées via [GitHub Issues](https://github.com/lomiafrica/lomi./issues).
+- **Coder** : contribuez directement au dépôt. Voir les [Bonnes pratiques](/resources/contributing/best-practices).
+- **Documentation** : rendez-la plus claire et plus complète.
+- **Communauté** : aidez les autres sur le [Discord](https://discord.gg/33syDfh9).
+
+### Liens utiles
+
+Avant de commencer :
+
+- **[Code de conduite](/resources/contributing/code-of-conduct)** : ce que nous attendons dans la communauté.
+- **[Bonnes pratiques](/resources/contributing/best-practices)** : étapes concrètes pour le code et la doc.
+- **[Stratégie de branches](/resources/contributing/branching-strategy)** : gestion des branches et des releases.
+
+Merci encore pour votre intérêt !
+
+---
+
+# Premiers pas
+
+Prêt pour une première contribution ? Ce guide couvre choix d’une issue, environnement local, modifications et publication.
+
+## Prérequis
+
+Installez notamment :
+
+- **[Git](https://git-scm.com/)** pour le contrôle de version.
+- **[Node.js](https://nodejs.org/)** — dernière LTS recommandée.
+- **[bun](https://bun.sh/)** — gestionnaire préféré du monorepo.
+
+<Steps>
+
+### Choisir une issue
+
+Avant de coder, trouvez ou proposez une issue :
+
+- Parcourez les [issues ouvertes](https://github.com/lomiafrica/lomi./issues).
+- Cherchez `good first issue` si vous débutez.
+- Pour une idée nouvelle ou un correctif, créez une issue pour en discuter.
+- Posez des questions dans les commentaires si besoin.
+
+### Fork du dépôt
+
+Forkez le dépôt principal lomi. sur GitHub :
+
+1. Ouvrez le [dépôt lomi.](https://github.com/lomiafrica/lomi.).
+2. Mettez une étoile au projet !
+3. Cliquez sur « Fork » en haut à droite.
+
+### Cloner votre fork
+
+```bash filename="Terminal"
+git clone https://github.com/beloved_anon/lomi.git
+cd lomi.
+```
+
+Remplacez `beloved_anon` par votre identifiant GitHub réel.
+
+### Ajouter le remote upstream
+
+Ajoutez le dépôt d’origine en `upstream` pour rester synchronisé.
+
+```bash filename="Terminal"
+git remote add upstream https://github.com/lomiafrica/lomi./
+```
+
+Vérification :
+
+```bash filename="Terminal"
+git remote -v
+# origin  https://github.com/<YOUR_USERNAME>/lomi./ (fetch)
+# origin  https://github.com/<YOUR_USERNAME>/lomi./ (push)
+# upstream https://github.com/lomiafrica/lomi./ (fetch)
+# upstream https://github.com/lomiafrica/lomi./ (push)
+```
+
+### Dépendances et environnement
+
+À la racine du monorepo :
+
+```bash filename="Terminal"
+bun install
+```
+
+Variables locales :
+
+```bash filename="Terminal"
+cp .env.example .env
+# Complétez les secrets nécessaires
+```
+
+### Commandes de développement locales
+
+```bash filename="Terminal"
+# Serveur de dev (voir le package.json de l’app concernée)
+bun run dev
+
+# Documentation en local
+bun run docs:dev
+
+# Lint projet
+bun run lint
+
+# Lint avec correction automatique
+bun run lint:fix
+```
+
+### Créer une branche
+
+À partir de `develop`, en suivant la [Stratégie de branches](/resources/contributing/branching-strategy) :
+
+```bash filename="Terminal"
+git fetch upstream
+git checkout develop
+git pull upstream develop
+
+git checkout -b <BRANCH_TYPE>/<SHORT_DESCRIPTION>
+# Exemple : git checkout -b feature/add-cool-new-thing
+# Exemple : git checkout -b fix/resolve-that-bug
+```
+
+### Réaliser les changements
+
+Travaillez dans le bon dossier sous `packages/` ou `apps/`.
+
+- **Code** : respectez nos [Standards de code](/resources/contributing/best-practices#code-standards) et [Bonnes pratiques](/resources/contributing/best-practices).
+- **Documentation** : mettez à jour `apps/developers/src/pages/docs/` ou l’emplacement doc prévu au format Markdown (`.mdx`).
+
+**Maintenez la branche à jour** avec `upstream/develop` :
+
+```bash filename="Terminal"
+# Fetch the latest changes from upstream
+git fetch upstream
+
+# Rebase your branch onto the latest develop branch
+# Make sure you have committed or stashed your local changes first!
+git rebase upstream/develop
+
+# You might need to resolve conflicts during the rebase process.
+# After resolving conflicts: git add . ; git rebase --continue
+# If you get stuck: git rebase --abort
+```
+
+### Tester vos changements
+
+Assurez-vous que les tests pertinents passent et que la qualité est au rendez-vous.
+
+```bash filename="Terminal"
+# Example: Running tests for a specific package
+# Replace <package_name> with the actual package, e.g., @lomi/api
+bun --filter <package_name> test
+
+# Run specific tests using a pattern (e.g., tests related to 'payment')
+bun test -- --grep "payment"
+
+# Run all tests across the monorepo
+bun test
+
+# Run tests and generate a coverage report
+bun run test:coverage
+```
+
+Ajoutez des tests pour vos changements. Voir [Standards de code](/resources/contributing/best-practices#code-standards).
+
+### Commiter
+
+Messages conformes aux [Conventions de commit](/resources/contributing/branching-strategy) pour automatiser releases et changelogs.
+
+**Format :**
+
+```text filename="Format de message de commit"
+<type>(<scope>): <description>
+
+# Examples:
+# feat(api): add support for webhook signature verification
+# fix(docs): correct typo in getting started guide
+# chore(deps): update dependency xyz
+```
+
+**Exemple :**
+
+```bash filename="Terminal"
+git add .
+git commit -m "feat(payments): implement new payment provider"
+```
+
+Voir [Bonnes pratiques](/resources/contributing/best-practices) pour des exemples pertinents.
+
+### Pousser la branche
+
+```bash filename="Terminal"
+git push origin <BRANCH_NAME>
+```
+
+### Ouvrir une pull request (PR)
+
+1.  Sur votre fork (`https://github.com/<YOUR_USERNAME>/lomi.`).
+2.  Proposition de PR sur la branche poussée : « **Compare & pull request** ».
+3.  Base : dépôt `lomiafrica/lomi.`, branche `develop`.
+4.  Head : votre fork, branche fonctionnalité ou correctif.
+5.  **Titre de PR clair** : même style que les commits (`<type>(<scope>): <description>`).
+6.  **Modèle de PR** : décrivez clairement :
+    - **Changements** : quoi et pourquoi ?
+    - [ ] Le code respecte les conventions du projet.
+    - [ ] J’ai relu mon propre code.
+    - [ ] J’ai commenté les parties délicates.
+    - [ ] La documentation est à jour.
+    - [ ] Pas de nouveaux avertissements inutiles.
+    - [ ] Tests ajoutés pour la correction ou la fonctionnalité.
+    - [ ] `bun test` passe en local.
+    - [ ] Dépendances aval fusionnées si besoin.
+    - [ ] Commits fusionnés / messages explicites si nécessaire.
+7.  Soumettez la PR.
+
+</Steps>
+
+## Processus de revue
+
+Les mainteneurs examineront votre PR.
+
+### Pendant la revue
+
+- **Réactivité** : répondez aux commentaires rapidement.
+- **Itérations** : poussez des commits supplémentaires ; évitez le force-push sauf demande.
+- **À jour** : si `develop` avance, rebasez pour résoudre les conflits.
+
+### Après fusion
+
+- **Félicitations !** Merci pour la contribution.
+- **Nettoyage** : supprimez la branche de fonctionnalité sur votre fork si vous le souhaitez.
+- **Suivi** : surveillez les issues liées ou le déploiement si applicable.
+
+## Étapes suivantes
+
+- [Code de conduite](/resources/contributing/code-of-conduct)
+- [Stratégie de branches](/resources/contributing/branching-strategy)
+- [Revue de code](/resources/contributing/code-reviews)
+
+La revue suit notre [processus de code review](/resources/contributing/code-reviews) ; des itérations peuvent être nécessaires. Nous répondrons rapidement.
+
+Merci beaucoup.

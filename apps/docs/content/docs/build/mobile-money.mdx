@@ -1,0 +1,28 @@
+---
+title: 'How do I accept mobile money?'
+description: 'Use hosted checkout, payment links, or direct payment flows to accept Wave, MTN MoMo, Orange Money, SPI, and local payment methods.'
+---
+
+Mobile money is usually best handled through hosted checkout or payment links first. Those flows let lomi. present the right payment method and customer instructions for the selected market.
+
+![Placeholder mobile money checkout](/placeholder.webp)
+
+## Recommended paths
+
+| Path | Use when |
+| --- | --- |
+| Hosted checkout | Your app creates the order and redirects the customer |
+| Payment links | You want a shareable URL for invoices, services, or informal sales |
+| Payment requests | Your backend creates a payment request for an app-controlled flow |
+| Direct charge APIs | You need lower-level control and understand the provider-specific UX |
+
+## What to design for
+
+Mobile money flows can be asynchronous. Your customer may approve in an app, via USSD, or through provider-specific instructions. Always show a pending state and rely on webhooks or server-side reads for final state.
+
+## Related
+
+- [Hosted checkout](/build/checkout)
+- [Payment links](/build/payment-links)
+- [Payment requests](/build/payment-requests)
+- [Sandbox payments](/start/sandbox-payments)

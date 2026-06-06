@@ -1,0 +1,61 @@
+---
+title: 'How do I make a test payment?'
+description: 'Create a sandbox checkout session, open the hosted checkout URL, pay with a test method, and verify the result.'
+---
+
+This is the fastest way to prove your lomi. account, API key, checkout, and webhook assumptions work together.
+
+## Before you start
+
+You need:
+
+- A lomi. account.
+- A test secret key such as `lomi_sk_test_...`.
+- A local or hosted success URL and cancel URL.
+
+## 1. Create a checkout session
+
+```bash
+curl -sS -X POST "https://sandbox.api.lomi.africa/checkout-sessions" \
+  -H "X-API-Key: $LOMI_SECRET_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "amount": 10000,
+    "currency_code": "XOF",
+    "title": "Test order",
+    "success_url": "https://example.com/success",
+    "cancel_url": "https://example.com/cancel"
+  }'
+```
+
+The response includes a hosted checkout URL. Open it in your browser.
+
+![Placeholder hosted checkout screen](/placeholder.webp)
+
+## 2. Pay with a test method
+
+For a simple successful card payment, use:
+
+| Field | Value |
+| --- | --- |
+| Card number | `4242 4242 4242 4242` |
+| Expiry | Any future date, for example `12/34` |
+| CVC | Any three digits |
+
+You can also test mobile money methods in sandbox. See [sandbox payments](/start/sandbox-payments) for the full behavior.
+
+## 3. Verify the result
+
+After payment, confirm:
+
+- The checkout redirects to your success URL.
+- The transaction appears in the dashboard test view.
+- Your test balance changes, if the method creates a completed test transaction.
+- Your webhook endpoint receives the event, if webhooks are configured.
+
+## What should I build next?
+
+- Use [hosted checkout](/build/checkout) for app or store checkout.
+- Use [payment links](/build/payment-links) when you want a shareable URL.
+- Use [webhooks](/build/webhooks) to reconcile payment states server-side.
+- Use the [API reference](/api) for exact endpoint details.

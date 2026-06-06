@@ -1,0 +1,226 @@
+---
+title: 'Modèles de données'
+description: 'Les objets courants renvoyés par l’API publique lomi., avec les champs les plus utiles pour intégrer.'
+---
+
+Cette page explique les objets que vous croiserez dans l’API marchande publique. Ce n’est pas une liste brute de tous les schémas internes. Les objets réservés à l’administration du tableau de bord, à la configuration des prestataires ou aux opérations lomi. ne sont pas exposés ici.
+
+Les pages d’endpoint restent la source de vérité pour les requêtes et réponses exactes. Cette page sert à comprendre les objets que votre intégration va stocker, afficher ou réconcilier.
+
+## Conventions communes
+
+| Champ | Signification |
+| --- | --- |
+| `id`, `*_id` | Identifiant stable d’un objet. Stockez-le si vous devez retrouver ou réconcilier l’objet plus tard. |
+| `amount`, `gross_amount`, `net_amount`, `fee_amount` | Montant entier dans la plus petite unité monétaire. Pour `XOF`, `5000` signifie 5 000 XOF. |
+| `currency_code` | Code devise ISO comme `XOF`, `USD` ou `EUR`. |
+| `metadata` | Vos propres paires clé-valeur, par exemple un identifiant de commande ou d’utilisateur. |
+| `environment` | `test` ou `live`. Ne mélangez pas les objets des deux environnements dans un même flux de réconciliation. |
+| `created_at`, `updated_at` | Horodatages ISO 8601. |
+
+## Client
+
+Un client représente l’acheteur ou le payeur lié aux paiements, abonnements et sessions de portail.
+
+Renvoyé par les endpoints [Clients](/api/customers) et parfois inclus dans les réponses de paiement ou d’abonnement.
+
+```json filename="Client"
+{
+  "customer_id": "cus_123",
+  "name": "Awa Diop",
+  "email": "awa@example.com",
+  "phone_number": "+221771234567",
+  "country": "SN",
+  "metadata": {
+    "crm_id": "lead_981"
+  },
+  "environment": "live",
+  "created_at": "2026-02-14T10:30:00.000Z",
+  "updated_at": "2026-02-14T10:30:00.000Z"
+}
+```
+
+## Produit et prix
+
+Un produit correspond à ce que vous vendez. Un prix définit le montant et le comportement de facturation associé.
+
+Renvoyé par les endpoints [Produits](/api/products), checkout et abonnements.
+
+```json filename="Produit avec prix"
+{
+  "product_id": "prod_123",
+  "name": "Forfait Pro",
+  "description": "Accès mensuel à l’espace Pro",
+  "product_type": "recurring",
+  "is_active": true,
+  "metadata": {
+    "plan_code": "pro"
+  },
+  "prices": [
+    {
+      "price_id": "price_123",
+      "amount": 15000,
+      "currency_code": "XOF",
+      "billing_interval": "month",
+      "pricing_model": "standard",
+      "is_default": true
+    }
+  ],
+  "environment": "live"
+}
+```
+
+## Session checkout
+
+Une session checkout crée une page de paiement hébergée. Votre application redirige le client vers l’URL de checkout, puis suit le statut via les redirections et les webhooks.
+
+Renvoyée par [Sessions checkout](/api/checkout-sessions).
+
+```json filename="Session checkout"
+{
+  "id": "cs_123",
+  "status": "pending",
+  "amount": 15000,
+  "currency_code": "XOF",
+  "checkout_url": "https://checkout.lomi.africa/cs_123",
+  "success_url": "https://example.com/success",
+  "cancel_url": "https://example.com/cancel",
+  "metadata": {
+    "order_id": "order_481"
+  }
+}
+```
+
+## Encaissement direct
+
+Un encaissement direct lance un paiement spécifique à un prestataire sans checkout hébergé. Utilisez-le seulement si vous devez contrôler vous-même l’expérience de paiement.
+
+Renvoyé par [Encaissements directs avancés](/api/charge).
+
+```json filename="Encaissement direct"
+{
+  "id": "ch_123",
+  "status": "pending",
+  "amount": 5000,
+  "currency_code": "XOF",
+  "provider_code": "WAVE",
+  "payment_method_code": "MOBILE_MONEY",
+  "provider_transaction_id": "wave_abc123",
+  "metadata": {
+    "order_id": "order_481"
+  }
+}
+```
+
+## Abonnement
+
+Un abonnement représente un accès récurrent pour un client. La section abonnements regroupe les opérations générales et les opérations rattachées à un client.
+
+Renvoyé par [Abonnements](/api/subscriptions).
+
+```json filename="Abonnement"
+{
+  "subscription_id": "sub_123",
+  "customer_id": "cus_123",
+  "product_id": "prod_123",
+  "status": "active",
+  "amount": 15000,
+  "currency_code": "XOF",
+  "billing_frequency": "monthly",
+  "current_period_start": "2026-02-01T00:00:00.000Z",
+  "current_period_end": "2026-03-01T00:00:00.000Z",
+  "metadata": {
+    "workspace_id": "wk_42"
+  }
+}
+```
+
+## Transaction
+
+Une transaction est l’enregistrement comptable d’un mouvement d’argent. Utilisez-la pour la réconciliation, le reporting et le support.
+
+Renvoyée par [Transactions](/api/transactions).
+
+```json filename="Transaction"
+{
+  "transaction_id": "txn_123",
+  "gross_amount": 5000,
+  "fee_amount": 125,
+  "net_amount": 4875,
+  "currency_code": "XOF",
+  "transaction_type": "payment",
+  "status": "completed",
+  "provider_code": "WAVE",
+  "provider_transaction_id": "wave_abc123",
+  "metadata": {
+    "order_id": "order_481"
+  },
+  "created_at": "2026-02-14T10:31:04.000Z"
+}
+```
+
+## Solde
+
+Un solde montre l’argent disponible et en attente par devise. Utilisez-le avant un payout ou pour comprendre le calendrier de règlement.
+
+Renvoyé par [Soldes](/api/balances).
+
+```json filename="Solde"
+{
+  "currency_code": "XOF",
+  "available_amount": 275000,
+  "pending_amount": 42500,
+  "reserved_amount": 0,
+  "updated_at": "2026-02-14T10:45:00.000Z"
+}
+```
+
+## Endpoint webhook
+
+Un endpoint webhook indique à lomi. où livrer les événements. Stockez le secret de signature de façon sûre et vérifiez chaque événement entrant.
+
+Renvoyé par [Webhooks](/api/webhooks).
+
+```json filename="Endpoint webhook"
+{
+  "id": "wh_123",
+  "url": "https://example.com/webhooks/lomi",
+  "authorized_events": ["PAYMENT_SUCCEEDED", "PAYMENT_FAILED"],
+  "is_active": true,
+  "secret": "whsec_...",
+  "created_at": "2026-02-14T10:30:00.000Z"
+}
+```
+
+## Journal de livraison webhook
+
+Un journal de livraison décrit une tentative d’envoi webhook. Utilisez-le pour diagnostiquer les retries, les endpoints en échec et les problèmes de livraison.
+
+Renvoyé dans [Webhooks](/api/webhooks).
+
+```json filename="Journal de livraison webhook"
+{
+  "id": "wdl_123",
+  "webhook_id": "wh_123",
+  "event_type": "PAYMENT_SUCCEEDED",
+  "delivery_status": "failed",
+  "response_status": 500,
+  "attempt_count": 3,
+  "next_retry_at": "2026-02-14T10:45:00.000Z"
+}
+```
+
+## Erreur
+
+Les erreurs renvoient un message lisible et, lorsque disponible, des détails structurés que votre application peut journaliser.
+
+```json filename="Erreur"
+{
+  "error": {
+    "message": "Invalid API key",
+    "details": "The provided API key is invalid or does not exist"
+  }
+}
+```
+
+Voir [Erreurs](/api/errors) pour les codes HTTP et les échecs courants.

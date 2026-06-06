@@ -1,9 +1,0 @@
-{
-  "title": "Customer Subscriptions",
-  "pages": [
-    "CustomerSubscriptionsController_findAll",
-    "CustomerSubscriptionsController_findOne",
-    "CustomerSubscriptionsController_remove",
-    "CustomerSubscriptionsController_update"
-  ]
-}

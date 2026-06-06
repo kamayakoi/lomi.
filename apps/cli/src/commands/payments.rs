@@ -21,19 +21,17 @@ pub enum PaymentsCommand {
 
 #[derive(Serialize)]
 struct CreatePaymentLinkRequest {
-    merchant_id: String,
     title: String,
-    price: f64,
+    amount: f64,
     currency_code: String,
     link_type: &'static str,
-    is_active: bool,
 }
 
 #[derive(Deserialize)]
 struct PaymentLinkResponse {
     url: String,
     title: String,
-    price: f64,
+    amount: f64,
     currency_code: String,
 }
 
@@ -49,7 +47,6 @@ async fn create_payment_link(common: &CommonOptions) -> Result<()> {
     let auth = ensure_authenticated(common, true, false, false).await?;
     let client = ApiClient::new(&auth)?;
 
-    let merchant_id = cli::prompts::text("Enter your merchant ID:")?;
     let title = cli::prompts::text("Enter payment link title:")?;
     let amount_text = cli::prompts::text("Enter amount:")?;
     let amount: f64 = amount_text
@@ -69,12 +66,10 @@ async fn create_payment_link(common: &CommonOptions) -> Result<()> {
         .post(
             "/payment-links",
             &CreatePaymentLinkRequest {
-                merchant_id,
                 title: title.clone(),
-                price: amount,
+                amount,
                 currency_code: currency.clone(),
                 link_type: "instant",
-                is_active: true,
             },
         )
         .await?;
@@ -86,7 +81,7 @@ async fn create_payment_link(common: &CommonOptions) -> Result<()> {
     println!("{}", "Payment Link Details:".bold());
     println!("URL:    {}", response.url.bright_blue());
     println!("Title:  {}", response.title);
-    println!("Amount: {} {}", response.price, response.currency_code);
+    println!("Amount: {} {}", response.amount, response.currency_code);
     println!();
     println!("Share this link with your customers to accept payments.");
     Ok(())

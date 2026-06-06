@@ -1,9 +1,16 @@
 {
   "title": "Abonnements",
+  "description": "Plans récurrents, abonnements clients, changements de statut et gestion d’abonnements par client.",
   "pages": [
-    "SubscriptionsController_cancel",
+    "index",
     "SubscriptionsController_findAll",
     "SubscriptionsController_findByCustomer",
-    "SubscriptionsController_findOne"
+    "SubscriptionsController_findOne",
+    "SubscriptionsController_update",
+    "SubscriptionsController_cancel",
+    "CustomerSubscriptionsController_findAll",
+    "CustomerSubscriptionsController_findOne",
+    "CustomerSubscriptionsController_update",
+    "CustomerSubscriptionsController_remove"
   ]
 }

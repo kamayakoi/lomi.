@@ -1,0 +1,64 @@
+---
+title: 'Initialiser un projet'
+description: 'Générez une intégration lomi. avec client SDK, exemples checkout/webhook et variables d’environnement.'
+---
+
+La commande `lomi init` prépare une intégration lomi. dans votre répertoire de projet : client SDK, exemples et fichier `.env`.
+
+Nécessite un [`lomi login`](/build/cli/auth) préalable (ou `LOMI_ACCESS_TOKEN` en CI).
+
+## Usage
+
+```bash filename="Terminal"
+cd mon-projet
+lomi init
+```
+
+### Options
+
+| Option | Description |
+| --- | --- |
+| `-y, --yes` | Mode non interactif (requiert `--environment`, `--language`, `--api-key`) |
+| `-e, --environment` | `production` ou `sandbox` |
+| `-L, --language` | `ts` ou `js` |
+| `--api-key` | Clé secrète écrite dans `.env` |
+| `--skip-package-install` | Ignorer l’installation npm |
+| `--skip-rules-install` | Ignorer l’invite des règles agent |
+
+### Exemple CI
+
+```bash filename="Terminal"
+lomi init --yes \
+  --environment sandbox \
+  --language ts \
+  --api-key lomi_sk_test_xxx \
+  --skip-package-install \
+  --skip-rules-install
+```
+
+## Fichiers créés
+
+| Fichier | Rôle |
+| --- | --- |
+| `.env` | `LOMI_API_KEY`, placeholder `LOMI_WEBHOOK_SECRET`, `LOMI_API_URL` |
+| `lib/lomi./client.{ts\|js}` | Client SDK initialisé |
+| `examples/create-checkout-session.{ts\|js}` | Exemple checkout |
+| `examples/webhook-handler.{ts\|js}` | Exemple webhook |
+| `lomi.config.ts` | Configuration projet |
+
+<Callout type="warning" emoji="⚠️" title="Secrets hors git">
+  Ajoutez `.env` à votre `.gitignore`.
+</Callout>
+
+## Après init
+
+```bash filename="Terminal"
+lomi dev      # webhooks en local
+lomi status   # vérifier la CLI
+```
+
+## Suite
+
+- [Serveur de développement](/build/cli/dev)
+- [Webhooks](/build/advanced-guides/handling-webhooks)
+- [SDK TypeScript](/build/sdks/typescript)

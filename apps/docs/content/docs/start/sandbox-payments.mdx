@@ -1,0 +1,57 @@
+---
+title: 'How do I test safely in sandbox?'
+description: 'Use test keys, test payment methods, test balances, and webhook verification before switching to live mode.'
+---
+
+Sandbox lets you run realistic payment flows without moving real money. Use it for checkout QA, webhook handling, failure states, and go-live rehearsal.
+
+![Placeholder sandbox payment result](/placeholder.webp)
+
+## Test and live at a glance
+
+| Area | Test | Live |
+| --- | --- | --- |
+| Base URL | `https://sandbox.api.lomi.africa` | `https://api.lomi.africa` |
+| Secret key | `lomi_sk_test_...` | `lomi_sk_live_...` |
+| Publishable key | `lomi_pk_test_...` | `lomi_pk_live_...` |
+| Money movement | Test balances only | Real balances and payouts |
+| Customer notifications | Usually suppressed or simulated | Real customer communication |
+
+## What should I test?
+
+Test at least these scenarios before going live:
+
+- Successful hosted checkout payment.
+- Failed or declined card payment.
+- Mobile money payment initiation and completion behavior.
+- Customer cancellation from checkout.
+- Webhook delivery, signature verification, and idempotent handling.
+- Dashboard reconciliation between transaction, payment, and balance views.
+
+## Common card numbers
+
+| Scenario | Card number |
+| --- | --- |
+| Successful payment | `4242 4242 4242 4242` |
+| Generic decline | `4000 0000 0000 0002` |
+| Insufficient funds | `4000 0000 0000 9995` |
+| 3D Secure challenge | `4000 0025 0000 3155` |
+| Wrong CVC | `4000 0000 0000 0127` |
+
+Use any future expiry date and any valid CVC unless the scenario specifically tests CVC behavior.
+
+## Testing mobile money
+
+In sandbox, mobile money flows simulate provider behavior. Use realistic phone-number formats for the market you are testing, then verify the dashboard transaction and webhook event.
+
+## When am I ready for live mode?
+
+Move to live keys only when:
+
+- Your server never exposes secret keys.
+- Your checkout success and cancel URLs are production URLs.
+- Webhook signatures are verified with the raw request body.
+- Payment creation is idempotent where retries are possible.
+- Your team knows how to reconcile dashboard transactions and payouts.
+
+Next: [Go-live checklist](/start/go-live).

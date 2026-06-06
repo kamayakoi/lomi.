@@ -1,0 +1,28 @@
+---
+title: 'Comment accepter le mobile money ?'
+description: 'Utilisez le checkout hébergé, les liens de paiement ou des flux directs pour accepter Wave, MTN MoMo, Orange Money, SPI et les moyens locaux.'
+---
+
+Le mobile money est généralement plus simple avec le checkout hébergé ou les liens de paiement. Ces flux permettent à lomi. d’afficher le bon moyen de paiement et les bonnes instructions client selon le marché.
+
+![Checkout mobile money à remplacer](/placeholder.webp)
+
+## Chemins recommandés
+
+| Chemin | À utiliser quand |
+| --- | --- |
+| Checkout hébergé | Votre app crée la commande et redirige le client |
+| Liens de paiement | Vous voulez une URL partageable pour factures, services ou ventes simples |
+| Demandes de paiement | Votre backend crée une demande pour un flux contrôlé par l’app |
+| APIs de charge directe | Vous avez besoin de contrôle bas niveau et comprenez l’UX fournisseur |
+
+## Ce qu’il faut prévoir
+
+Les flux mobile money peuvent être asynchrones. Le client peut approuver dans une app, via USSD ou avec des instructions fournisseur. Affichez toujours un état en attente et utilisez les webhooks ou lectures serveur pour l’état final.
+
+## Liens utiles
+
+- [Checkout hébergé](/build/checkout)
+- [Liens de paiement](/build/payment-links)
+- [Demandes de paiement](/build/payment-requests)
+- [Paiements sandbox](/start/sandbox-payments)

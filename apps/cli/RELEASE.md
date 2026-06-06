@@ -34,13 +34,25 @@ After each release, update `sha256` lines using:
 ./scripts/update-homebrew-sha256.sh 3.0.0
 ```
 
+## Versioning policy
+
+The Rust CLI uses **3.x** semver (successor to the legacy TypeScript `lomi.cli` v2.x).
+
+**3.1.x line (current):** stay on patch bumps for routine releases — `3.1.0`, `3.1.1`, `3.1.2`, … — until a breaking change warrants `3.2.0` or `4.0.0`. Do not jump minor versions for every feature batch.
+
+```bash
+./scripts/bump-version.sh 3.1.1   # next small release
+```
+
+npm and Cargo only accept three-part semver (`major.minor.patch`), not `3.1.0.1`.
+
 ## Every release
 
 ### 1. Bump version
 
 ```bash
 cd apps/cli
-./scripts/bump-version.sh 3.0.0   # or next semver
+./scripts/bump-version.sh 3.1.0   # or next patch, e.g. 3.1.1
 ./scripts/generate-rules.sh       # refresh llms.txt + api-reference.md
 cargo test -- --test-threads=1
 ```
@@ -50,8 +62,8 @@ Commit the version bump + regenerated rules.
 ### 2. Tag and push
 
 ```bash
-git tag cli-v3.0.0
-git push origin cli-v3.0.0
+git tag cli-v3.1.0
+git push origin cli-v3.1.0
 ```
 
 ### 3. GitHub Actions (automatic)

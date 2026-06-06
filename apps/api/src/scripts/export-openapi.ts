@@ -16,6 +16,7 @@ import { ExpressAdapter } from '@nestjs/platform-express';
 import express from 'express';
 import { OpenApiExportModule } from '../open-api-export.module';
 import { buildSwaggerDocumentBase } from '../swagger.config';
+import { isPublicRestApiOperation } from '../../../docs/lib/scripts/manual-api/constants';
 
 function resolveDocsOpenApiPath(): string {
   // Run with cwd `apps/api` (see package.json script).
@@ -40,6 +41,160 @@ function stripNoiseOpenApiPaths<T extends { paths?: Record<string, unknown> }>(
     delete paths[p];
   }
   return { ...document, paths };
+}
+
+function stripNonPublicRestApiPaths<T extends { paths?: Record<string, unknown> }>(
+  document: T,
+): T {
+  if (!document.paths) return document;
+  const paths: Record<string, unknown> = {};
+
+  for (const [pathKey, pathItem] of Object.entries(document.paths)) {
+    if (!pathItem || typeof pathItem !== 'object') continue;
+
+    const filteredPathItem: Record<string, unknown> = {};
+    for (const [method, operation] of Object.entries(
+      pathItem as Record<string, unknown>,
+    )) {
+      if (method === 'parameters') {
+        filteredPathItem[method] = operation;
+        continue;
+      }
+
+      if (isPublicRestApiOperation(method, pathKey)) {
+        filteredPathItem[method] = operation;
+      }
+    }
+
+    const hasOperation = Object.keys(filteredPathItem).some(
+      (key) => key !== 'parameters',
+    );
+    if (hasOperation) {
+      paths[pathKey] = filteredPathItem;
+    }
+  }
+
+  return { ...document, paths };
+}
+
+function collectComponentSchemaRefs(value: unknown, refs: Set<string>): void {
+  if (!value || typeof value !== 'object') return;
+
+  if (Array.isArray(value)) {
+    for (const item of value) collectComponentSchemaRefs(item, refs);
+    return;
+  }
+
+  const record = value as Record<string, unknown>;
+  const ref = record.$ref;
+  if (typeof ref === 'string' && ref.startsWith('#/components/schemas/')) {
+    refs.add(decodeURIComponent(ref.slice('#/components/schemas/'.length)));
+  }
+
+  for (const child of Object.values(record)) {
+    collectComponentSchemaRefs(child, refs);
+  }
+}
+
+function pruneUnusedOpenApiComponentSchemas<
+  T extends {
+    paths?: Record<string, unknown>;
+    components?: { schemas?: Record<string, unknown> } & Record<string, unknown>;
+  },
+>(document: T): T {
+  const schemas = document.components?.schemas;
+  if (!schemas) return document;
+
+  const used = new Set<string>();
+  collectComponentSchemaRefs(document.paths, used);
+
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const schemaName of Array.from(used)) {
+      const before = used.size;
+      collectComponentSchemaRefs(schemas[schemaName], used);
+      changed = changed || used.size !== before;
+    }
+  }
+
+  const nextSchemas = Object.fromEntries(
+    Object.entries(schemas).filter(([schemaName]) => used.has(schemaName)),
+  );
+
+  return {
+    ...document,
+    components: {
+      ...document.components,
+      schemas: nextSchemas,
+    },
+  };
+}
+
+function getPublicOperationTag(pathKey: string): string | undefined {
+  if (pathKey.startsWith('/accounts/balance')) return 'Balances';
+  if (pathKey.startsWith('/charge/')) return 'Advanced Direct Charges';
+  if (pathKey.startsWith('/checkout-sessions')) return 'Checkout Sessions';
+  if (pathKey.startsWith('/payment-links')) return 'Payment Links';
+  if (pathKey.startsWith('/payment-requests')) return 'Payment Requests';
+  if (pathKey.startsWith('/customers')) return 'Customers';
+  if (pathKey.startsWith('/products')) return 'Products';
+  if (pathKey.startsWith('/subscriptions')) return 'Subscriptions';
+  if (pathKey.startsWith('/customer-subscriptions')) return 'Subscriptions';
+  if (pathKey.startsWith('/discount-coupons')) return 'Discount Coupons';
+  if (pathKey.startsWith('/refunds')) return 'Refunds';
+  if (pathKey.startsWith('/payouts')) return 'Payouts';
+  if (pathKey.startsWith('/transactions')) return 'Transactions';
+  if (pathKey.startsWith('/webhooks')) return 'Webhooks';
+  if (pathKey.startsWith('/webhook-delivery-logs')) return 'Webhooks';
+  return undefined;
+}
+
+function normalizePublicOperationTags<
+  T extends { paths?: Record<string, unknown>; tags?: unknown },
+>(document: T): T {
+  if (!document.paths) return document;
+  const paths: Record<string, unknown> = {};
+  const tagNames = new Set<string>();
+
+  for (const [pathKey, pathItem] of Object.entries(document.paths)) {
+    if (!pathItem || typeof pathItem !== 'object') {
+      paths[pathKey] = pathItem;
+      continue;
+    }
+
+    const publicTag = getPublicOperationTag(pathKey);
+    const nextPathItem: Record<string, unknown> = {};
+
+    for (const [method, operation] of Object.entries(
+      pathItem as Record<string, unknown>,
+    )) {
+      if (
+        publicTag &&
+        operation &&
+        typeof operation === 'object' &&
+        method !== 'parameters'
+      ) {
+        nextPathItem[method] = {
+          ...(operation as Record<string, unknown>),
+          tags: [publicTag],
+        };
+        tagNames.add(publicTag);
+      } else {
+        nextPathItem[method] = operation;
+      }
+    }
+
+    paths[pathKey] = nextPathItem;
+  }
+
+  return {
+    ...document,
+    paths,
+    tags: Array.from(tagNames)
+      .sort()
+      .map((name) => ({ name })),
+  };
 }
 
 /** Provider ingress — must never ship in the public merchant OpenAPI artifact. */
@@ -89,8 +244,12 @@ async function exportOpenApi(): Promise<void> {
   );
 
   const builderResult = buildSwaggerDocumentBase();
-  const document = stripNoiseOpenApiPaths(
-    SwaggerModule.createDocument(app, builderResult),
+  const document = normalizePublicOperationTags(
+    pruneUnusedOpenApiComponentSchemas(
+      stripNonPublicRestApiPaths(
+        stripNoiseOpenApiPaths(SwaggerModule.createDocument(app, builderResult)),
+      ),
+    ),
   );
 
   assertNoForbiddenProviderIngressPaths(document);

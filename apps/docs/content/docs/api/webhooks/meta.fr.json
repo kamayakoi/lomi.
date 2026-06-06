@@ -1,8 +1,16 @@
 {
   "title": "Webhooks",
+  "description": "Endpoints webhook, événements de test, retries et inspection des journaux de livraison.",
   "pages": [
+    "index",
+    "WebhooksController_create",
     "WebhooksController_findAll",
     "WebhooksController_findOne",
-    "WebhooksController_update"
+    "WebhooksController_update",
+    "WebhooksController_test",
+    "WebhooksController_retryDelivery",
+    "WebhooksController_remove",
+    "WebhookDeliveryLogsController_findAll",
+    "WebhookDeliveryLogsController_findOne"
   ]
 }

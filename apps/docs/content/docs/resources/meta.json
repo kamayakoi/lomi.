@@ -1,0 +1,16 @@
+{
+  "title": "Resources",
+  "description": "Support, changelog, merchant policies, open-source material, and contributor documentation.",
+  "root": true,
+  "icon": "Library",
+  "pages": [
+    "support",
+    "changelog",
+    "merchant-of-record",
+    "network",
+    "open-source",
+    "community",
+    "manifesto",
+    "contributing"
+  ]
+}

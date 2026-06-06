@@ -1,10 +1,16 @@
 {
   "title": "Subscriptions",
+  "description": "Recurring plans, customer subscriptions, status updates, and customer-scoped subscription management.",
   "pages": [
-    "SubscriptionsController_cancel",
+    "index",
     "SubscriptionsController_findAll",
     "SubscriptionsController_findByCustomer",
     "SubscriptionsController_findOne",
-    "SubscriptionsController_update"
+    "SubscriptionsController_update",
+    "SubscriptionsController_cancel",
+    "CustomerSubscriptionsController_findAll",
+    "CustomerSubscriptionsController_findOne",
+    "CustomerSubscriptionsController_update",
+    "CustomerSubscriptionsController_remove"
   ]
 }

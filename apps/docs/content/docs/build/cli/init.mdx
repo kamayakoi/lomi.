@@ -1,0 +1,119 @@
+---
+title: 'Initialize a project'
+description: 'Scaffold a lomi. integration with SDK client, checkout and webhook examples, and environment variables.'
+---
+
+The `lomi init` command bootstraps a lomi. integration in your project directory. It creates SDK client setup, example code, and a `.env` file with your API credentials.
+
+Requires prior [`lomi login`](/build/cli/auth) (or `LOMI_ACCESS_TOKEN` in CI).
+
+## Usage
+
+```bash filename="Terminal"
+cd my-project
+lomi init
+```
+
+### Options
+
+| Flag | Description |
+| --- | --- |
+| `-y, --yes` | Headless mode (requires `--environment`, `--language`, `--api-key`) |
+| `-e, --environment` | `production` or `sandbox` |
+| `-L, --language` | `ts` or `js` |
+| `--api-key` | Secret API key written to `.env` |
+| `--skip-package-install` | Skip `npm install` of SDK dependencies |
+| `--skip-rules-install` | Skip the agent rules install prompt |
+| `[path]` | Project directory (default: current directory) |
+
+### Headless example (CI)
+
+```bash filename="Terminal"
+lomi init --yes \
+  --environment sandbox \
+  --language ts \
+  --api-key lomi_sk_test_xxx \
+  --skip-package-install \
+  --skip-rules-install
+```
+
+## Interactive flow
+
+When run interactively, `lomi init` prompts for:
+
+1. **Environment** — Production or Sandbox (sets `LOMI_API_URL`)
+2. **Language** — TypeScript or JavaScript for generated examples
+3. **API key** — Your secret key from the [Merchant Portal](https://lomi.africa/portal/settings/api-keys)
+
+It may also offer to run [`lomi install-rules`](/build/cli/install-rules) if you haven't installed agent rules yet.
+
+## Files created
+
+| File | Purpose |
+| --- | --- |
+| `.env` | `LOMI_API_KEY`, `LOMI_WEBHOOK_SECRET` placeholder, `LOMI_API_URL` |
+| `lib/lomi./client.{ts\|js}` | Initialized SDK client loading from `.env` |
+| `examples/create-checkout-session.{ts\|js}` | Checkout session creation example |
+| `examples/webhook-handler.{ts\|js}` | Basic webhook handler example |
+| `lomi.config.ts` | Project-level lomi. configuration |
+
+Example `.env`:
+
+```dotenv filename=".env"
+LOMI_API_KEY=lomi_sk_test_xxx
+LOMI_WEBHOOK_SECRET=whsec_your_webhook_secret_here
+LOMI_API_URL=https://sandbox.api.lomi.africa
+```
+
+<Callout type="warning" emoji="⚠️" title="Keep secrets out of git">
+  Add `.env` to your `.gitignore`. Never commit secret API keys or webhook secrets.
+</Callout>
+
+## Dependencies
+
+If `package.json` exists (or is created), `lomi init` installs:
+
+- `@lomi./sdk`
+- `dotenv`
+
+Use `--skip-package-install` to skip this step in CI and install manually.
+
+## After init
+
+<Steps>
+
+### Review generated examples
+
+Open `lib/lomi./client.ts` and the files in `examples/`.
+
+### Add your webhook secret
+
+Replace the `LOMI_WEBHOOK_SECRET` placeholder in `.env` with the signing secret from the Merchant Portal.
+
+### Test webhooks locally
+
+```bash filename="Terminal"
+lomi dev
+```
+
+Point your dashboard webhook URL to a tunnel (e.g. ngrok) or use the local server during development. See [Local development server](/build/cli/dev).
+
+### Verify CLI auth
+
+```bash filename="Terminal"
+lomi status
+```
+
+</Steps>
+
+## Prerequisites
+
+- [`lomi login`](/build/cli/auth) completed (or `LOMI_ACCESS_TOKEN` set)
+- A **secret API key** from the Merchant Portal (`lomi_sk_test_…` or `lomi_sk_live_…`)
+
+## Next steps
+
+- [Local development server](/build/cli/dev)
+- [Handling webhooks](/build/advanced-guides/handling-webhooks)
+- [Checkout sessions](/build/checkout)
+- [TypeScript SDK](/build/sdks/typescript)

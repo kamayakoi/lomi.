@@ -1,0 +1,120 @@
+---
+title: Customer Portal
+description: Build a hosted customer portal flow with launch sessions, OTP/magic-link auth, and customer-scoped access.
+---
+
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
+import { Callout } from 'fumadocs-ui/components/callout';
+
+The lomi. customer portal provides a hosted customer account area at `customers.lomi.africa` where end-users can:
+
+![Placeholder customer portal](/placeholder.webp)
+
+- View payment history
+- View and manage subscriptions (pause/resume/cancel depending on status)
+
+This guide describes the recommended production integration.
+
+## Architecture (recommended)
+
+1. Your merchant backend creates a one-time portal launch session.
+2. You redirect/open the returned `launch_url`.
+3. The hosted portal consumes the token once and asks the customer to verify via:
+   - Email magic link, or
+   - SMS OTP
+4. Portal session is established and scoped to `(organization_id, customer_id, environment)`.
+5. Customer sees only their own records.
+
+<Callout type="warn">
+  Do not mint launch sessions in browser code. Create them from your backend only.
+</Callout>
+
+## Create a launch session
+
+Use `POST /customers/{id}/portal-launch-session`:
+
+- Optional `return_url`
+- Optional `flow_type` (`portal_home`, `subscription_cancel`, `subscription_manage`)
+- Optional `flow_subscription_id` (required for `subscription_cancel`)
+- Optional `flow_after_completion_url`
+
+See endpoint details and payload examples in [Customers](/api/customers/CustomersController_createPortalLaunchSession).
+
+## Eligibility model
+
+A customer is eligible for portal access only if they:
+
+1. Belong to your organization in the requested environment, and
+2. Have at least one billing record (transaction or subscription)
+
+This avoids exposing an empty portal to contacts that never transacted.
+
+## End-to-end example
+
+<Tabs items={["TypeScript", "cURL"]}>
+<Tab value="TypeScript">
+```typescript
+import axios from "axios";
+
+const apiKey = process.env.LOMI_API_KEY!;
+const customerId = "2d8f4f8b-1ea8-4de9-9fd8-f52f743bb265";
+
+const { data } = await axios.post(
+  `https://api.lomi.africa/customers/${customerId}/portal-launch-session`,
+  {
+    return_url: "https://merchant.example.com/account",
+    flow_type: "subscription_cancel",
+    flow_subscription_id: "3d6236f9-2c3e-4f0c-b00d-e2d73d3f0d24",
+    flow_after_completion_url:
+      "https://merchant.example.com/account/subscription-cancelled",
+  },
+  {
+    headers: {
+      "X-API-KEY": apiKey,
+      "Content-Type": "application/json",
+    },
+  },
+);
+
+// Redirect customer to hosted portal
+return data.launch_url;
+```
+</Tab>
+<Tab value="cURL">
+```bash
+curl -sS -X POST "https://api.lomi.africa/customers/2d8f4f8b-1ea8-4de9-9fd8-f52f743bb265/portal-launch-session" \
+  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "return_url": "https://merchant.example.com/account",
+    "flow_type": "subscription_cancel",
+    "flow_subscription_id": "3d6236f9-2c3e-4f0c-b00d-e2d73d3f0d24",
+    "flow_after_completion_url": "https://merchant.example.com/account/subscription-cancelled"
+  }'
+```
+</Tab>
+</Tabs>
+
+## Security controls
+
+- Launch tokens are one-time and short-lived (15 min)
+- Tokens are hashed at rest
+- OTP/magic challenges are hashed, expiring, and attempt-limited
+- Portal sessions are hashed, revocable, and renewed on activity
+- Requests are organization/customer scoped at SQL function level
+- Audit events recorded for launch, challenge, session, and subscription actions
+
+## Production checklist
+
+- Set `CUSTOMER_PORTAL_BASE_URL` in your API environment.
+- Ensure merchant backend uses server-side API key storage.
+- Use HTTPS `return_url` and `flow_after_completion_url`.
+- Monitor launch/session/challenge failures and abuse rates.
+- Keep customer phone/email normalization consistent in your CRM.
+
+## Troubleshooting
+
+- **404 customer not found**: wrong customer ID or organization mismatch.
+- **400 invalid flow**: unsupported `flow_type` or missing `flow_subscription_id`.
+- **Launch URL opens expired page**: token reused or expired.
+- **Customer cannot proceed after contact input**: no eligible billing records.

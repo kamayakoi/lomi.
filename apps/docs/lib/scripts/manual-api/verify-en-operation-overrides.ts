@@ -8,7 +8,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { EN_OPERATION_COPY } from '@/lib/scripts/manual-api/en-operation-overrides';
-import { isAgentRoute } from '@/lib/scripts/manual-api/constants';
+import { isPublicRestApiOperation } from '@/lib/scripts/manual-api/constants';
 import { collectPublicOperations } from '@/lib/scripts/manual-api/render-operation-mdx';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -17,8 +17,8 @@ const openApiPath = join(__dirname, '..', '..', '..', 'openapi.json');
 const raw = readFileSync(openApiPath, 'utf-8');
 const spec = JSON.parse(raw) as Parameters<typeof collectPublicOperations>[0];
 
-const merchant = collectPublicOperations(spec).filter(
-  (o) => !isAgentRoute(o.path),
+const merchant = collectPublicOperations(spec).filter((o) =>
+  isPublicRestApiOperation(o.method, o.path),
 );
 
 const missing = merchant.filter((o) => !EN_OPERATION_COPY[o.operationId]);

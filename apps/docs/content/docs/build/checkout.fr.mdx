@@ -1,0 +1,65 @@
+---
+title: 'Comment utiliser le checkout hébergé ?'
+description: 'Créez une session de checkout, redirigez le client vers lomi., puis confirmez le résultat avec redirections, dashboard et webhooks.'
+---
+
+Le checkout hébergé est l’intégration recommandée pour la plupart des équipes. Votre serveur crée une session, le client paie sur une page hébergée par lomi., puis votre système confirme le résultat.
+
+![Checkout hébergé à remplacer](/placeholder.webp)
+
+## Quand utiliser le checkout hébergé ?
+
+Utilisez-le si vous voulez :
+
+- Une page de paiement complète avec plusieurs moyens de paiement.
+- Moins de travail UI et conformité dans votre propre application.
+- Un flux clair avec URL de succès et d’annulation.
+- Un checkout basé sur un montant ou sur un produit.
+- Un chemin fiable de la sandbox vers le live.
+
+## Créer une session de checkout
+
+```bash
+curl -sS -X POST "https://sandbox.api.lomi.africa/checkout-sessions" \
+  -H "X-API-Key: $LOMI_SECRET_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "amount": 10000,
+    "currency_code": "XOF",
+    "title": "Commande #12345",
+    "success_url": "https://example.com/success",
+    "cancel_url": "https://example.com/cancel",
+    "metadata": {
+      "order_id": "ORD-12345"
+    }
+  }'
+```
+
+Redirigez ensuite le client vers le `checkout_url` renvoyé par l’API.
+
+## Confirmer le paiement
+
+Les redirections servent à l’expérience client, pas à la réconciliation finale. Votre serveur doit s’appuyer sur les webhooks ou une lecture API côté serveur avant de livrer une commande.
+
+Vérifiez :
+
+- Le statut de la session de checkout.
+- Le statut de la transaction liée.
+- Le montant, la devise, le client et les métadonnées.
+- La signature webhook et l’ID d’événement.
+
+## Variantes courantes
+
+| Variante | À utiliser quand |
+| --- | --- |
+| Montant fixe | Votre backend connaît déjà le montant |
+| Checkout produit | Le montant vient d’un produit ou prix |
+| Checkout abonnement | Le client démarre un plan récurrent |
+| Coupons activés | Vous acceptez des codes promo |
+| Checkout test | Vous validez avec `lomi_sk_test_...` |
+
+## API liée
+
+- [Créer une session de checkout](/api/checkout-sessions/CheckoutSessionsController_create)
+- [Comportement checkout](/build/payments/checkout-behavior)
+- [Webhooks](/build/webhooks)

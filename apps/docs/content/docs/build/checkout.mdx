@@ -1,0 +1,65 @@
+---
+title: 'How do I use hosted checkout?'
+description: 'Create a checkout session, redirect the customer to lomi., then confirm the result with redirects, dashboard records, and webhooks.'
+---
+
+Hosted checkout is the recommended first integration for most teams. Your server creates a session, your customer pays on a lomi.-hosted page, and your system confirms the result.
+
+![Placeholder hosted checkout](/placeholder.webp)
+
+## When to use hosted checkout
+
+Use hosted checkout when you want:
+
+- A complete payment page with multiple payment methods.
+- Less payment UI and compliance work in your own app.
+- A clear success and cancel redirect flow.
+- Support for product-based or amount-based checkout.
+- A reliable path from sandbox testing to live payments.
+
+## Create a checkout session
+
+```bash
+curl -sS -X POST "https://sandbox.api.lomi.africa/checkout-sessions" \
+  -H "X-API-Key: $LOMI_SECRET_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "amount": 10000,
+    "currency_code": "XOF",
+    "title": "Order #12345",
+    "success_url": "https://example.com/success",
+    "cancel_url": "https://example.com/cancel",
+    "metadata": {
+      "order_id": "ORD-12345"
+    }
+  }'
+```
+
+Redirect the customer to the `checkout_url` returned by the API.
+
+## Confirm the payment
+
+Use redirects for customer experience, not final reconciliation. Your server should rely on webhooks or a server-side API read before fulfilling an order.
+
+Confirm:
+
+- The checkout session status.
+- The related transaction status.
+- The amount, currency, customer, and metadata.
+- The webhook event signature and event ID.
+
+## Common variants
+
+| Variant | Use when |
+| --- | --- |
+| Fixed amount | Your backend already knows the amount |
+| Product checkout | The amount should come from a product or price |
+| Subscription checkout | The customer is starting a recurring plan |
+| Coupon-enabled checkout | You allow discount codes |
+| Test checkout | You are validating with `lomi_sk_test_...` |
+
+## Related API
+
+- [Create checkout session](/api/checkout-sessions/CheckoutSessionsController_create)
+- [Checkout behavior](/build/payments/checkout-behavior)
+- [Webhooks](/build/webhooks)

@@ -1,0 +1,50 @@
+---
+title: 'How should I handle webhooks?'
+description: 'Use webhooks to reconcile payment, checkout, refund, subscription, and payout events from your server.'
+---
+
+Webhooks tell your backend when something important happened after a customer or provider action. Use them for reconciliation, fulfillment, emails, subscriptions, and ledger updates.
+
+![Placeholder webhook settings and delivery logs](/placeholder.webp)
+
+## What are webhooks for?
+
+Use webhooks to:
+
+- Confirm a payment completed before fulfilling an order.
+- Learn when a payment failed, expired, or was cancelled.
+- Track subscription creation, renewal, and cancellation events.
+- Reconcile refunds, payouts, and transaction state changes.
+- Recover from browser redirects that customers never complete.
+
+## Minimum safe handler
+
+Your webhook endpoint should:
+
+1. Read the raw request body.
+2. Verify the signature with your webhook secret.
+3. Store the event ID or delivery ID.
+4. Ignore duplicate events safely.
+5. Fetch related resources from the API when you need authoritative state.
+6. Return a fast `2xx` response after the event is accepted.
+
+## Common mistakes
+
+| Mistake | Safer behavior |
+| --- | --- |
+| Trusting only the success redirect | Use webhooks or server-side API reads for fulfillment |
+| Parsing JSON before signature verification | Verify against the raw request body |
+| Updating orders without idempotency | Store processed event IDs |
+| Assuming event order is perfect | Fetch final resource state when needed |
+| Doing slow work inline | Queue long-running jobs after accepting the webhook |
+
+## What should I test?
+
+Test successful, failed, duplicate, and delayed events in sandbox. Confirm your dashboard state, order state, and customer communication all agree.
+
+## Related API
+
+- [Create webhook endpoint](/api/webhooks/WebhooksController_create)
+- [List webhook endpoints](/api/webhooks/WebhooksController_findAll)
+- [Webhook delivery logs](/api/webhooks)
+- [Webhook reliability](/build/advanced-guides/webhook-reliability)

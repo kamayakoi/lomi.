@@ -16,7 +16,7 @@ import { join } from 'node:path';
 
 import {
   REST_API_SECTION_ORDER,
-  isAgentRoute,
+  isPublicRestApiOperation,
   pathToFolder,
 } from '@/lib/scripts/manual-api/constants';
 import {
@@ -56,7 +56,9 @@ async function main(): Promise<void> {
   >[0];
 
   const all = collectPublicOperations(spec);
-  const merchant = all.filter((o) => !isAgentRoute(o.path));
+  const merchant = all.filter((o) =>
+    isPublicRestApiOperation(o.method, o.path),
+  );
   const schemaComponents = (
     spec as { components?: { schemas?: Record<string, unknown> } }
   ).components?.schemas;

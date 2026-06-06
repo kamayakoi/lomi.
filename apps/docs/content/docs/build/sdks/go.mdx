@@ -1,0 +1,265 @@
+---
+title: 'Go SDK'
+description: 'Official Go SDK for lomi. payments API.'
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+# Go SDK
+
+Official Go SDK for the lomi. payments API. Works with any Go 1.18+ application.
+
+## Installation
+
+```bash
+go get github.com/lomiafrica/lomi-go-sdk
+```
+
+## Quick start
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "os"
+
+    lomi "github.com/lomiafrica/lomi-go-sdk"
+)
+
+func main() {
+    configuration := lomi.NewConfiguration()
+    client := lomi.NewAPIClient(configuration)
+
+    // Configure authentication
+    auth := context.WithValue(
+        context.Background(),
+        lomi.ContextAPIKeys,
+        map[string]lomi.APIKey{
+            "ApiKeyAuth": {Key: os.Getenv("LOMI_API_KEY")},
+        },
+    )
+
+    // Now use auth context for all API calls
+}
+```
+
+## Examples
+
+### List customers
+
+```go
+customers, _, err := client.CustomersAPI.ListCustomers(auth).Execute()
+if err != nil {
+    fmt.Printf("Error: %v\n", err)
+    return
+}
+
+for _, customer := range customers.Data {
+    fmt.Printf("%s: %s\n", *customer.Id, *customer.Name)
+}
+```
+
+### Create a customer
+
+```go
+customerData := lomi.CustomersCreate{
+    Name:        lomi.PtrString("Moussa Keita"),
+    Email:       lomi.PtrString("moussa@example.com"),
+    PhoneNumber: lomi.PtrString("+22370123456"),
+}
+
+customer, _, err := client.CustomersAPI.CreateCustomer(auth).
+    CustomersCreate(customerData).
+    Execute()
+
+if err != nil {
+    fmt.Printf("Error: %v\n", err)
+    return
+}
+
+fmt.Printf("Created customer: %s\n", *customer.Id)
+```
+
+### Create a checkout session
+
+```go
+sessionData := lomi.CheckoutSessionsCreate{
+    Amount:     lomi.PtrInt32(5000), // 5,000 F CFA
+    Currency:   lomi.PtrString("XOF"),
+    SuccessUrl: lomi.PtrString("https://yoursite.com/success"),
+    CancelUrl:  lomi.PtrString("https://yoursite.com/cancel"),
+}
+
+session, _, err := client.CheckoutSessionsAPI.CreateCheckoutSession(auth).
+    CheckoutSessionsCreate(sessionData).
+    Execute()
+
+if err != nil {
+    fmt.Printf("Error: %v\n", err)
+    return
+}
+
+// Redirect customer to session.Url
+fmt.Printf("Checkout URL: %s\n", *session.Url)
+```
+
+### List transactions
+
+```go
+transactions, _, err := client.TransactionsAPI.ListTransactions(auth).Execute()
+if err != nil {
+    fmt.Printf("Error: %v\n", err)
+    return
+}
+
+for _, tx := range transactions.Data {
+    fmt.Printf("%s: %d %s - %s\n", *tx.Id, *tx.Amount, *tx.Currency, *tx.Status)
+}
+```
+
+### Create a payment link
+
+```go
+linkData := lomi.PaymentLinksCreate{
+    Amount:      lomi.PtrInt32(10000),
+    Currency:    lomi.PtrString("XOF"),
+    Description: lomi.PtrString("Premium subscription"),
+    Reusable:    lomi.PtrBool(true),
+}
+
+link, _, err := client.PaymentLinksAPI.CreatePaymentLink(auth).
+    PaymentLinksCreate(linkData).
+    Execute()
+
+if err != nil {
+    fmt.Printf("Error: %v\n", err)
+    return
+}
+
+fmt.Printf("Share this link: %s\n", *link.Url)
+```
+
+## Error handling
+
+```go
+customer, response, err := client.CustomersAPI.RetrieveCustomer(auth, "invalid_id").Execute()
+
+if err != nil {
+    // Check for API error details
+    if apiErr, ok := err.(*lomi.GenericOpenAPIError); ok {
+        fmt.Printf("API Error: %s\n", apiErr.Error())
+        fmt.Printf("Response body: %s\n", string(apiErr.Body()))
+    }
+
+    // Check HTTP status
+    if response != nil {
+        fmt.Printf("HTTP Status: %d\n", response.StatusCode)
+    }
+    return
+}
+```
+
+## Webhook handling
+
+```go
+package main
+
+import (
+    "crypto/hmac"
+    "crypto/sha256"
+    "encoding/hex"
+    "encoding/json"
+    "io"
+    "log"
+    "net/http"
+    "os"
+)
+
+type WebhookEvent struct {
+    Type string                 `json:"type"`
+    Data map[string]interface{} `json:"data"`
+}
+
+func webhookHandler(w http.ResponseWriter, r *http.Request) {
+    signature := r.Header.Get("x-lomi-signature")
+    secret := os.Getenv("LOMI_WEBHOOK_SECRET")
+
+    body, err := io.ReadAll(r.Body)
+    if err != nil {
+        http.Error(w, "Failed to read body", http.StatusBadRequest)
+        return
+    }
+
+    // Verify signature
+    mac := hmac.New(sha256.New, []byte(secret))
+    mac.Write(body)
+    expectedSignature := hex.EncodeToString(mac.Sum(nil))
+
+    if !hmac.Equal([]byte(signature), []byte(expectedSignature)) {
+        http.Error(w, "Invalid signature", http.StatusBadRequest)
+        return
+    }
+
+    var event WebhookEvent
+    if err := json.Unmarshal(body, &event); err != nil {
+        http.Error(w, "Invalid JSON", http.StatusBadRequest)
+        return
+    }
+
+    switch event.Type {
+    case "PAYMENT_SUCCEEDED":
+        log.Printf("Payment succeeded: %v", event.Data)
+        // Handle payment
+
+    default:
+        log.Printf("Unhandled event: %s", event.Type)
+    }
+
+    w.WriteHeader(http.StatusOK)
+    json.NewEncoder(w).Encode(map[string]bool{"received": true})
+}
+
+func main() {
+    http.HandleFunc("/webhook", webhookHandler)
+    log.Println("Webhook listener running on :3000")
+    log.Fatal(http.ListenAndServe(":3000", nil))
+}
+```
+
+## Pointer helpers
+
+The SDK provides pointer helper functions for all basic types:
+
+```go
+// Use these helpers for optional fields
+name := lomi.PtrString("Customer Name")
+amount := lomi.PtrInt32(5000)
+active := lomi.PtrBool(true)
+rate := lomi.PtrFloat64(0.025)
+```
+
+## Available APIs
+
+| API                   | Methods                                                                                                                      |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `CustomersAPI`        | `ListCustomers`, `CreateCustomer`, `RetrieveCustomer`, `UpdateCustomer`, `DeleteCustomer`                                    |
+| `CheckoutSessionsAPI` | `ListCheckoutSessions`, `CreateCheckoutSession`, `RetrieveCheckoutSession`, `UpdateCheckoutSession`, `DeleteCheckoutSession` |
+| `TransactionsAPI`     | `ListTransactions`, `RetrieveTransaction`                                                                                    |
+| `PaymentLinksAPI`     | `ListPaymentLinks`, `CreatePaymentLink`, `RetrievePaymentLink`, `UpdatePaymentLink`, `DeletePaymentLink`                     |
+| `ProductsAPI`         | `ListProducts`, `CreateProduct`, `RetrieveProduct`, `UpdateProduct`, `DeleteProduct`                                         |
+| `SubscriptionsAPI`    | `ListSubscriptions`, `CreateSubscription`, `RetrieveSubscription`, `UpdateSubscription`, `DeleteSubscription`                |
+| `RefundsAPI`          | `ListRefunds`, `CreateRefund`, `RetrieveRefund`                                                                              |
+| `PayoutsAPI`          | `ListPayouts`, `CreatePayout`, `RetrievePayout` (self and beneficiary via `destination`)                                   |
+| `ChargesAPI`          | `CreateWaveCharge`, `CreateMtnCharge`, `CreateCardCharge`, `GetCardCharge`, `CancelCardCharge`                               |
+| `PaymentRequestsAPI`  | `ListPaymentRequests`, `CreatePaymentRequest`, `RetrievePaymentRequest`                                                      |
+| `DiscountCouponsAPI`  | `ListDiscountCoupons`, `CreateDiscountCoupon`, `RetrieveDiscountCoupon`, `UpdateDiscountCoupon`, `DeleteDiscountCoupon`      |
+| `WebhookDeliveryLogsAPI`| `ListWebhookDeliveryLogs`, `RetrieveWebhookDeliveryLog`                                                                    |
+| `WebhooksAPI`         | `ListWebhooks`, `CreateWebhook`, `RetrieveWebhook`, `UpdateWebhook`, `DeleteWebhook`                                         |
+
+## Need help?
+
+- [API Reference](/api) - Full API documentation
+- [GitHub Issues](https://github.com/lomiafrica/lomi./issues) - Report bugs
+- [Discord](https://discord.gg/yb4FnBmh) - Community support

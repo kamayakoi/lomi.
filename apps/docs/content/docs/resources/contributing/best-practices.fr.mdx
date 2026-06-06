@@ -1,0 +1,310 @@
+---
+title: 'Bonnes pratiques'
+description: 'Ces bonnes pratiques préservent qualité du code, cohérence et sécurité sur tout le projet lomi..'
+---
+
+## Style de code
+
+Gardez un code lisible. Prettier et ESLint assurent formatage et lint (`bun run lint:fix`).
+
+### Formatage et lisibilité
+
+```typescript filename="Code Style Example"
+// Bon : formatage cohérent, noms explicites
+function isValidAmount(amount: number, maxAmount: number = 1000000): boolean {
+  return amount > 0 && amount <= maxAmount;
+}
+
+// Mauvais : formatage pauvre, noms courts peu clairs, nombres magiques
+# function validate(a){return a>0&&a<=1000000}
+```
+
+## Standards de code
+
+Pour une qualité élevée :
+
+### TypeScript
+
+TypeScript pour la sûreté de types.
+
+```typescript filename="TypeScript Example"
+// Bon : interface et types explicites
+interface PaymentRequest {
+  amount: number; // Montant en plus petite unité monétaire (p. ex. centimes)
+  currency: string; // Code devise ISO 4217 (p. ex. 'XOF')
+  providerCode: string; // Identifiant unique du prestataire de paiement
+}
+
+async function processPayment(request: PaymentRequest): Promise<PaymentResult> {
+  // Implémentation…
+  // Utiliser aussi des types pour les valeurs de retour
+}
+```
+
+## Sécurité
+
+Priorité absolue aux données utilisateurs et à l’intégrité du système.
+
+### Variables d’environnement
+
+Ne jamais committer de secrets dans le dépôt ; utilisez des variables d’environnement.
+
+```bash filename=".env.example"
+# .env.example - Provide a template for required variables
+LOMI_API_KEY=
+LOMI_WEBHOOK_SECRET=
+NODE_ENV=development
+```
+
+```bash filename=".gitignore"
+# .gitignore - Ensure local environment files are not tracked
+.env
+.env.local
+*.log
+```
+
+Voir aussi [Variables d’environnement](/start/api-keys).
+
+### Données sensibles
+
+Évitez les journaux contenant clés API, mots de passe ou données personnelles ; sinon masquez correctement.
+
+```typescript filename="Redaction Example"
+// Example: Redact sensitive information in logs
+const sanitizeData = (data: any) => {
+  const masked = { ...data };
+  // Define sensitive keys specific to your context
+  const sensitiveKeys = [
+    'apiKey',
+    'secretKey',
+    'password',
+    'authorization',
+    'phoneNumber',
+  ];
+  sensitiveKeys.forEach((key) => {
+    if (masked[key]) masked[key] = '[REDACTED]';
+  });
+  return masked;
+};
+```
+
+Validez et assainissez les entrées utilisateur. Voir [vérification des signatures webhook](/build/advanced-guides/handling-webhooks).
+
+## Gestion des erreurs
+
+Erreurs traitées proprement avec contexte.
+
+### Gestion structurée
+
+```typescript filename="Error Handling Example"
+// Good: Catch specific errors, provide context, log appropriately
+import { logger } from './logger'; // Assuming a logger utility
+
+try {
+  const result = await processPayment(request);
+  logger.info({ transactionId: result.id }, 'Payment successful');
+} catch (error) {
+  if (error instanceof ValidationError) {
+    logger.warn({ error, request }, 'Invalid payment request');
+    // Return specific error response to client
+  } else if (error instanceof PaymentProviderError) {
+    logger.error({ error, request }, 'Payment provider failed');
+    // Handle provider-specific failure (e.g., retry logic, alert)
+  } else {
+    logger.error({ error, request }, 'Unexpected error during payment processing');
+    // Handle unknown error
+  }
+}
+
+# Bad: Ignores error, logs vaguely
+/*
+try {
+  await processPayment(request);
+} catch (error) {
+  console.error("Something went wrong"); // Lacks context
+}
+*/
+```
+
+## Tests
+
+Écrivez des tests significatifs avec Vitest (`describe`, `it`, `expect`). Combinez tests unitaires, d’intégration et bout en bout.
+
+```typescript filename="Testing Example (Vitest)"
+import { describe, it, expect } from 'vitest';
+import { processPayment } from '../src/payment-processor'; // Adjust path
+
+describe('Payment Processing', () => {
+  it('should process a valid payment request', async () => {
+    const request: PaymentRequest = {
+      amount: 10000, // e.g., 100.00 XOF
+      currency: 'XOF',
+      providerCode: 'PROVIDER_X',
+    };
+
+    // Mock dependencies if necessary
+    // vi.mock(...)
+
+    const result = await processPayment(request);
+    expect(result).toBeDefined();
+    expect(result.status).toBe('completed');
+    // Add more specific assertions
+  });
+
+  it('should throw validation error for invalid amount', async () => {
+    const request: PaymentRequest = {
+      amount: -500,
+      currency: 'XOF',
+      providerCode: 'PROVIDER_X',
+    };
+
+    await expect(processPayment(request)).rejects.toThrow(ValidationError);
+  });
+});
+```
+
+## Workflow Git
+
+Suivez notre [Stratégie de branches](/resources/contributing/branching-strategy).
+
+### Gestion des branches
+
+Branches courtes et centrées sur une tâche ; rebase régulier depuis `develop`.
+
+```bash filename="Terminal"
+# Create a focused feature branch
+git checkout develop
+git pull upstream develop
+git checkout -b feature/add-wave-provider
+
+# Work on the feature...
+
+# Commit changes following guidelines
+git commit -m "feat(payments): implement Wave provider"
+
+# Push the branch
+git push origin feature/add-wave-provider
+```
+
+### Messages de commit
+
+[Conventional commits](https://www.conventionalcommits.org/) pour clarifier et automatiser le changelog.
+
+```bash filename="Terminal - Good Commits"
+# Good: Specific type, scope, and description
+git commit -m "feat(auth): implement API key generation endpoint"
+git commit -m "fix(webhooks): handle duplicate event processing"
+git commit -m "docs(contributing): clarify rebase workflow"
+
+# Bad: Vague, uninformative
+# git commit -m "fixed stuff"
+# git commit -m "wip"
+# git commit -m "more changes"
+```
+
+## Documentation
+
+Indispensable pour la maintenance et la collaboration.
+
+### Commentaires de code
+
+Expliquez le _pourquoi_, pas le _quoi_. TSDoc pour les fonctions complexes.
+
+````typescript filename="TSDoc Example"
+/**
+ * Processes a payment request using the specified provider.
+ * Handles potential errors and ensures idempotency.
+ * @param request - The payment request details.
+ * @returns A promise resolving to the payment result.
+ * @throws {ValidationError} If the request payload is invalid.
+ * @throws {PaymentProcessingError} If the provider fails.
+ * @example
+ * ```typescript
+ * const result = await processPayment({ amount: 5000, currency: 'XOF', providerCode: 'WAVE' });
+ * console.log(result.transactionId);
+ * ```
+ */
+async function processPayment(request: PaymentRequest): Promise<PaymentResult> {
+  // Implementation details...
+}
+````
+
+### Fichiers README
+
+Chaque paquet ou composant important doit avoir un `README` : rôle, usage, configuration, tests.
+
+```markdown filename="README Example"
+# Package/Component Name
+
+## Overview
+
+A brief description of what this package/component does.
+
+## Installation
+
+`pnpm add @lomi/package-name`
+
+## Usage
+
+Provide clear code examples and instructions.
+
+## Configuration
+
+Detail any available configuration options.
+
+## Testing
+
+Explain how to run tests for this specific package/component.
+`pnpm --filter @lomi/package-name test`
+```
+
+## Déploiement
+
+Respectez les procédures CI/CD.
+
+### CI/CD
+
+Les pipelines automatisent tests et déploiements ; toute contribution doit faire passer les contrôles.
+
+```yaml filename=".github/workflows/ci.yml Example"
+# Example: .github/workflows/ci.yml (Simplified)
+name: CI Checks
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8 # Specify pnpm version
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18' # Specify Node.js version
+          cache: 'pnpm'
+      - run: pnpm install
+      - run: pnpm lint
+      - run: pnpm test
+```
+
+### Contrôle de version
+
+Versions dans chaque `package.json`, selon le guide [Versionnement](/resources/contributing/versioning).
+
+```json filename="package.json Example"
+// Example: packages/api/package.json
+{
+  "name": "@lomi/api",
+  "version": "1.2.3",
+  "engines": {
+    "node": ">=18"
+  },
+  "main": "dist/index.js"
+}
+```
+
+## Étapes suivantes
+
+- [Revue de code](/resources/contributing/code-reviews)
+- [Stratégie de branches](/resources/contributing/branching-strategy)
+- [Support](/resources/support)

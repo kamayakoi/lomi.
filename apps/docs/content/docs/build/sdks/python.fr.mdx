@@ -1,0 +1,320 @@
+---
+title: SDK Python
+description: SDK Python officiel pour l’API de paiement lomi.
+---
+
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
+import { Callout } from 'fumadocs-ui/components/callout';
+
+SDK Python officiel pour l’API de paiement lomi. Compatible Django, Flask, FastAPI et Python 3.9+.
+
+## Installation
+
+```bash
+pip install lomi-sdk
+```
+
+Ou avec Poetry :
+
+```bash
+poetry add lomi-sdk
+```
+
+## Démarrage rapide
+
+```python
+import os
+from lomi import LomiClient
+
+client = LomiClient(
+    api_key=os.environ["LOMI_API_KEY"],
+    environment="test"  # « test » = bac à sable ; « live » = production
+)
+```
+
+<Callout type="info">
+  **Environnements :**
+  - `'test'` → `https://sandbox.api.lomi.africa`
+  - `'live'` → `https://api.lomi.africa`
+</Callout>
+
+---
+
+## Exemples de paiement
+
+### Créer une session de paiement
+
+```python
+session = client.checkout_sessions.create({
+    "amount": 10000,
+    "currency_code": "XOF",
+    "title": "Abonnement Premium",
+    "description": "Accès mensuel aux fonctionnalités premium",
+    "customer_email": "customer@example.com",
+    "success_url": "https://yoursite.com/success",
+    "cancel_url": "https://yoursite.com/cancel",
+    "metadata": {"order_id": "ORD-123"}
+})
+
+print(f"Redirection vers : {session['checkout_url']}")
+```
+
+### Créer un lien de paiement
+
+```python
+link = client.payment_links.create({
+    "link_type": "product",
+    "title": "Formule Pro",
+    "currency_code": "XOF",
+    "product_id": "prod_abc123...",
+    "allow_coupon_code": True
+})
+
+print(f"Partagez ce lien : {link['url']}")
+```
+
+### Lister les transactions avec filtres
+
+```python
+transactions = client.transactions.list(
+    status="completed",
+    provider="WAVE",
+    startDate="2024-01-01T00:00:00Z",
+    pageSize=50
+)
+
+for tx in transactions:
+    print(f"{tx['id']}: {tx['gross_amount']} {tx['currency_code']}")
+```
+
+---
+
+## Gestion des clients
+
+### Créer un client
+
+```python
+customer = client.customers.create({
+    "name": "Fatou Diop",
+    "email": "fatou@example.com",
+    "phone_number": "+221771234567",
+    "country": "Senegal",
+    "city": "Dakar",
+    "metadata": {"source": "website"}
+})
+
+print(f"ID client : {customer['id']}")
+```
+
+### Transactions d’un client
+
+```python
+transactions = client.customers.get_transactions("cus_abc123...")
+```
+
+---
+
+## Produits et abonnements
+
+### Créer un produit
+
+```python
+product = client.products.create({
+    "name": "Formule Premium",
+    "description": "Accès à l’ensemble des fonctionnalités",
+    "product_type": "recurring",
+    "prices": [
+        {
+            "amount": 15000,
+            "currency_code": "XOF",
+            "billing_interval": "month",
+            "is_default": True
+        }
+    ],
+    "trial_enabled": True,
+    "trial_period_days": 7
+})
+```
+
+### Ajouter un nouveau tarif
+
+```python
+price = client.products.add_price("prod_abc123...", {
+    "amount": 150000,
+    "currency_code": "XOF",
+    "billing_interval": "year"
+})
+```
+
+### Annuler un abonnement
+
+```python
+cancelled = client.subscriptions.cancel("sub_abc123...", {
+    "cancel_at_period_end": True,
+    "reason": "Demande du client"
+})
+```
+
+---
+
+## Virements
+
+### Initier un retrait
+
+```python
+payout = client.payouts.create({
+    "amount": 100000,
+    "currency_code": "XOF",
+    "payout_method_id": "pm_abc123...",
+    "description": "Retrait mensuel"
+})
+```
+
+### Payer un bénéficiaire
+
+```python
+beneficiary_payout = client.beneficiary_payouts.create({
+    "amount": 50000,
+    "currency_code": "XOF",
+    "beneficiary_phone": "+221771234567",
+    "beneficiary_name": "Nom du prestataire",
+    "provider_code": "WAVE"
+})
+```
+
+---
+
+## Compte et organisation
+
+### Obtenir le solde du compte
+
+```python
+balances = client.accounts.get_balance()
+xof_balance = client.accounts.get_balance(currency="XOF")
+
+print(f"Disponible : {xof_balance['available']}")
+```
+
+### Indicateurs de l’organisation
+
+```python
+metrics = client.organizations.get_metrics()
+
+print(f"MRR : {metrics['mrr']}")
+print(f"Nombre de clients : {metrics['total_customers']}")
+```
+
+---
+
+## Gestion des erreurs
+
+```python
+from lomi import LomiClient, LomiError, LomiNotFoundError
+
+try:
+    customer = client.customers.get("invalid_id")
+except LomiNotFoundError:
+    print("Client introuvable")
+except LomiError as e:
+    print(f"Erreur API [{e.status_code}] : {e.message}")
+```
+
+---
+
+## Intégration Django
+
+```python
+# settings.py
+LOMI_API_KEY = os.environ.get("LOMI_API_KEY")
+LOMI_WEBHOOK_SECRET = os.environ.get("LOMI_WEBHOOK_SECRET")
+
+# views.py
+import hmac
+import hashlib
+import json
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
+
+@csrf_exempt
+def lomi_webhook(request):
+    signature = request.headers.get("x-lomi-signature")
+    expected = hmac.new(
+        settings.LOMI_WEBHOOK_SECRET.encode(),
+        request.body,
+        hashlib.sha256
+    ).hexdigest()
+
+    if not hmac.compare_digest(signature, expected):
+        return JsonResponse({"error": "Invalid signature"}, status=400)
+
+    event = json.loads(request.body)
+
+    if event["type"] == "PAYMENT_SUCCEEDED":
+        # Traiter le paiement réussi
+        transaction = event["data"]
+        print(f"Paiement reçu : {transaction['gross_amount']}")
+
+    return JsonResponse({"received": True})
+```
+
+---
+
+## Intégration Flask
+
+```python
+import hmac
+import hashlib
+import os
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+@app.route("/webhook", methods=["POST"])
+def webhook():
+    signature = request.headers.get("x-lomi-signature")
+    secret = os.environ["LOMI_WEBHOOK_SECRET"].encode()
+    expected = hmac.new(secret, request.data, hashlib.sha256).hexdigest()
+
+    if not hmac.compare_digest(signature, expected):
+        return jsonify({"error": "Invalid signature"}), 400
+
+    event = request.json
+
+    if event["type"] == "PAYMENT_SUCCEEDED":
+        # Traiter le paiement
+        pass
+
+    return jsonify({"received": True})
+```
+
+---
+
+## Services disponibles
+
+| Service | Méthodes |
+|---------|----------|
+| `accounts` | `list`, `get`, `get_balance`, `get_balance_breakdown`, `check_balance` |
+| `beneficiary_payouts` | `list`, `get`, `create` |
+| `checkout_sessions` | `list`, `get`, `create` |
+| `customers` | `list`, `get`, `create`, `update`, `delete`, `get_transactions` |
+| `discount_coupons` | `list`, `get`, `create`, `get_performance` |
+| `organizations` | `list`, `get`, `get_metrics` |
+| `payment_links` | `list`, `get`, `create` |
+| `payment_requests` | `list`, `get`, `create` |
+| `payouts` | `list`, `get`, `create` |
+| `products` | `list`, `get`, `create`, `add_price`, `set_default_price` |
+| `refunds` | `list`, `get`, `create` |
+| `subscriptions` | `list`, `get`, `get_by_customer`, `cancel` |
+| `transactions` | `list`, `get` |
+| `webhook_delivery_logs` | `list`, `get` |
+| `webhooks` | `list`, `get`, `create`, `update`, `delete` |
+
+---
+
+## Ressources
+
+- [Premiers pas](/start/create-account)
+- [Référence API](/api)
+- [GitHub](https://github.com/lomiafrica/lomi.)
+- [Communauté Discord](https://discord.gg/yb4FnBmh)

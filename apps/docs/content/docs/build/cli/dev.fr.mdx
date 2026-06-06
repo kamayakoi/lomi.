@@ -1,0 +1,54 @@
+---
+title: 'Serveur de développement local'
+description: 'Lancez lomi dev pour recevoir et inspecter les événements webhook sur votre machine.'
+---
+
+La commande `lomi dev` démarre un serveur HTTP léger qui reçoit les webhooks POST et affiche les événements dans le terminal.
+
+Nécessite [`lomi login`](/build/cli/auth).
+
+## Usage
+
+```bash filename="Terminal"
+lomi dev
+```
+
+URL par défaut : **`http://localhost:4242/webhook`**
+
+### Options
+
+| Option | Défaut | Description |
+| --- | --- | --- |
+| `-p, --port` | `4242` | Port du serveur |
+| `--env-file` | `.env` | Fichier dotenv |
+| `--verify-signature` | `false` | Vérifier `lomi-signature` via `LOMI_WEBHOOK_SECRET` |
+
+## Endpoints
+
+| Méthode | Chemin | Description |
+| --- | --- | --- |
+| `POST` | `/webhook` | Réception des événements |
+| `GET` | `/health` | Retourne `ok` |
+
+## Test local
+
+```bash filename="Terminal"
+lomi dev
+
+curl -X POST http://localhost:4242/webhook \
+  -H "Content-Type: application/json" \
+  -d '{"type":"test.event","data":{}}'
+```
+
+Pour des tests bout en bout, exposez le serveur via un tunnel (ngrok) et enregistrez l’URL dans le portail marchand.
+
+## Vérification de signature
+
+Avec `--verify-signature`, le serveur valide l’en-tête `lomi-signature` contre `LOMI_WEBHOOK_SECRET` du `.env`.
+
+Voir [Gérer les webhooks](/build/advanced-guides/handling-webhooks) et [Référence webhooks](/build/webhooks).
+
+## Suite
+
+- [Initialiser un projet](/build/cli/init)
+- [Webhooks](/build/webhooks)

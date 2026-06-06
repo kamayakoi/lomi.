@@ -4,6 +4,8 @@ mod cli;
 mod commands;
 mod config;
 mod rules;
+mod ui;
+mod webhook;
 
 use anyhow::Result;
 use clap::{Parser, Subcommand};
@@ -38,14 +40,26 @@ enum Commands {
     Init(commands::init::InitArgs),
     /// Start a local webhook development server
     Dev(commands::dev::DevArgs),
+    /// Listen for cloud webhook events (sandbox-first)
+    Listen(commands::listen::ListenArgs),
+    /// Run integration health checks
+    Probe(commands::probe::ProbeArgs),
     /// Manage checkout sessions
     Checkout(commands::checkout::CheckoutArgs),
     /// Manage payments
     Payments(commands::payments::PaymentsArgs),
+    /// Manage webhooks
+    Webhooks(commands::webhooks_cmd::WebhooksArgs),
+    /// List products and prices
+    Products(commands::products::ProductsArgs),
+    /// List transactions
+    Transactions(commands::transactions::TransactionsArgs),
     /// Install lomi. agent rules for Cursor, Claude, and other AI tools
     InstallRules(commands::install_rules::InstallRulesArgs),
     /// Update @lomi./sdk to the latest version
     Update(commands::update::UpdateArgs),
+    /// Install and update Lomi UI checkout components
+    Ui(commands::ui::UiArgs),
     /// List all CLI profiles
     ListProfiles(commands::list_profiles::ListProfilesArgs),
     /// Switch the default CLI profile
@@ -64,10 +78,16 @@ async fn main() -> Result<()> {
         Commands::Status(args) => commands::status::run(&cli.common, args).await,
         Commands::Init(args) => commands::init::run(&cli.common, args).await,
         Commands::Dev(args) => commands::dev::run(&cli.common, args).await,
+        Commands::Listen(args) => commands::listen::run(&cli.common, args).await,
+        Commands::Probe(args) => commands::probe::run(&cli.common, args).await,
         Commands::Checkout(args) => commands::checkout::run(&cli.common, args).await,
         Commands::Payments(args) => commands::payments::run(&cli.common, args).await,
+        Commands::Webhooks(args) => commands::webhooks_cmd::run(&cli.common, args).await,
+        Commands::Products(args) => commands::products::run(&cli.common, args).await,
+        Commands::Transactions(args) => commands::transactions::run(&cli.common, args).await,
         Commands::InstallRules(args) => commands::install_rules::run(&cli.common, args).await,
         Commands::Update(args) => commands::update::run(&cli.common, args).await,
+        Commands::Ui(args) => commands::ui::run(&cli.common, args).await,
         Commands::ListProfiles(args) => commands::list_profiles::run(&cli.common, args).await,
         Commands::Switch(args) => commands::switch::run(&cli.common, args).await,
     }

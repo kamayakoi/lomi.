@@ -2,6 +2,7 @@ use anyhow::Result;
 use clap::Args;
 use colored::Colorize;
 
+use crate::api::{ApiClient, MeResponse};
 use crate::auth::session::try_authenticated;
 use crate::cli::{self, CommonOptions};
 use crate::config::global::config_path;
@@ -36,6 +37,12 @@ pub async fn run(common: &CommonOptions, _args: WhoamiArgs) -> Result<()> {
         }
     };
 
+    let identity = if let Ok(client) = ApiClient::new(&auth) {
+        client.get::<MeResponse>("/me").await.ok()
+    } else {
+        None
+    };
+
     spinner.finish_and_clear();
 
     let token_preview = if auth.cli_token.len() > 8 {
@@ -44,12 +51,21 @@ pub async fn run(common: &CommonOptions, _args: WhoamiArgs) -> Result<()> {
         "hidden".to_string()
     };
 
+    let mut body = format!(
+        "Profile:  {}\nToken:    {}\nAPI URL:  {}",
+        auth.profile, token_preview, auth.api_url
+    );
+
+    if let Some(me) = identity {
+        body.push_str(&format!(
+            "\nMerchant: {}\nOrganization: {} ({})\nEnvironment: {}",
+            me.merchant_id, me.organization_name, me.organization_id, me.environment
+        ));
+    }
+
     cli::output::print_note(
         &format!("Account details [{}]", common.profile),
-        &format!(
-            "Profile:  {}\nToken:    {}\nAPI URL:  {}",
-            auth.profile, token_preview, auth.api_url
-        ),
+        &body,
     );
 
     if let Ok(path) = config_path() {

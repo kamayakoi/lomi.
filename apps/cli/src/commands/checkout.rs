@@ -20,25 +20,22 @@ pub enum CheckoutCommand {
 }
 
 #[derive(Serialize)]
-struct LineItem {
-    price: String,
-    quantity: u32,
-}
-
-#[derive(Serialize)]
 struct CreateCheckoutSessionRequest {
-    merchant_id: String,
+    currency_code: String,
     success_url: String,
     cancel_url: String,
-    line_items: Vec<LineItem>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    price_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    amount: Option<f64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     customer_email: Option<String>,
 }
 
 #[derive(Deserialize)]
 struct CheckoutSessionResponse {
-    id: String,
-    url: String,
+    checkout_session_id: String,
+    checkout_url: String,
 }
 
 pub async fn run(common: &CommonOptions, args: CheckoutArgs) -> Result<()> {
@@ -53,11 +50,27 @@ async fn create_checkout_session(common: &CommonOptions) -> Result<()> {
     let auth = ensure_authenticated(common, true, false, false).await?;
     let client = ApiClient::new(&auth)?;
 
-    let merchant_id = cli::prompts::text("Enter your merchant ID:")?;
-    let price_id = cli::prompts::text("Enter price ID (price_xxx):")?;
-    let success_url = cli::prompts::text("Success URL (use {CHECKOUT_SESSION_ID} placeholder):")?;
+    let use_price = cli::prompts::confirm("Do you have a price ID?", true)?;
+    let (price_id, amount) = if use_price {
+        let price_id = cli::prompts::text("Enter price ID:")?;
+        (Some(price_id), None)
+    } else {
+        let amount_text = cli::prompts::text("Enter amount:")?;
+        let amount: f64 = amount_text
+            .parse()
+            .map_err(|_| anyhow::anyhow!("Amount must be a number"))?;
+        (None, Some(amount))
+    };
+
+    let currency = cli::prompts::select(
+        "Select currency:",
+        vec!["XOF".to_string(), "USD".to_string(), "EUR".to_string()],
+        "XOF".to_string(),
+    )?;
+    let success_url = cli::prompts::text("Success URL:")?;
     let cancel_url = cli::prompts::text("Cancel URL:")?;
-    let customer_email: String = cli::prompts::text("Customer email (optional, press Enter to skip):")?;
+    let customer_email: String =
+        cli::prompts::text("Customer email (optional, press Enter to skip):")?;
     let customer_email = if customer_email.trim().is_empty() {
         None
     } else {
@@ -72,13 +85,11 @@ async fn create_checkout_session(common: &CommonOptions) -> Result<()> {
         .post(
             "/checkout-sessions",
             &CreateCheckoutSessionRequest {
-                merchant_id,
+                currency_code: currency,
                 success_url,
                 cancel_url,
-                line_items: vec![LineItem {
-                    price: price_id,
-                    quantity: 1,
-                }],
+                price_id,
+                amount,
                 customer_email,
             },
         )
@@ -89,8 +100,8 @@ async fn create_checkout_session(common: &CommonOptions) -> Result<()> {
 
     println!();
     println!("{}", "Session Details:".bold());
-    println!("ID:  {}", response.id.cyan());
-    println!("URL: {}", response.url.bright_blue());
+    println!("ID:  {}", response.checkout_session_id.cyan());
+    println!("URL: {}", response.checkout_url.bright_blue());
     println!();
     println!("Redirect your customer to the URL above to complete payment.");
     Ok(())

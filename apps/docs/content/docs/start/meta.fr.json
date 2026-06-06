@@ -1,0 +1,14 @@
+{
+  "title": "Démarrer",
+  "description": "Comprendre lomi., créer un compte, obtenir des clés API, faire un paiement de test et passer en production.",
+  "root": true,
+  "icon": "Compass",
+  "pages": [
+    "overview",
+    "create-account",
+    "api-keys",
+    "first-payment",
+    "sandbox-payments",
+    "go-live"
+  ]
+}

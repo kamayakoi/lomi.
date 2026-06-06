@@ -1,0 +1,41 @@
+---
+title: 'What should I check before going live?'
+description: 'Review keys, checkout URLs, webhooks, payment methods, reconciliation, and support before enabling real payments.'
+---
+
+Use this checklist before switching from test keys to live keys.
+
+## Account and dashboard
+
+- Your account verification is complete.
+- Business details, support contact, and payout information are correct.
+- Team members have the right access.
+- Test data is not confused with live reporting.
+
+## Keys and environments
+
+- Production servers use `lomi_sk_live_...`.
+- Frontend card flows use `lomi_pk_live_...` only where required.
+- Secret keys are stored in environment variables or a secrets manager.
+- Logs, analytics, and error reporters do not capture keys or `client_secret` values.
+
+## Checkout and payment methods
+
+- Success and cancel URLs point to production pages.
+- Checkout copy, product names, amounts, currencies, and metadata are correct.
+- Enabled payment methods match the countries and customers you serve.
+- Failure, cancellation, and pending states are visible to customers.
+
+## Webhooks and reconciliation
+
+- Your webhook endpoint is reachable over HTTPS.
+- Signatures are verified from the raw request body.
+- Event handling is idempotent.
+- Your system can reconcile orders against lomi. transaction IDs.
+- Your team knows where to inspect webhook delivery and retry behavior.
+
+## Final live test
+
+Create one small live payment, complete it, verify the webhook, confirm dashboard reporting, then refund or reconcile it according to your internal process.
+
+Next: [API Reference](/api) or [Build guides](/build/choose-integration).

@@ -1,0 +1,197 @@
+---
+title: 'Command reference'
+description: 'Complete reference for every lomi. CLI command, subcommand, and global flag.'
+---
+
+All commands support global flags documented in [Getting started](/build/cli/overview#global-options).
+
+## Authentication
+
+### `lomi login`
+
+Authenticate via browser device flow. Stores a CLI token globally.
+
+```bash
+lomi login
+lomi login --no-browser
+lomi login --profile sandbox
+```
+
+### `lomi logout`
+
+Remove stored credentials for a profile.
+
+```bash
+lomi logout
+lomi logout --profile sandbox
+```
+
+### `lomi whoami`
+
+Show the active profile and account context.
+
+```bash
+lomi whoami
+```
+
+### `lomi status`
+
+Verify login and API connectivity (`GET /` + `GET /accounts/balance`).
+
+```bash
+lomi status
+```
+
+### `lomi list-profiles`
+
+List all saved auth profiles.
+
+```bash
+lomi list-profiles
+```
+
+### `lomi switch <profile>`
+
+Set the default active profile.
+
+```bash
+lomi switch sandbox
+```
+
+---
+
+## Project setup
+
+### `lomi init`
+
+Scaffold SDK client, examples, and `.env`. See [Initialize a project](/build/cli/init).
+
+```bash
+lomi init
+lomi init --yes -e sandbox -L ts --api-key lomi_sk_test_xxx
+```
+
+### `lomi update`
+
+Update `@lomi./sdk` in the current project (runs your package manager).
+
+```bash
+lomi update
+```
+
+---
+
+## Development
+
+### `lomi dev`
+
+Start a local webhook development server. See [Local development server](/build/cli/dev).
+
+```bash
+lomi dev
+lomi dev --port 4242
+lomi dev --verify-signature
+lomi dev --env-file .env.local
+```
+
+| Flag | Default | Description |
+| --- | --- | --- |
+| `-p, --port` | `4242` | HTTP port |
+| `--env-file` | `.env` | Path to dotenv file |
+| `--verify-signature` | `false` | Verify `lomi-signature` header |
+| `--skip-rules-install` | — | Skip agent rules prompt |
+
+**Endpoints:**
+
+- `POST /webhook` — receive webhook events
+- `GET /health` — health check
+
+---
+
+## Payments
+
+These commands require authentication and run interactively (prompts for merchant ID, amounts, URLs, etc.).
+
+### `lomi checkout create`
+
+Create a hosted checkout session via `POST /checkout-sessions`.
+
+```bash
+lomi checkout create
+```
+
+Prompts for: merchant ID, price ID, success URL, cancel URL, optional customer email.
+
+### `lomi payments create`
+
+Create a payment link via the payment links API.
+
+```bash
+lomi payments create
+```
+
+Prompts for: merchant ID, title, price, currency.
+
+---
+
+## AI agent rules
+
+### `lomi install-rules`
+
+Install lomi. documentation for AI coding tools. See [Install agent rules](/build/cli/install-rules).
+
+```bash
+lomi install-rules
+lomi install-rules --target cursor --target llms.txt
+lomi install-rules --force
+```
+
+| Target | Output |
+| --- | --- |
+| `cursor` | `.cursor/rules/lomi.*.mdc` |
+| `claude-code` | `CLAUDE.md` |
+| `codex` | `AGENTS.md` |
+| `vscode` | `.github/instructions/lomi-*.instructions.md` |
+| `llms.txt` | Project-root `llms.txt` |
+
+---
+
+## Typical workflows
+
+### New integration from scratch
+
+```bash
+npm install -g lomi.cli
+lomi login
+mkdir my-store && cd my-store
+lomi init
+lomi install-rules --target cursor
+lomi dev
+```
+
+### Sandbox vs production profiles
+
+```bash
+lomi login --profile sandbox
+lomi login --profile production
+lomi switch sandbox
+lomi init --profile sandbox
+```
+
+### CI pipeline
+
+```bash
+export LOMI_ACCESS_TOKEN=$CLI_TOKEN
+lomi status
+lomi init --yes -e sandbox -L ts --api-key $LOMI_API_KEY --skip-package-install --skip-rules-install
+```
+
+## Help
+
+```bash
+lomi --help
+lomi login --help
+lomi init --help
+lomi dev --help
+lomi install-rules --help
+```

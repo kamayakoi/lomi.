@@ -1,0 +1,68 @@
+---
+title: E‑commerce extensions
+description:
+  Official and maintained plugins for hosted checkout with Lomi. WooCommerce,
+  Magento 2, and PrestaShop use the same public API contract; Shopify is
+  documented separately.
+---
+
+import { Cards, Card } from 'fumadocs-ui/components/card';
+import { Callout } from 'fumadocs-ui/components/callout';
+
+# E‑commerce extensions
+
+Install Lomi on your store without writing checkout plumbing yourself. These modules create **hosted checkout sessions**, redirect shoppers to Lomi Checkout, then confirm payment via **return URLs** and **merchant webhooks**.
+
+## Shared technical contract
+
+WooCommerce, Magento 2, and PrestaShop talk only to Lomi’s **public REST API** (`/v1/checkout-sessions`). They do **not** call Supabase RPC or internal-only Nest endpoints.
+
+| Concern | Contract |
+| --- | --- |
+| Base URL | `https://api.lomi.africa` (live) or `https://sandbox.api.lomi.africa` (test) |
+| Auth | `X-API-Key` — merchant **secret** key from the dashboard |
+| Create session | `POST /checkout-sessions` |
+| Confirm session | `GET /checkout-sessions/{id}` |
+| Paid state | Session `status` **`completed`**, with amount/currency checked against the cart/order |
+| Webhooks | `X-Lomi-Event` (e.g. `PAYMENT_SUCCEEDED`), `X-Lomi-Signature` — **HMAC-SHA256 hex** over the **raw** JSON body |
+
+For the canonical wording maintained next to source code, see the repo docs:
+
+- [Platform plugins integration contract](https://github.com/lomiafrica/lomi./blob/master/apps/plugins/INTEGRATION_CONTRACT.md)
+- [Integration QA checklist](https://github.com/lomiafrica/lomi./blob/master/apps/plugins/INTEGRATION_QA_CHECKLIST.md)
+
+Before going live, also read [API integration](/start/first-payment), [Authentication](/api/authentication), and [Webhooks](/build/webhooks) for outbound subscription management.
+
+## Choose your platform
+
+<Cards>
+  <Card
+    title="MCP"
+    description="Hosted Model Context Protocol server for AI clients"
+    href="/build/ecommerce-extensions/mcp"
+  />
+  <Card
+    title="WooCommerce"
+    description="WordPress / WooCommerce payment gateway"
+    href="/build/ecommerce-extensions/woocommerce"
+  />
+  <Card
+    title="Magento 2"
+    description="Lomi_Payments hosted checkout module"
+    href="/build/ecommerce-extensions/magento"
+  />
+  <Card
+    title="PrestaShop"
+    description="PrestaShop 1.7+ module"
+    href="/build/ecommerce-extensions/prestashop"
+  />
+  <Card
+    title="Shopify"
+    description="Remix app — work in progress"
+    href="/build/ecommerce-extensions/shopify"
+  />
+</Cards>
+
+<Callout type="info">
+  **Shopify** uses OAuth, embedded admin, and app-managed configuration — see the Shopify page for current limitations and a **Work in progress** notice.
+</Callout>

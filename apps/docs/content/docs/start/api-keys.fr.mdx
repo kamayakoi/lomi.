@@ -1,0 +1,55 @@
+---
+title: 'Où trouver mes clés API ?'
+description: 'Trouvez vos clés de test et live, comprenez quelle clé utiliser à quel endroit et stockez-les correctement.'
+---
+
+Les clés API connectent votre application à lomi. Utilisez les clés de test pendant le développement, puis passez aux clés live uniquement quand l’intégration est validée.
+
+![Paramètres de clés API à remplacer](/placeholder.webp)
+
+## Où sont les clés ?
+
+Ouvrez le tableau de bord, puis allez dans **Settings -> Access tokens** ou la page développeur/API équivalente de votre compte.
+
+Vous verrez des clés séparées pour les environnements test et live :
+
+| Clé | Préfixe | À utiliser depuis |
+| --- | --- | --- |
+| Clé secrète test | `lomi_sk_test_...` | Votre serveur pendant le développement |
+| Clé secrète live | `lomi_sk_live_...` | Votre serveur en production |
+| Clé publiable test | `lomi_pk_test_...` | Navigateur/mobile pour les flux carte en test |
+| Clé publiable live | `lomi_pk_live_...` | Navigateur/mobile pour les flux carte en live |
+
+## Quelle clé utiliser ?
+
+Utilisez les clés secrètes uniquement côté serveur, scripts, workers et CI que vous contrôlez. Ne mettez jamais une clé secrète dans du code frontend, une app mobile, un dépôt public, des logs, captures d’écran ou messages de support.
+
+Utilisez les clés publiables seulement lorsqu’un guide le demande explicitement, par exemple pour confirmer une carte avec Payment Elements.
+
+## Variables d’environnement
+
+Stockez les clés dans votre environnement d’exécution :
+
+```bash filename=".env.example"
+LOMI_SECRET_KEY=lomi_sk_test_xxxxxxxxxxxxxxxxxxxxxx
+LOMI_PUBLISHABLE_KEY=lomi_pk_test_xxxxxxxxxxxxxxxxxxxxxx
+LOMI_WEBHOOK_SECRET=whsec_xxxxxxxxxxxxxxxxxxxxxx
+```
+
+Au passage en production, remplacez les clés de test par les clés live et utilisez `https://api.lomi.africa` pour les appels HTTP directs.
+
+## Vérifier que la clé fonctionne
+
+```bash
+curl -sS \
+  -H "X-API-Key: $LOMI_SECRET_KEY" \
+  "https://sandbox.api.lomi.africa/accounts"
+```
+
+Si la requête renvoie `401`, vérifiez que la clé secrète est complète et que votre serveur charge bien la variable d’environnement.
+
+## Étapes suivantes
+
+- [Faire un paiement de test](/start/first-payment)
+- [Authentification API](/api/authentication)
+- [Erreurs](/api/errors)

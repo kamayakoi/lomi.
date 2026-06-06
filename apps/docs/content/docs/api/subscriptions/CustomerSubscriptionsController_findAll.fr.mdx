@@ -1,0 +1,72 @@
+---
+title: "List customer subscriptions"
+description: "List customer subscriptions"
+full: true
+method: get
+path: /customer-subscriptions
+operationId: CustomerSubscriptionsController_findAll
+---
+
+## Aperçu
+
+List customer subscriptions
+
+### Quand utiliser cet endpoint
+
+Utilisez cet endpoint quand vous devez exécuter `GET /customer-subscriptions` (List customer subscriptions).
+
+
+## Authentification
+
+Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (voir [Aperçu de l’intégration](/api)). Utilisez une clé **test** avec `https://sandbox.api.lomi.africa` et une clé **live** avec `https://api.lomi.africa`.
+
+## Point de terminaison
+
+`GET /customer-subscriptions`
+
+URLs de base :
+
+- `https://sandbox.api.lomi.africa`
+- `https://api.lomi.africa`
+
+## Requête
+
+### Paramètres de chemin
+
+_Aucun paramètre de chemin au-delà du motif d’URL._
+
+
+### Paramètres de requête
+
+| Nom | Emplacement | Obligatoire | Schéma | Description |
+| --- | --- | --- | --- | --- |
+| `offset` | query | Non | — |  |
+| `limit` | query | Non | — |  |
+| `status` | query | Non | — |  |
+| `customer_id` | query | Non | — |  |
+
+
+
+## Réponses
+
+| Statut | Description |
+| --- | --- |
+| `200` | — |
+
+## Erreurs
+
+Les erreurs suivent le format JSON standard (code de statut et message lisible par machine). Validez les entrées avant appel ; **401** indique une clé manquante/invalide, **404** une ressource introuvable pour cette organisation, **429** une limitation de débit. Pour les retries sûrs sur les créations, envoyez une clé d’idempotence quand votre flux le permet.
+
+## Exemple
+
+```bash
+curl -sS -X GET "https://sandbox.api.lomi.africa/customer-subscriptions?offset=1&limit=1" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+
+## OpenAPI
+
+- **operationId**: `CustomerSubscriptionsController_findAll`
+- **Operation**: `GET /customer-subscriptions`
+
+Schémas complets et **Try it** : [référence API](/api/index). Contrat machine : `openapi.json` à la racine des docs.

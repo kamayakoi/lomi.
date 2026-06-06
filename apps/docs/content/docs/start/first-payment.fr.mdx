@@ -1,0 +1,61 @@
+---
+title: 'Comment faire un paiement de test ?'
+description: 'Créez une session de checkout en sandbox, ouvrez l’URL hébergée, payez avec un moyen de test et vérifiez le résultat.'
+---
+
+C’est le chemin le plus rapide pour vérifier que votre compte lomi., votre clé API, le checkout et vos hypothèses webhook fonctionnent ensemble.
+
+## Avant de commencer
+
+Il vous faut :
+
+- Un compte lomi.
+- Une clé secrète de test comme `lomi_sk_test_...`.
+- Une URL de succès et une URL d’annulation, locales ou hébergées.
+
+## 1. Créer une session de checkout
+
+```bash
+curl -sS -X POST "https://sandbox.api.lomi.africa/checkout-sessions" \
+  -H "X-API-Key: $LOMI_SECRET_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "amount": 10000,
+    "currency_code": "XOF",
+    "title": "Commande de test",
+    "success_url": "https://example.com/success",
+    "cancel_url": "https://example.com/cancel"
+  }'
+```
+
+La réponse contient une URL de checkout hébergé. Ouvrez-la dans votre navigateur.
+
+![Écran de checkout hébergé à remplacer](/placeholder.webp)
+
+## 2. Payer avec un moyen de test
+
+Pour un paiement carte réussi simple, utilisez :
+
+| Champ | Valeur |
+| --- | --- |
+| Numéro de carte | `4242 4242 4242 4242` |
+| Expiration | Une date future, par exemple `12/34` |
+| CVC | Trois chiffres au choix |
+
+Vous pouvez aussi tester le mobile money en sandbox. Consultez [paiements sandbox](/start/sandbox-payments) pour le comportement complet.
+
+## 3. Vérifier le résultat
+
+Après le paiement, vérifiez :
+
+- Le checkout redirige vers votre URL de succès.
+- La transaction apparaît dans la vue test du tableau de bord.
+- Votre solde de test évolue si la méthode crée une transaction complétée.
+- Votre endpoint webhook reçoit l’événement si les webhooks sont configurés.
+
+## Que construire ensuite ?
+
+- Utilisez le [checkout hébergé](/build/checkout) pour une app ou boutique.
+- Utilisez les [liens de paiement](/build/payment-links) si vous voulez une URL partageable.
+- Utilisez les [webhooks](/build/webhooks) pour réconcilier les états côté serveur.
+- Consultez la [référence API](/api) pour les détails exacts des endpoints.

@@ -1,0 +1,90 @@
+---
+title: 'Authentification'
+description: 'Connectez la CLI lomi. via le flux device dans le navigateur, gérez les profils et utilisez des jetons en CI.'
+---
+
+La plupart des commandes CLI qui appellent l’API lomi. nécessitent une authentification via un **flux d’autorisation device** (OAuth 2.0 device grant).
+
+## Usage
+
+```bash filename="Terminal"
+lomi login
+```
+
+### Options
+
+| Option | Description |
+| --- | --- |
+| `--no-browser` | Afficher l’URL au lieu d’ouvrir le navigateur |
+| `--profile <nom>` | Enregistrer sous un profil nommé |
+
+### Exemple sandbox
+
+```bash filename="Terminal"
+lomi login --profile sandbox
+lomi switch sandbox
+```
+
+## Fonctionnement
+
+<Steps>
+
+### 1. Démarrage device
+
+La CLI contacte la fonction edge Supabase `cli-auth` et reçoit un **code utilisateur** et une **URL de vérification**.
+
+### 2. Autorisation dans le navigateur
+
+Connectez-vous à lomi. et approuvez la CLI.
+
+### 3. Polling et jeton
+
+La CLI interroge le service jusqu’à réception d’une clé API utilisée comme jeton CLI.
+
+### 4. Stockage global
+
+| Plateforme | Fichier de config |
+| --- | --- |
+| macOS | `~/Library/Application Support/lomi/config.json` |
+| Linux | `~/.config/lomi/config.json` |
+
+Variable `LOMI_CONFIG_DIR` pour surcharger le répertoire.
+
+</Steps>
+
+## Vérifier l’authentification
+
+```bash filename="Terminal"
+lomi whoami
+lomi status
+```
+
+## Profils
+
+```bash filename="Terminal"
+lomi login --profile sandbox
+lomi login --profile production
+lomi list-profiles
+lomi switch sandbox
+lomi logout --profile sandbox
+```
+
+## CI et environnements sans TTY
+
+```bash filename="Terminal"
+export LOMI_ACCESS_TOKEN=votre_jeton_cli
+lomi status
+```
+
+## Dépannage
+
+| Problème | Solution |
+| --- | --- |
+| Navigateur ne s’ouvre pas | Copier l’URL affichée |
+| Code expiré | Relancer `lomi login` |
+| Non authentifié | `lomi login` ou `LOMI_ACCESS_TOKEN` |
+
+## Suite
+
+- [Initialiser un projet](/build/cli/init)
+- [Configuration](/build/cli/configuration)

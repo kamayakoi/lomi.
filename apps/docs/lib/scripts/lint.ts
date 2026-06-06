@@ -12,7 +12,7 @@ import remarkMdx from 'remark-mdx';
 import { visit } from 'unist-util-visit';
 import { remark } from 'remark';
 import { remarkHeading } from 'fumadocs-core/mdx-plugins';
-import { isAgentRoute } from '@/lib/scripts/manual-api/constants';
+import { isPublicRestApiOperation } from '@/lib/scripts/manual-api/constants';
 import { collectPublicOperations } from '@/lib/scripts/manual-api/render-operation-mdx';
 
 const HTTP_METHODS = [
@@ -149,9 +149,19 @@ function collectOpenApiTextErrors(spec: JsonObject, errors: string[]): void {
 
 /** Provider ingress routes must not appear in the committed public OpenAPI contract. */
 const FORBIDDEN_PUBLIC_OPENAPI_PATHS = new Set([
+  '/accounts',
+  '/accounts/{id}',
+  '/organizations',
+  '/providers',
   '/webhooks/stripe',
   '/webhooks/wave',
 ]);
+
+const FORBIDDEN_PUBLIC_OPENAPI_PREFIXES = [
+  '/agent/',
+  '/merchants/',
+  '/organizations/',
+] as const;
 
 function collectForbiddenProviderIngressOpenApiPaths(
   spec: JsonObject,
@@ -159,9 +169,14 @@ function collectForbiddenProviderIngressOpenApiPaths(
 ): void {
   if (!spec.paths || typeof spec.paths !== 'object') return;
   for (const pathKey of Object.keys(spec.paths as Record<string, unknown>)) {
-    if (FORBIDDEN_PUBLIC_OPENAPI_PATHS.has(pathKey)) {
+    if (
+      FORBIDDEN_PUBLIC_OPENAPI_PATHS.has(pathKey) ||
+      FORBIDDEN_PUBLIC_OPENAPI_PREFIXES.some((prefix) =>
+        pathKey.startsWith(prefix),
+      )
+    ) {
       errors.push(
-        `openapi.json defines forbidden provider-ingress path "${pathKey}"; remove it from the export graph and re-run apps/api openapi:export.`,
+        `openapi.json defines forbidden public path "${pathKey}"; remove it from the export graph and re-run apps/api openapi:export.`,
       );
     }
   }
@@ -361,13 +376,15 @@ async function checkRestApiManualPages(): Promise<void> {
 
   const operations = collectPublicOperations(
     spec as Parameters<typeof collectPublicOperations>[0],
-  ).filter((o) => !isAgentRoute(o.path));
+  ).filter((o) => isPublicRestApiOperation(o.method, o.path));
 
   const expected = new Set(
     operations.map((o) => `${o.method.toUpperCase()} ${o.path}`),
   );
 
-  const docFiles = await glob('content/docs/api/*/*.mdx');
+  const docFiles = (await glob('content/docs/api/*/*.mdx')).filter(
+    (file) => !/\/index(?:\.fr)?\.mdx$/.test(file),
+  );
   const documented = new Set<string>();
   const errors: string[] = [];
 

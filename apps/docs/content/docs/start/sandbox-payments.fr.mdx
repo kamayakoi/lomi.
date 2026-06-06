@@ -1,0 +1,57 @@
+---
+title: 'Comment tester en sécurité dans la sandbox ?'
+description: 'Utilisez les clés de test, moyens de paiement de test, soldes de test et webhooks avant de passer en live.'
+---
+
+La sandbox permet d’exécuter des flux de paiement réalistes sans déplacer d’argent réel. Utilisez-la pour tester le checkout, les webhooks, les échecs et la répétition du passage en production.
+
+![Résultat de paiement sandbox à remplacer](/placeholder.webp)
+
+## Test et live en un coup d’œil
+
+| Zone | Test | Live |
+| --- | --- | --- |
+| URL de base | `https://sandbox.api.lomi.africa` | `https://api.lomi.africa` |
+| Clé secrète | `lomi_sk_test_...` | `lomi_sk_live_...` |
+| Clé publiable | `lomi_pk_test_...` | `lomi_pk_live_...` |
+| Mouvement d’argent | Soldes de test uniquement | Soldes et reversements réels |
+| Notifications client | Généralement supprimées ou simulées | Communication réelle au client |
+
+## Que tester ?
+
+Avant le live, testez au minimum :
+
+- Un paiement réussi via checkout hébergé.
+- Un paiement carte refusé ou échoué.
+- L’initiation et la complétion d’un paiement mobile money.
+- L’annulation côté client depuis le checkout.
+- La livraison webhook, la vérification de signature et le traitement idempotent.
+- La réconciliation entre transaction, paiement et solde dans le dashboard.
+
+## Cartes de test courantes
+
+| Scénario | Numéro de carte |
+| --- | --- |
+| Paiement réussi | `4242 4242 4242 4242` |
+| Refus générique | `4000 0000 0000 0002` |
+| Fonds insuffisants | `4000 0000 0000 9995` |
+| Challenge 3D Secure | `4000 0025 0000 3155` |
+| CVC incorrect | `4000 0000 0000 0127` |
+
+Utilisez une date d’expiration future et un CVC valide, sauf si le scénario teste précisément le CVC.
+
+## Tester le mobile money
+
+En sandbox, les flux mobile money simulent le comportement fournisseur. Utilisez des formats de téléphone réalistes pour le marché testé, puis vérifiez la transaction dashboard et l’événement webhook.
+
+## Quand passer en live ?
+
+Passez aux clés live seulement quand :
+
+- Votre serveur n’expose jamais les clés secrètes.
+- Vos URLs de succès et d’annulation sont des URLs de production.
+- Les signatures webhook sont vérifiées avec le corps brut de la requête.
+- La création de paiement est idempotente lorsque des retries sont possibles.
+- Votre équipe sait réconcilier transactions et reversements dans le dashboard.
+
+Ensuite : [checklist de passage en production](/start/go-live).

@@ -1,0 +1,27 @@
+---
+title: 'Advanced Direct Charges'
+description: 'Create direct Wave, MTN MoMo, and embedded card payments when hosted checkout is not the right fit.'
+index: true
+---
+
+Direct charge APIs are for teams that need lower-level control than hosted checkout or payment links. Keep using [Checkout Sessions](/api/checkout-sessions) for the default hosted flow.
+
+## When to use direct charges
+
+Use direct charges when:
+
+- Your app already owns the payment UI.
+- You need to start a Wave or MTN MoMo payment from a custom flow.
+- You need embedded card collection with client-side confirmation.
+- You can handle pending, failed, cancelled, and completed states yourself.
+
+## What to build around it
+
+Direct charge integrations should include:
+
+- Server-side creation with a secret key.
+- Customer-visible pending and failure states.
+- Webhook handling for final reconciliation.
+- Safe handling of any `client_secret` returned for embedded card flows.
+
+<DocsCategory />

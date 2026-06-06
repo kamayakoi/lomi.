@@ -1,0 +1,42 @@
+---
+title: Shopify
+description:
+  Application Shopify basée sur le modèle Remix — en cours. Contrat différent
+  des plugins WooCommerce / Magento / PrestaShop (sessions checkout uniquement).
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+# Shopify
+
+<Callout type="warn">
+  **En cours.** La documentation marchande pour Lomi sur Shopify n’est pas terminée. Le dépôt repose sur le **Shopify App Template (Remix)** officiel, avec stockage de session Supabase et configuration Lomi — le comportement et les consignes d’exploitation peuvent encore évoluer.
+</Callout>
+
+## Périmètre actuel
+
+L’application dans [`apps/plugins/shopify`](https://github.com/lomiafrica/lomi./tree/master/apps/plugins/shopify) couvre notamment :
+
+- **OAuth Shopify** et admin embarqué via `@shopify/shopify-app-remix`
+- **Supabase** pour les sessions Shopify et les réglages marchands Lomi (voir README **Application Storage**)
+- Développement local **Shopify CLI / Remix** et déploiement
+
+Elle ne reproduit pas encore le même récit **session de checkout hébergée + webhook tableau de bord** que WooCommerce, Magento et PrestaShop décrit dans le [contrat d’intégration des plugins](https://github.com/lomiafrica/lomi./blob/master/apps/plugins/INTEGRATION_CONTRACT.md).
+
+## Où regarder aujourd’hui
+
+- README du dépôt (démarrage rapide, variables d’environnement, pièges webhooks) : [shopify/README.md](https://github.com/lomiafrica/lomi./blob/master/apps/plugins/shopify/README.md)
+- Modèle de gestion des webhooks obligatoires (template) : `app/routes/webhooks` (liens dans le README)
+
+## Documentation prévue (en cours)
+
+Quand cette page ne sera plus « en cours », elle devrait couvrir :
+
+- Onboarding marchand (clés, environnements, APIs Lomi utilisées)
+- Sujets webhook Shopify requis et pièges **HMAC** (création admin vs abonnements gérés par l’app)
+- Correspondance commandes / paiements Shopify avec transactions Lomi et rapprochement
+
+## Voir aussi
+
+- [Hub extensions e‑commerce](/build/ecommerce-extensions)
+- [Liste de contrôle QA d’intégration](https://github.com/lomiafrica/lomi./blob/master/apps/plugins/INTEGRATION_QA_CHECKLIST.md) (orientée Woo / Magento / Presta pour l’instant ; scénarios Shopify à définir)

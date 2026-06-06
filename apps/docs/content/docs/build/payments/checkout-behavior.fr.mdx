@@ -1,0 +1,101 @@
+---
+title: Comportement du tunnel de paiement
+description: Sessions, liens de paiement, montants, codes promo et règles d’expiration pour le tunnel hébergé.
+---
+
+Le tunnel combine **sessions de paiement**, **liens de paiement**, **produits / tarifs**, **codes promo** et parcours **prestataires**. Cette page décrit les règles transverses ; les détails d’endpoint restent sur chaque ressource.
+
+## Sessions de paiement
+
+- Les sessions sont en général **limitées dans le temps** (la fenêtre d’expiration par défaut est documentée sous [Sessions de paiement](/build/checkout)).
+- Le statut évolue (par ex. ouvert → terminé / expiré) lorsque le client paie ou que le temps est écoulé.
+- Le **`price_id`** sur la session choisit le tarif du produit appliqué ; le montant peut être dérivé ou validé par rapport aux tarifs du produit.
+
+## Liens de paiement
+
+- Les liens **produit** déterminent le montant à partir des tarifs catalogue. Si **`price_id`** est défini, la session initiale utilise le `amount` suggéré de cette ligne de tarif (pas seulement le tarif par défaut).
+- Les liens **instantanés** utilisent un montant fixe que vous fournissez.
+- Les flux multi-lignes peuvent définir **`has_line_items`** dans les métadonnées de session ; les totaux agrègent les lignes, les frais d’expédition / taxes optionnels et les frais liés au produit lorsqu’ils sont configurés.
+- Les produits **payez ce que vous voulez** exigent un lien ou une session **mono-produit**. Les paniers multi-lignes rejettent le PWYW (`line_items_pwyw_not_supported`).
+
+## Payez ce que vous voulez
+
+La tarification flexible est disponible pour les produits **ponctuels** uniquement (`pricing_model: pay_what_you_want` sur une ligne de tarif) :
+
+- **Prix unitaire** — le client choisit un prix unitaire ; total = unité × `quantity`.
+- **`amount` sur le tarif** — prix unitaire suggéré prérempli au tunnel (par défaut `minimum_amount` si omis à la création du produit).
+- **Bornes** — `minimum_amount` (obligatoire) et `maximum_amount` optionnel plafonnent le prix unitaire. L’API et la base **rejettent** un `amount` suggéré hors de `[minimum_amount, maximum_amount]`.
+- **Liens de paiement** — les liens produit préremplissent le montant suggéré depuis le `price_id` lié (ou le tarif par défaut) ; le tunnel hébergé permet à l’acheteur d’ajuster dans les bornes avant de payer.
+- **Sessions API** — à la création d’une session avec `product_id`/`price_id`, passez `amount` comme sous-total produit ou omettez-le pour utiliser le prix suggéré × quantité. Voir [Sessions de paiement](/build/checkout) et [Produits](/build/products).
+
+<Callout type="warning">
+  **N’incluez pas de tarifs payez ce que vous voulez dans un panier multi-produits.** Utilisez un lien ou une session dédiée pour les dons et tarifs flexibles. Les APIs panier renvoient `line_items_pwyw_not_supported`.
+</Callout>
+
+## Abonnements
+
+Les produits récurrents (`product_type: recurring`) créent une **instance d’abonnement** à la fin de l’inscription. Cela s’applique au tunnel hébergé, aux liens de paiement, à la vitrine (bouton S’abonner) et aux sessions API avec un `product_id` récurrent.
+
+<Callout type="warning">
+  **Ne mélangez pas produits récurrents et ponctuels dans un même panier.** Le flux multi-lignes `create_checkout_session_with_line_items` vise les produits ponctuels. Vendez les abonnements via une session ou un lien dédié au produit récurrent.
+</Callout>
+
+### Premier paiement et essais
+
+Les champs produit définissent le **premier prélèvement au tunnel** (voir [Produits](/build/products)) :
+
+| Réglage | Montant à l’inscription |
+|---------|-------------------------|
+| `first_payment_type: initial` | Tarif récurrent (ou part au prorata). |
+| `first_payment_type: non_initial` | **0** à l’inscription ; premier prélèvement à `next_billing_date`. |
+| `first_payment_type: prorated` | Montant partiel pour le reste de la période. |
+| `trial_enabled: true` | **0** pendant `trial_period_days` ; facturation après l’essai. |
+
+Le tunnel hébergé et la vitrine affichent le total résolu côté serveur. Le **`amount` de la session** peut refléter le **prix catalogue** pour respecter la validation (`amount` &gt; 0), tandis que le client paie **0** ou enregistre uniquement sa carte pour l’essai.
+
+### Moyens de paiement à l’inscription
+
+| Prestataire | Essai / inscription à 0 |
+|-------------|-------------------------|
+| **Cartes** | SetupIntent enregistre la carte ; pas de prélèvement avant la fin de l’essai ou la première échéance. |
+| **Wave / MTN** | Inscription sans paiement immédiat lorsque `requires_payment` est false. |
+| **Inscription payante** | Flux de paiement normal ; première transaction de type `instalment` liée à l’abonnement. |
+
+### Renouvellements et échecs
+
+- **Cartes** : prélèvement automatique sur le moyen enregistré à `next_billing_date`.
+- **Mobile money** : sans moyen enregistré, lomi. peut envoyer un **lien de renouvellement manuel** par e-mail.
+- Les échecs peuvent passer le statut en `past_due` ou `paused` selon `failed_payment_action` (`continue`, `pause`, `cancel`).
+- Écoutez **`SUBSCRIPTION_RENEWED`** et **`PAYMENT_FAILED`** (transactions de renouvellement).
+
+### Abonnements à durée fixe
+
+Clés **metadata** produit optionnelles (API `metadata` ou tableau de bord) :
+
+| Clé | Description |
+|-----|-------------|
+| `subscription_length` | `"automatic"` (défaut) ou stratégie à durée fixe. |
+| `fixed_charges` | Nombre de cycles de facturation avant expiration. |
+
+Voir [Abonnements](/build/subscriptions) pour le cycle de vie et les webhooks.
+
+## Codes promo
+
+- La validation applique les **dates**, **plafonds d’usage**, **type de client** (nouveau ou récurrent), **périmètre** (organisation entière ou produits précis) et plafonds de **quantité**.
+- Plusieurs codes (lorsque c’est pris en charge) s’appliquent **séquentiellement** sur un montant courant — voir [Codes de réduction](/build/discount-coupons) et [Exemples de logique des codes](/build/payments/coupon-logic-examples).
+
+## Multi-devises
+
+Lorsque la devise de la session diffère de celle d’un tarif produit, la logique serveur peut **convertir** pour valider que le montant payé correspond au tarif configuré dans l’autre devise.
+
+## Identité client
+
+Le tunnel peut **créer automatiquement ou fusionner** des fiches clients lorsque les champs de contact sont fournis, pour que les webhooks et transactions en aval s’associent lorsque possible à un `customer_id` stable.
+
+## Pages connexes
+
+- [Sessions de paiement](/build/checkout)
+- [Liens de paiement](/build/payment-links)
+- [Produits](/build/products)
+- [Abonnements](/build/subscriptions)
+- [Machine à états du paiement](/api/payment-state-machine)

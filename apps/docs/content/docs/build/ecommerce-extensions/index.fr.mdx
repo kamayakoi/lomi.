@@ -1,0 +1,68 @@
+---
+title: Extensions e‑commerce
+description:
+  Extensions officielles ou maintenues pour un paiement hébergé avec Lomi.
+  WooCommerce, Magento 2 et PrestaShop partagent le même contrat d’API
+  publique ; Shopify est traité à part.
+---
+
+import { Cards, Card } from 'fumadocs-ui/components/card';
+import { Callout } from 'fumadocs-ui/components/callout';
+
+# Extensions e‑commerce
+
+Installez Lomi sur votre boutique sans recoder le tunnel de paiement. Ces modules créent des **sessions de paiement hébergées**, envoient le client vers la **page Lomi Checkout**, puis confirment le paiement via les **URL de retour** et les **webhooks marchands**.
+
+## Contrat technique partagé
+
+WooCommerce, Magento 2 et PrestaShop n’utilent que l’**API REST publique** Lomi (`/v1/checkout-sessions`). Ils **n’appellent pas** les RPC Supabase ni les endpoints internes Nest.
+
+| Point | Contrat |
+| --- | --- |
+| URL de base | `https://api.lomi.africa` (production) ou `https://sandbox.api.lomi.africa` (test) |
+| Auth | `X-API-Key` — clé **secrète** marchande depuis le tableau de bord |
+| Créer une session | `POST /checkout-sessions` |
+| Lire une session | `GET /checkout-sessions/{id}` |
+| Paiement validé | `status` **`completed`**, avec contrôle montant / devise par rapport au panier / commande |
+| Webhooks | `X-Lomi-Event` (ex. `PAYMENT_SUCCEEDED`), `X-Lomi-Signature` — **HMAC-SHA256 hex** sur le corps JSON **brut** |
+
+Formulation canonique à côté du code :
+
+- [Contrat d’intégration des plugins](https://github.com/lomiafrica/lomi./blob/master/apps/plugins/INTEGRATION_CONTRACT.md)
+- [Liste de contrôle QA d’intégration](https://github.com/lomiafrica/lomi./blob/master/apps/plugins/INTEGRATION_QA_CHECKLIST.md)
+
+Avant la mise en production : [Intégration API](/start/first-payment), [Authentification](/api/authentication) et [Webhooks](/build/webhooks).
+
+## Choisir la plateforme
+
+<Cards>
+  <Card
+    title="MCP"
+    description="Serveur Model Context Protocol hébergé pour clients IA"
+    href="/build/ecommerce-extensions/mcp"
+  />
+  <Card
+    title="WooCommerce"
+    description="Passerelle de paiement WordPress / WooCommerce"
+    href="/build/ecommerce-extensions/woocommerce"
+  />
+  <Card
+    title="Magento 2"
+    description="Module Lomi_Payments — checkout hébergé"
+    href="/build/ecommerce-extensions/magento"
+  />
+  <Card
+    title="PrestaShop"
+    description="Module PrestaShop 1.7+"
+    href="/build/ecommerce-extensions/prestashop"
+  />
+  <Card
+    title="Shopify"
+    description="Application Remix — en cours"
+    href="/build/ecommerce-extensions/shopify"
+  />
+</Cards>
+
+<Callout type="info">
+  **Shopify** repose sur OAuth, l’admin intégré et la configuration gérée par l’app — voir la page Shopify pour les limites actuelles et l’avertissement **En cours**.
+</Callout>

@@ -1,0 +1,10 @@
+{
+  "title": "Soldes",
+  "description": "Lecture des soldes et vérifications de disponibilité pour réconciliation et préparation des virements.",
+  "pages": [
+    "index",
+    "AccountsController_getBalance",
+    "AccountsController_getBalanceBreakdown",
+    "AccountsController_checkAvailableBalance"
+  ]
+}

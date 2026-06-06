@@ -32,6 +32,9 @@ function getFirstPageUrl(node: Folder): string | undefined {
 }
 
 const SECTION_LABEL_KEYS: Record<string, string> = {
+  Start: 'section.start',
+  Build: 'section.build',
+  Resources: 'section.resources',
   'First steps': 'section.firstSteps',
   'API Reference': 'section.apiReference',
   'REST API': 'section.restApi',
@@ -42,6 +45,14 @@ const SECTION_LABEL_KEYS: Record<string, string> = {
 };
 
 const SECTION_DESCRIPTION_KEYS: Record<string, string> = {
+  'Understand lomi., create your account, get API keys, make a test payment, and go live.':
+    'sectionDescription.start',
+  'Choose an integration path and build checkout, payment links, subscriptions, webhooks, and tools.':
+    'sectionDescription.build',
+  'Authentication, errors, data models, and endpoint reference for the lomi. API.':
+    'sectionDescription.apiReference',
+  'Support, changelog, merchant policies, open-source material, and contributor documentation.':
+    'sectionDescription.resources',
   'Developers use lomi. to reliably accept payments in West Africa.':
     'sectionDescription.firstSteps',
   'Complete reference to building with lomi. API.':

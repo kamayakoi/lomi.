@@ -44,14 +44,25 @@ lomi init
 # Install AI agent rules (Cursor, Claude Code, Codex)
 lomi install-rules
 
+# Listen for sandbox webhooks (no ngrok)
+lomi listen http://localhost:3000/webhooks
+
 # Local webhook development server
 lomi dev
+
+# Integration health check
+lomi probe
 
 # Create a checkout session
 lomi checkout create
 
 # Create a payment link
 lomi payments create
+
+# Install Lomi UI checkout components
+lomi ui list
+lomi ui add payment-provider-selector
+lomi ui update
 ```
 
 ## Commands
@@ -63,11 +74,17 @@ lomi payments create
 | `whoami` | Show current account and profile |
 | `status` | Verify login and API connectivity |
 | `init` | Initialize project with SDK, examples, and `.env` |
+| `listen` | Cloud webhook relay (sandbox-first) |
+| `probe` | Integration health checks |
+| `webhooks list` / `webhooks test` | Manage and test webhook endpoints |
+| `products list` | List products and prices |
+| `transactions list` | List recent transactions |
 | `checkout create` | Create a hosted checkout session interactively |
 | `dev` | Local webhook receiver for development |
 | `install-rules` | AI setup wizard: Cursor, Claude Code, Codex, llms.txt |
 | `payments create` | Create a payment link interactively |
 | `update` | Update `@lomi./sdk` in the current project |
+| `ui list` / `ui add` / `ui update` | Install Lomi UI components from docs registry (no login) |
 | `list-profiles` | List CLI auth profiles |
 | `switch` | Set the default profile |
 

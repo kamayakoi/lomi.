@@ -1,0 +1,50 @@
+---
+title: 'Comment gérer les webhooks ?'
+description: 'Utilisez les webhooks pour réconcilier paiements, checkout, remboursements, abonnements et reversements depuis votre serveur.'
+---
+
+Les webhooks indiquent à votre backend qu’un événement important s’est produit après une action client ou fournisseur. Utilisez-les pour la réconciliation, la livraison, les emails, les abonnements et les mises à jour comptables.
+
+![Paramètres webhook et journaux de livraison à remplacer](/placeholder.webp)
+
+## À quoi servent les webhooks ?
+
+Utilisez-les pour :
+
+- Confirmer qu’un paiement est complété avant de livrer une commande.
+- Savoir qu’un paiement a échoué, expiré ou été annulé.
+- Suivre création, renouvellement et annulation d’abonnement.
+- Réconcilier remboursements, reversements et changements d’état transaction.
+- Récupérer les cas où le client ne revient jamais via la redirection navigateur.
+
+## Handler minimal sûr
+
+Votre endpoint webhook doit :
+
+1. Lire le corps brut de la requête.
+2. Vérifier la signature avec le secret webhook.
+3. Stocker l’ID d’événement ou de livraison.
+4. Ignorer les doublons sans effet secondaire.
+5. Relire les ressources liées via l’API quand l’état final doit être sûr.
+6. Répondre rapidement avec `2xx` après acceptation de l’événement.
+
+## Erreurs courantes
+
+| Erreur | Comportement plus sûr |
+| --- | --- |
+| Faire confiance uniquement à la redirection succès | Utiliser webhooks ou lecture API serveur pour livrer |
+| Parser le JSON avant la vérification | Vérifier avec le corps brut |
+| Mettre à jour sans idempotence | Stocker les IDs d’événements traités |
+| Supposer un ordre parfait | Relire l’état final de la ressource si nécessaire |
+| Faire un traitement lent inline | Mettre en file les tâches longues après acceptation |
+
+## Que tester ?
+
+Testez les événements réussis, échoués, dupliqués et retardés en sandbox. Vérifiez que l’état dashboard, l’état commande et la communication client sont cohérents.
+
+## API liée
+
+- [Créer un endpoint webhook](/api/webhooks/WebhooksController_create)
+- [Lister les endpoints webhook](/api/webhooks/WebhooksController_findAll)
+- [Journaux de livraison webhook](/api/webhooks)
+- [Fiabilité webhook](/build/advanced-guides/webhook-reliability)

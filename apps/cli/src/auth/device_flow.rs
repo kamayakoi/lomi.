@@ -139,9 +139,13 @@ pub async fn login(options: LoginOptions) -> Result<String> {
     while Instant::now() < expiry {
         tokio::time::sleep(poll_interval).await;
 
+        let environment = environment_for_profile(&options.profile);
         let response = client
             .post(format!("{CLI_AUTH_BASE}/token"))
-            .json(&serde_json::json!({ "device_code": device_auth.device_code }))
+            .json(&serde_json::json!({
+                "device_code": device_auth.device_code,
+                "environment": environment,
+            }))
             .send()
             .await
             .context("Failed to poll for authorization token")?;
@@ -195,6 +199,14 @@ pub async fn login(options: LoginOptions) -> Result<String> {
     }
 
     Ok(token)
+}
+
+pub fn environment_for_profile(profile: &str) -> &'static str {
+    if profile == "sandbox" {
+        "test"
+    } else {
+        "live"
+    }
 }
 
 pub fn api_url_for_profile(profile: &str, override_url: Option<&str>) -> String {

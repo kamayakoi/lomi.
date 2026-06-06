@@ -21,6 +21,9 @@ const STRINGS: Record<Language, Record<string, string>> = {
     'ui.chooseTheme': 'Theme',
     'ui.editOnGithub': 'Edit on GitHub',
     'ui.notFound': 'NOT FOUND',
+    'section.start': 'Start',
+    'section.build': 'Build',
+    'section.resources': 'Resources',
     'section.firstSteps': 'First steps',
     'section.apiReference': 'API Reference',
     'section.restApi': 'REST API',
@@ -28,6 +31,12 @@ const STRINGS: Record<Language, Record<string, string>> = {
     'section.implementation': 'Implementation',
     'section.community': 'Community',
     'section.management': 'Management',
+    'sectionDescription.start':
+      'Understand lomi., create your account, get API keys, make a test payment, and go live.',
+    'sectionDescription.build':
+      'Choose an integration path and build checkout, payment links, subscriptions, webhooks, and tools.',
+    'sectionDescription.resources':
+      'Support, changelog, merchant policies, open-source material, and contributor documentation.',
     'sectionDescription.firstSteps':
       'Developers use lomi. to reliably accept payments in West Africa.',
     'sectionDescription.apiReference':
@@ -58,6 +67,9 @@ const STRINGS: Record<Language, Record<string, string>> = {
     'ui.chooseTheme': 'Thème',
     'ui.editOnGithub': 'Modifier sur GitHub',
     'ui.notFound': 'PAGE INTROUVABLE',
+    'section.start': 'Démarrer',
+    'section.build': 'Construire',
+    'section.resources': 'Ressources',
     'section.firstSteps': 'Premiers pas',
     'section.apiReference': 'Référence API',
     'section.restApi': 'API REST',
@@ -65,6 +77,12 @@ const STRINGS: Record<Language, Record<string, string>> = {
     'section.implementation': 'Mise en œuvre',
     'section.community': 'Communauté',
     'section.management': 'Gestion',
+    'sectionDescription.start':
+      'Comprendre lomi., créer un compte, obtenir des clés API, faire un paiement de test et passer en production.',
+    'sectionDescription.build':
+      'Choisir une intégration et construire checkout, liens de paiement, abonnements, webhooks et outils.',
+    'sectionDescription.resources':
+      'Support, changelog, règles marchandes, open source et documentation contributeur.',
     'sectionDescription.firstSteps':
       "Les développeurs utilisent lomi. pour encaisser des paiements en toute fiabilité en Afrique de l'Ouest.",
     'sectionDescription.apiReference':

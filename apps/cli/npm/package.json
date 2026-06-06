@@ -1,6 +1,6 @@
 {
   "name": "lomi.cli",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "Command line interface for lomi.'s payment infrastructure",
   "bin": {
     "lomi": "bin/lomi.js",

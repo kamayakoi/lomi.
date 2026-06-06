@@ -1,0 +1,41 @@
+---
+title: 'Que vérifier avant de passer en live ?'
+description: 'Vérifiez les clés, URLs de checkout, webhooks, moyens de paiement, réconciliation et support avant d’activer les paiements réels.'
+---
+
+Utilisez cette checklist avant de remplacer les clés de test par les clés live.
+
+## Compte et tableau de bord
+
+- La vérification du compte est terminée.
+- Les informations d’entreprise, contact support et informations de reversement sont corrects.
+- Les membres d’équipe ont les bons accès.
+- Les données de test ne sont pas confondues avec les rapports live.
+
+## Clés et environnements
+
+- Les serveurs de production utilisent `lomi_sk_live_...`.
+- Les flux carte frontend utilisent `lomi_pk_live_...` uniquement quand c’est nécessaire.
+- Les clés secrètes sont stockées dans des variables d’environnement ou un gestionnaire de secrets.
+- Les logs, outils d’analyse et rapports d’erreur ne capturent pas les clés ni les valeurs `client_secret`.
+
+## Checkout et moyens de paiement
+
+- Les URLs de succès et d’annulation pointent vers des pages de production.
+- Les textes, produits, montants, devises et métadonnées du checkout sont corrects.
+- Les moyens de paiement activés correspondent aux pays et clients servis.
+- Les états échec, annulation et attente sont visibles pour les clients.
+
+## Webhooks et réconciliation
+
+- Votre endpoint webhook est accessible en HTTPS.
+- Les signatures sont vérifiées avec le corps brut de la requête.
+- Le traitement des événements est idempotent.
+- Votre système peut réconcilier les commandes avec les IDs de transaction lomi.
+- Votre équipe sait où inspecter les livraisons webhook et les retries.
+
+## Dernier test live
+
+Créez un petit paiement live, complétez-le, vérifiez le webhook, confirmez le reporting dashboard, puis remboursez ou réconciliez-le selon votre processus interne.
+
+Ensuite : [Référence API](/api) ou [guides Build](/build/choose-integration).

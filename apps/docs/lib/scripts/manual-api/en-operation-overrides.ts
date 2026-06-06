@@ -27,19 +27,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     whenToUse:
       'Call before initiating a payout, beneficiary payout, or any flow where you must guarantee spendable balance.',
     related:
-      '[Account balances](/api/accounts/AccountsController_getBalance) · [Payouts](/api/payouts/PayoutsUnifiedController_create)',
-  },
-  AccountsController_findAll: {
-    summary: 'List accounts',
-    body: 'Returns every account your API key can see, typically for reconciliation or routing funds.',
-    whenToUse:
-      'Use when building dashboards, ledgers, or any automation that needs the list of settlement accounts.',
-  },
-  AccountsController_findOne: {
-    summary: 'Retrieve an account',
-    body: 'Returns a single account record. Responds with **404** when the ID is unknown or outside your scope.',
-    whenToUse:
-      'Use after you have an account ID from a prior list call or from a payment/payout response.',
+      '[Account balances](/api/balances/AccountsController_getBalance) · [Payouts](/api/payouts/PayoutsUnifiedController_create)',
   },
   AccountsController_getBalance: {
     summary: 'Account balances',
@@ -149,7 +137,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     whenToUse:
       'Use from your app when a logged-in buyer opens “Manage billing” without building portal UI yourself.',
     related:
-      '[Portal audit log](/api/customers/CustomersController_getPortalAudit) · [Customer subscriptions](/api/customer-subscriptions/CustomerSubscriptionsController_findAll)',
+      '[Portal audit log](/api/customers/CustomersController_getPortalAudit) · [Customer subscriptions](/api/subscriptions/CustomerSubscriptionsController_findAll)',
   },
   CustomersController_getPortalAudit: {
     summary: 'Customer portal audit log',
@@ -165,7 +153,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     whenToUse:
       'Use for billing ops dashboards and exports—not the same as org-level [subscriptions](/api/subscriptions/SubscriptionsController_findAll).',
     related:
-      '[Retrieve customer subscription](/api/customer-subscriptions/CustomerSubscriptionsController_findOne)',
+      '[Retrieve customer subscription](/api/subscriptions/CustomerSubscriptionsController_findOne)',
   },
   CustomerSubscriptionsController_findOne: {
     summary: 'Retrieve customer subscription',
@@ -179,7 +167,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     whenToUse:
       'Use when the buyer cancels via your UI or support cancels on their behalf.',
     related:
-      '[Update customer subscription](/api/customer-subscriptions/CustomerSubscriptionsController_update)',
+      '[Update customer subscription](/api/subscriptions/CustomerSubscriptionsController_update)',
   },
   CustomerSubscriptionsController_update: {
     summary: 'Update customer subscription',
@@ -187,7 +175,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     whenToUse:
       'Use for upgrades, downgrades, or syncing subscription state from your billing system.',
     related:
-      '[Retrieve customer subscription](/api/customer-subscriptions/CustomerSubscriptionsController_findOne)',
+      '[Retrieve customer subscription](/api/subscriptions/CustomerSubscriptionsController_findOne)',
   },
   DiscountCouponsController_create: {
     summary: 'Create discount coupon',
@@ -214,53 +202,6 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     related:
       '[Retrieve coupon](/api/discount-coupons/DiscountCouponsController_findOne)',
   },
-  MerchantsController_getArr: {
-    summary: 'Merchant annual recurring revenue',
-    body: 'Returns ARR metrics for a merchant ID visible to your API key.',
-    whenToUse:
-      'Use in partner or marketplace reporting where you track sub-merchant performance.',
-    related: '[Merchant MRR](/api/merchants/MerchantsController_getMrr)',
-  },
-  MerchantsController_getBalance: {
-    summary: 'Merchant balance',
-    body: 'Returns balance figures for a merchant ID (available, pending, or totals per API shape).',
-    whenToUse:
-      'Use for marketplace dashboards before initiating movements on behalf of a connected merchant.',
-    related:
-      '[Merchant details](/api/merchants/MerchantsController_getDetails)',
-  },
-  MerchantsController_getDetails: {
-    summary: 'Merchant details',
-    body: 'Returns profile and configuration metadata for a merchant ID.',
-    whenToUse:
-      'Use when onboarding status pages or routing API calls per sub-merchant.',
-    related:
-      '[Merchant balance](/api/merchants/MerchantsController_getBalance)',
-  },
-  MerchantsController_getMrr: {
-    summary: 'Merchant monthly recurring revenue',
-    body: 'Returns MRR metrics for a merchant ID visible to your API key.',
-    whenToUse: 'Use for monthly revenue rollups in partner analytics.',
-    related: '[Merchant ARR](/api/merchants/MerchantsController_getArr)',
-  },
-  OrganizationsController_findAll: {
-    summary: 'List organizations',
-    body: 'Returns organizations visible to your API key (merchant users often have one; partners may see several).',
-    whenToUse: 'Use at login or when building org-switcher experiences.',
-  },
-  OrganizationsController_findOne: {
-    summary: 'Retrieve organization',
-    body: 'Returns one organization by ID. Responds with **404** when unknown or outside your scope.',
-    whenToUse:
-      'Use to load merchant profile, branding, or settlement settings for a known org ID.',
-  },
-  OrganizationsController_getMetrics: {
-    summary: 'Organization metrics',
-    body: 'Returns revenue and subscriber-oriented aggregates suitable for dashboard cards.',
-    whenToUse:
-      'Use for home screens and executive summaries rather than low-level transaction drill-down.',
-    related: '[Transactions](/api/transactions/TransactionsController_findAll)',
-  },
   ChargesController_createCardCharge: {
     summary: 'Create embedded card charge',
     body: 'Creates a card charge for embedded checkout and returns `client_secret` for client-side confirmation.',
@@ -284,14 +225,6 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     whenToUse: 'Use when the buyer abandons checkout.',
     related:
       '[Create card charge](/api/charge/ChargesController_createCardCharge)',
-  },
-  ProvidersController_findAll: {
-    summary: 'List payment providers',
-    body: 'Returns payment providers and rails enabled for your organization.',
-    whenToUse:
-      'Use when building checkout method pickers or validating which rails you can charge on.',
-    related:
-      '[Create Wave charge](/api/charge/ChargesController_createWaveCharge)',
   },
   PaymentLinksController_create: {
     summary: 'Create payment link',
@@ -337,7 +270,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     caveats:
       'Self payouts require payout_method_id; beneficiary wave requires recipient.name and recipient.phone (any mobile number, not payout_method_id). Wave rails (self or beneficiary) return 400 on test API keys—live keys only. MTN returns 400 until supported.',
     related:
-      '[List payouts](/api/payouts/PayoutsUnifiedController_findAll) · [Check available balance](/api/accounts/AccountsController_checkAvailableBalance)',
+      '[List payouts](/api/payouts/PayoutsUnifiedController_findAll) · [Check available balance](/api/balances/AccountsController_checkAvailableBalance)',
   },
   PayoutsUnifiedController_findAll: {
     summary: 'List payouts',
@@ -437,7 +370,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     summary: 'Update subscription',
     body: 'Patches an organization subscription (metadata, price, or fields supported by the API).',
     whenToUse:
-      'Use for plan changes initiated from your admin tools—not the customer-portal-scoped [customer subscriptions](/api/customer-subscriptions/CustomerSubscriptionsController_update) API.',
+      'Use for plan changes initiated from your admin tools—not the customer-portal-scoped [customer subscriptions](/api/subscriptions/CustomerSubscriptionsController_update) API.',
     related:
       '[Retrieve subscription](/api/subscriptions/SubscriptionsController_findOne) · [Cancel subscription](/api/subscriptions/SubscriptionsController_cancel)',
   },
@@ -447,7 +380,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     whenToUse:
       'Use as the primary reconciliation feed for payments, refunds, and payouts visible to your org.',
     related:
-      'See also [payment state machine](/reference/reference/payment-state-machine) for status semantics.',
+      'See also [payment state machine](/api/payment-state-machine) for status semantics.',
   },
   TransactionsController_findOne: {
     summary: 'Retrieve transaction',
@@ -502,7 +435,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     whenToUse:
       'Use from support tools—not a substitute for idempotent handling on your server.',
     related:
-      '[Webhook delivery logs](/api/webhook-delivery-logs/WebhookDeliveryLogsController_findOne)',
+      '[Webhook delivery logs](/api/webhooks/WebhookDeliveryLogsController_findOne)',
   },
   WebhooksController_test: {
     summary: 'Test webhook',
@@ -518,6 +451,6 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     caveats:
       'Coordinate secret rotation with your receiver to avoid rejecting signed payloads.',
     related:
-      '[Webhook delivery logs](/api/webhook-delivery-logs/WebhookDeliveryLogsController_findAll)',
+      '[Webhook delivery logs](/api/webhooks/WebhookDeliveryLogsController_findAll)',
   },
 };

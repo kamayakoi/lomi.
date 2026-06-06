@@ -1,0 +1,14 @@
+{
+  "title": "Start",
+  "description": "Understand lomi., create your account, get API keys, make a test payment, and go live.",
+  "root": true,
+  "icon": "Compass",
+  "pages": [
+    "overview",
+    "create-account",
+    "api-keys",
+    "first-payment",
+    "sandbox-payments",
+    "go-live"
+  ]
+}

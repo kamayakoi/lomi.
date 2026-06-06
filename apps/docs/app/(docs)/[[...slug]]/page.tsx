@@ -25,7 +25,7 @@ import { Installation } from '@/components/preview/installation';
 import { Customisation } from '@/components/preview/customisation';
 import { DocsPage } from 'fumadocs-ui/page';
 
-const DEFAULT_DOC_SLUG = ['core', 'introduction', 'what-is-lomi'] as const;
+const DEFAULT_DOC_SLUG = ['start', 'overview'] as const;
 
 function effectiveSlug(slug: string[] | undefined): string[] {
   if (slug && slug.length > 0) return slug;

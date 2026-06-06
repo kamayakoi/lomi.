@@ -4,26 +4,17 @@ Handle lomi. webhook events securely in your application.
 
 ## Signature verification
 
-lomi. signs webhooks with HMAC-SHA256. The signature is in the `lomi-signature` header:
-
-```
-lomi-signature: t=1678886400,s=sha256=abcdef...
-```
-
-Verify by computing HMAC-SHA256 over `{timestamp}.{rawBody}` with your webhook secret.
+lomi. signs webhooks with HMAC-SHA256 over the **raw JSON body**. The signature is in the `X-Lomi-Signature` header; the event type is in `X-Lomi-Event`.
 
 ```typescript
 import crypto from 'node:crypto';
 
-function verifyLomiSignature(rawBody: string, header: string, secret: string) {
-  const parts = header.split(',');
-  const timestamp = parts.find(p => p.startsWith('t='))?.split('=')[1];
-  const signature = parts.find(p => p.startsWith('s='))?.split('=')[1];
+function verifyLomiWebhook(rawBody: string, signature: string, secret: string) {
   const expected = crypto
     .createHmac('sha256', secret)
-    .update(`${timestamp}.${rawBody}`)
+    .update(rawBody)
     .digest('hex');
-  if (!crypto.timingSafeEqual(Buffer.from(signature!, 'hex'), Buffer.from(expected, 'hex'))) {
+  if (!crypto.timingSafeEqual(Buffer.from(signature, 'hex'), Buffer.from(expected, 'hex'))) {
     throw new Error('Invalid signature');
   }
   return JSON.parse(rawBody);
@@ -32,18 +23,17 @@ function verifyLomiSignature(rawBody: string, header: string, secret: string) {
 
 ## Common event types
 
-- `checkout.session.completed`
-- `payment_intent.succeeded`
-- `payment_intent.failed`
-- `transaction.completed`
-- `refund.created`
-- `subscription.created` / `subscription.updated` / `subscription.cancelled`
+- `PAYMENT_SUCCEEDED`
+- `PAYMENT_FAILED`
+- `REFUND_CREATED`
+- `SUBSCRIPTION_CREATED` / `SUBSCRIPTION_UPDATED` / `SUBSCRIPTION_CANCELLED`
 
 ## Local development
 
-Run `lomi dev` to start a local webhook receiver on port 4242.
-Use ngrok or similar to expose it publicly for dashboard webhook configuration.
+**Recommended:** `lomi listen http://localhost:3000/webhooks` — receives real sandbox webhooks via cloud relay (no ngrok).
+
+**Alternative:** `lomi dev` — local HTTP receiver on port 4242.
 
 ## Environment variable
 
-Set `LOMI_WEBHOOK_SECRET=whsec_…` from your dashboard webhook settings.
+Set `LOMI_WEBHOOK_SECRET=whsec_…` from `lomi listen` (connected event) or your dashboard webhook settings.
