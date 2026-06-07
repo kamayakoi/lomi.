@@ -46,7 +46,7 @@ This workflow publishes SDKs to their respective package registries.
 1. Go to **Actions** tab in GitHub
 2. Select **Publish SDKs** workflow
 3. Click **Run workflow**
-4. Choose SDK to publish (typescript/javascript/python/all)
+4. Choose SDK to publish (typescript/javascript/python/embed/all)
 5. Optionally choose version bump (skip/patch/minor/major)
 6. Click **Run workflow** button
 
@@ -81,6 +81,21 @@ Before using the publish workflow, set these secrets in GitHub repository settin
 - **Version:** (pending publication)
 - **Install:** `pip install lomi-sdk`
 - **Registry:** https://pypi.org/project/lomi-sdk/
+
+### Embed SDK
+- **Package:** `@lomi./embed`
+- **Version:** `0.2.0`
+- **Install:** `npm i @lomi./embed`
+- **Registry:** https://www.npmjs.com/package/@lomi./embed
+- **Publish:** GitHub Actions → Publish SDKs → `embed`, or locally:
+
+```bash
+cd apps/sdks/embed
+npm ci
+npm test
+npm run build
+npm publish --access public
+```
 
 ## 🚀 Quick Commands
 

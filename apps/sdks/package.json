@@ -11,8 +11,8 @@
     "generate:python": "node scripts/python-generate.js",
     "generate:go": "node scripts/go-generate.js",
     "generate:php": "node scripts/php-generate.js",
-    "verify:sdk-parity": "node scripts/verify-sdk-surface-parity.js"
-
+    "verify:sdk-parity": "node scripts/verify-sdk-surface-parity.js",
+    "build:embed": "cd embed && npm install && npm run build"
   },
   "keywords": [
     "lomi",

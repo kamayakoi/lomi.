@@ -23,7 +23,7 @@ There are three ways to integrate lomi. Payments:
 | ------------------------------------------- | ---------------------------------------------------------- |
 | **TypeScript SDK (`@lomi./sdk`)**            | Apps web (Vanilla JS, React, Vue, etc.) pour Payment Elements |
 | **React Native SDK (`@lomi/react-native`)** | Native mobile apps for iOS and Android                     |
-| **Embedded Checkout (`@lomi/embed`)**       | iframe-based integration preserving Lomi's full UI         |
+| **Embedded Checkout (`@lomi./embed`)**       | iframe-based integration preserving Lomi's full UI         |
 
 ---
 
@@ -32,7 +32,7 @@ There are three ways to integrate lomi. Payments:
 <Tabs items={['Web (JS)', 'React Native', 'Embedded Checkout']}>
   <Tab value="Web (JS)">```bash npm install @lomi./sdk ```</Tab>
   <Tab value="React Native">```bash npm install @lomi/react-native ```</Tab>
-  <Tab value="Embedded Checkout">```bash npm install @lomi/embed ```</Tab>
+  <Tab value="Embedded Checkout">```bash npm install @lomi./embed ```</Tab>
 </Tabs>
 
 ---
@@ -151,26 +151,21 @@ Detailed endpoint docs: [Create card charge](/api/charge/ChargesController_creat
   </Tab>
 
   <Tab value="Embedded Checkout">
-    ```html
-    <!DOCTYPE html>
-    <html>
-    <body>
-      <div id="lomi-checkout"></div>
-      
-      &lt;script type="module"&gt;
-        import { loadLomiCheckout } from '@lomi/embed';
-        
-        loadLomiCheckout({
-          elementId: 'lomi-checkout',
-          sessionId: 'cs_your_checkout_session_id',
-          publicKey: 'lomi_pk_your_publishable_key',
-        });
-      &lt;/script&gt;
-    </body>
-    </html>
+    See the full guide: [Embed checkout widget](/build/embed-widget).
+
+    ```javascript
+    import { loadLomiCheckout } from '@lomi./embed';
+
+    loadLomiCheckout({
+      checkoutUrl: session.checkout_url,
+      mode: 'modal',
+      onComplete: (payload) => {
+        console.log(payload.transactionId, payload.hasDigitalDeliverables);
+      },
+    });
     ```
 
-    The Embedded Checkout preserves Lomi's full UI/UX and automatically resizes to fit its container.
+    For declarative inline embeds, use `data-lomi-checkout-url` (or `data-lomi-session-id`) on a container element, then load the IIFE bundle (`dist/lomi.js`) or import the npm package.
 
   </Tab>
 </Tabs>

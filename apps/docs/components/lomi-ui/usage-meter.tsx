@@ -19,9 +19,9 @@ function cn(...classes: Array<string | false | null | undefined>) {
 }
 
 function usageTone(percent: number) {
-  if (percent >= 90) return 'bg-red-500';
+  if (percent >= 90) return 'bg-destructive';
   if (percent >= 75) return 'bg-amber-500';
-  return 'bg-[#56A5F9]';
+  return 'bg-primary';
 }
 
 export function UsageMeter({
@@ -33,12 +33,12 @@ export function UsageMeter({
   return (
     <section
       className={cn(
-        'w-full max-w-xl rounded-sm border border-gray-200 bg-white p-5 text-gray-950 shadow-sm',
+        'w-full max-w-xl rounded-sm border bg-card p-5 text-card-foreground shadow-sm',
         className,
       )}
     >
       <h3 className="text-base font-semibold">{title}</h3>
-      <p className="mt-1 text-sm text-gray-500">{description}</p>
+      <p className="mt-1 text-sm text-muted-foreground">{description}</p>
       <div className="mt-5 space-y-4">
         {items.map((item) => {
           const percent = Math.min(
@@ -49,12 +49,12 @@ export function UsageMeter({
             <div key={item.label} className="space-y-2">
               <div className="flex items-center justify-between gap-4 text-sm">
                 <span className="font-medium">{item.label}</span>
-                <span className="text-gray-500">
+                <span className="text-muted-foreground">
                   {item.used.toLocaleString()} / {item.limit.toLocaleString()}
                   {item.unit ? ` ${item.unit}` : ''}
                 </span>
               </div>
-              <div className="h-2 overflow-hidden rounded-full bg-gray-100">
+              <div className="h-2 overflow-hidden rounded-full bg-secondary">
                 <div
                   className={cn(
                     'h-full rounded-full transition-all',

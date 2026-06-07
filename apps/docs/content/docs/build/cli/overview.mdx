@@ -113,6 +113,14 @@ lomi install-rules
 
 Installs Cursor rules, `CLAUDE.md`, `AGENTS.md`, VS Code instructions, and `llms.txt`. See [Install agent rules](/build/cli/install-rules).
 
+### Listen for webhooks (recommended)
+
+```bash filename="Terminal"
+lomi listen http://localhost:3000/webhooks
+```
+
+Receives real sandbox webhooks via cloud relay — no ngrok. See [Listen for webhooks](/build/cli/listen).
+
 ### Run local webhook server
 
 ```bash filename="Terminal"
@@ -132,7 +140,13 @@ Starts a webhook receiver on `http://localhost:4242/webhook`. See [Local develop
 | `lomi whoami` | Show current profile |
 | `lomi status` | Check login and API connectivity |
 | `lomi init` | Scaffold SDK project files |
+| `lomi listen` | Cloud webhook relay (sandbox-first) |
 | `lomi dev` | Local webhook development server |
+| `lomi probe` | Integration health checks |
+| `lomi webhooks list` | List webhook endpoints |
+| `lomi webhooks test` | Send a test webhook event |
+| `lomi products list` | List products and prices |
+| `lomi transactions list` | List recent transactions |
 | `lomi checkout create` | Create a hosted checkout session |
 | `lomi payments create` | Create a payment link |
 | `lomi install-rules` | Install AI agent documentation |

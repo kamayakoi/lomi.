@@ -16,6 +16,10 @@ export type ManifestTool = {
   write: boolean;
   wantsBody: boolean;
   inputSchema: Record<string, unknown>;
+  readOnly: boolean;
+  destructive: boolean;
+  alwaysLoad: boolean;
+  searchHint: string;
 };
 
 export type ToolsManifest = {

@@ -136,6 +136,8 @@ export class ProductsService {
         p_first_payment_type: createProductDto.first_payment_type || 'initial',
         p_trial_enabled: createProductDto.trial_enabled ?? false,
         p_trial_period_days: createProductDto.trial_period_days || null,
+        p_usage_aggregation: createProductDto.usage_aggregation || null,
+        p_usage_unit: createProductDto.usage_unit || null,
       } as any,
     );
 

@@ -36,7 +36,7 @@ lomi whoami
 
 ### `lomi status`
 
-Verify login and API connectivity (`GET /` + `GET /accounts/balance`).
+Verify login and API connectivity (`GET /me` + `GET /accounts/balance`).
 
 ```bash
 lomi status
@@ -79,9 +79,58 @@ Update `@lomi./sdk` in the current project (runs your package manager).
 lomi update
 ```
 
+### `lomi ui`
+
+Install and update [Lomi UI](/build/lomi-ui) checkout components from the live docs registry. See [Lomi UI commands](/build/cli/ui).
+
+```bash
+lomi ui list
+lomi ui add payment-provider-selector
+lomi ui add --all
+lomi ui update
+lomi ui update --component payment-provider-selector
+```
+
+No authentication required. Requires Node.js, `npx`, and a shadcn project (`components.json`).
+
+| Subcommand | Description |
+| --- | --- |
+| `list` | Fetch and print available registry components |
+| `add <name>` | Install one component via `npx shadcn@latest add` |
+| `add --all` | Install every registry item |
+| `update` | Re-install locked components from `.lomi/ui-lock.json` |
+
+| Flag | Applies to | Description |
+| --- | --- | --- |
+| `--path` | `add`, `update` | Target project directory |
+| `--yes` | `add`, `update` | Skip shadcn init prompt |
+| `--dry-run` | `add`, `update` | Print commands without running |
+| `--component` | `update` | Update a single locked component |
+
+`lomi init --with-ui <name>` installs a component after scaffold. See [Initialize a project](/build/cli/init).
+
 ---
 
 ## Development
+
+### `lomi listen`
+
+Cloud webhook relay (sandbox-first). See [Listen for webhooks](/build/cli/listen).
+
+```bash
+lomi listen
+lomi listen http://localhost:3000/webhooks
+lomi listen --allow-production
+```
+
+### `lomi probe`
+
+Run read-only integration health checks.
+
+```bash
+lomi probe
+lomi probe --send-test-webhook
+```
 
 ### `lomi dev`
 
@@ -98,7 +147,7 @@ lomi dev --env-file .env.local
 | --- | --- | --- |
 | `-p, --port` | `4242` | HTTP port |
 | `--env-file` | `.env` | Path to dotenv file |
-| `--verify-signature` | `false` | Verify `lomi-signature` header |
+| `--verify-signature` | auto | Verify `X-Lomi-Signature` header |
 | `--skip-rules-install` | — | Skip agent rules prompt |
 
 **Endpoints:**
@@ -108,9 +157,49 @@ lomi dev --env-file .env.local
 
 ---
 
+## Webhooks
+
+### `lomi webhooks list`
+
+List configured webhook endpoints.
+
+```bash
+lomi webhooks list
+```
+
+### `lomi webhooks test <id>`
+
+Send a test event to a webhook endpoint.
+
+```bash
+lomi webhooks test wh_xxxxxxxx
+```
+
+---
+
+## Catalog and transactions
+
+### `lomi products list`
+
+List products and prices in your organization.
+
+```bash
+lomi products list
+```
+
+### `lomi transactions list`
+
+List recent transactions.
+
+```bash
+lomi transactions list
+```
+
+---
+
 ## Payments
 
-These commands require authentication and run interactively (prompts for merchant ID, amounts, URLs, etc.).
+These commands require authentication and use your CLI token (no manual merchant ID).
 
 ### `lomi checkout create`
 
@@ -120,7 +209,26 @@ Create a hosted checkout session via `POST /checkout-sessions`.
 lomi checkout create
 ```
 
-Prompts for: merchant ID, price ID, success URL, cancel URL, optional customer email.
+Prompts for: price ID or amount, currency, success/cancel URLs, optional customer email.
+
+After creation, prints the checkout URL and a ready-to-paste HTML embed snippet using `@lomi./embed`:
+
+```html
+<!-- npm install @lomi./embed -->
+<script type="module">
+  import { loadLomiCheckout } from '@lomi./embed';
+  document.getElementById('pay').addEventListener('click', () => {
+    loadLomiCheckout({
+      checkoutUrl: 'https://checkout.lomi.africa/checkout/cs_...',
+      mode: 'modal',
+      onComplete: (p) => console.log(p),
+    });
+  });
+</script>
+<button id="pay">Pay</button>
+```
+
+See [Embed checkout widget](/build/embed-widget) for inline mode and self-hosted `dist/lomi.js`.
 
 ### `lomi payments create`
 
@@ -130,7 +238,7 @@ Create a payment link via the payment links API.
 lomi payments create
 ```
 
-Prompts for: merchant ID, title, price, currency.
+Prompts for: title, amount, currency.
 
 ---
 
@@ -166,7 +274,7 @@ lomi login
 mkdir my-store && cd my-store
 lomi init
 lomi install-rules --target cursor
-lomi dev
+lomi listen http://localhost:3000/webhooks
 ```
 
 ### Sandbox vs production profiles

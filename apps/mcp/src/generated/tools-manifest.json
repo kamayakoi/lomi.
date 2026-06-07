@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "apiVersion": "1.1.0",
   "apiTitle": "API lomi.",
-  "toolCount": 70,
+  "toolCount": 60,
   "tools": [
     {
       "name": "lomi_delete_customer_subscriptions_subscription_id",
@@ -13,10 +13,10 @@
         "subscription_id"
       ],
       "queryParamNames": [],
-      "title": "Cancel customer subscription",
+      "title": "Delete Subscriptions",
       "description": "Cancel customer subscription\n\nREST: DELETE /customer-subscriptions/{subscription_id}",
       "tags": [
-        "Customer subscriptions"
+        "Subscriptions"
       ],
       "operationId": "CustomerSubscriptionsController_remove",
       "write": true,
@@ -36,7 +36,11 @@
         "required": [
           "subscription_id"
         ]
-      }
+      },
+      "readOnly": false,
+      "destructive": true,
+      "alwaysLoad": false,
+      "searchHint": "customer delete id subscription subscriptions"
     },
     {
       "name": "lomi_delete_customers_id",
@@ -47,10 +51,10 @@
         "id"
       ],
       "queryParamNames": [],
-      "title": "Supprimer un client",
-      "description": "Supprimer un client\n\nRetire un client de l'usage actif : il n'apparaît plus dans les listes ni les réponses de détail. Réponse 404 si le client n'existe pas ou n'est pas accessible avec cette clé API.\n\nREST: DELETE /customers/{id}",
+      "title": "Delete Customers",
+      "description": "Delete Customers via the lomi. merchant REST API.\n\nREST: DELETE /customers/{id}",
       "tags": [
-        "Clients"
+        "Customers"
       ],
       "operationId": "CustomersController_remove",
       "write": true,
@@ -58,6 +62,11 @@
       "inputSchema": {
         "type": "object",
         "properties": {
+          "header_Lomi-Account": {
+            "type": "string",
+            "example": "acct_1234567890",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
+          },
           "id": {
             "type": "string",
             "description": "UUID du client"
@@ -70,7 +79,11 @@
         "required": [
           "id"
         ]
-      }
+      },
+      "readOnly": false,
+      "destructive": true,
+      "alwaysLoad": false,
+      "searchHint": "customers delete id"
     },
     {
       "name": "lomi_delete_webhooks_id",
@@ -81,8 +94,8 @@
         "id"
       ],
       "queryParamNames": [],
-      "title": "Supprimer un webhook",
-      "description": "Supprimer un webhook\n\nREST: DELETE /webhooks/{id}",
+      "title": "Delete Webhooks",
+      "description": "Delete Webhooks via the lomi. merchant REST API.\n\nREST: DELETE /webhooks/{id}",
       "tags": [
         "Webhooks"
       ],
@@ -103,27 +116,11 @@
         "required": [
           "id"
         ]
-      }
-    },
-    {
-      "name": "lomi_get_accounts",
-      "operationKey": "GET /accounts",
-      "method": "get",
-      "pathTemplate": "/accounts",
-      "pathParamNames": [],
-      "queryParamNames": [],
-      "title": "Lister les comptes",
-      "description": "Lister les comptes\n\nREST: GET /accounts",
-      "tags": [
-        "Comptes"
-      ],
-      "operationId": "AccountsController_findAll",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {}
-      }
+      },
+      "readOnly": false,
+      "destructive": true,
+      "alwaysLoad": false,
+      "searchHint": "delete id webhooks"
     },
     {
       "name": "lomi_get_accounts_balance",
@@ -134,10 +131,10 @@
       "queryParamNames": [
         "currency"
       ],
-      "title": "Solde du compte",
-      "description": "Solde du compte\n\nRécupère le solde courant pour toutes les devises ou pour une devise précise\n\nREST: GET /accounts/balance",
+      "title": "Get Balances",
+      "description": "Get Balances via the lomi. merchant REST API.\n\nREST: GET /accounts/balance",
       "tags": [
-        "Comptes"
+        "Balances"
       ],
       "operationId": "AccountsController_getBalance",
       "write": false,
@@ -155,7 +152,11 @@
             "description": "Filtrer par code devise (XOF, USD, EUR)"
           }
         }
-      }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": true,
+      "searchHint": "accounts balance balances get"
     },
     {
       "name": "lomi_get_accounts_balance_breakdown",
@@ -166,10 +167,10 @@
       "queryParamNames": [
         "target_currency"
       ],
-      "title": "Détail du solde",
-      "description": "Détail du solde\n\nRécupère le détail des soldes (disponible, en attente, total). Conversion optionnelle vers une devise cible.\n\nREST: GET /accounts/balance/breakdown",
+      "title": "Get Balances",
+      "description": "Get Balances via the lomi. merchant REST API.\n\nREST: GET /accounts/balance/breakdown",
       "tags": [
-        "Comptes"
+        "Balances"
       ],
       "operationId": "AccountsController_getBalanceBreakdown",
       "write": false,
@@ -187,7 +188,11 @@
             "description": "Devise cible pour la conversion (XOF, USD, EUR)"
           }
         }
-      }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "accounts balance balances breakdown get"
     },
     {
       "name": "lomi_get_accounts_balance_check_currency",
@@ -198,10 +203,10 @@
         "currency"
       ],
       "queryParamNames": [],
-      "title": "Vérifier le solde disponible",
-      "description": "Vérifier le solde disponible\n\nVérifie si le marchand dispose d’un solde disponible suffisant dans la devise indiquée\n\nREST: GET /accounts/balance/check/{currency}",
+      "title": "Get Balances",
+      "description": "Get Balances via the lomi. merchant REST API.\n\nREST: GET /accounts/balance/check/{currency}",
       "tags": [
-        "Comptes"
+        "Balances"
       ],
       "operationId": "AccountsController_checkAvailableBalance",
       "write": false,
@@ -217,37 +222,11 @@
         "required": [
           "currency"
         ]
-      }
-    },
-    {
-      "name": "lomi_get_accounts_id",
-      "operationKey": "GET /accounts/{id}",
-      "method": "get",
-      "pathTemplate": "/accounts/{id}",
-      "pathParamNames": [
-        "id"
-      ],
-      "queryParamNames": [],
-      "title": "Obtenir un compte par ID",
-      "description": "Obtenir un compte par ID\n\nREST: GET /accounts/{id}",
-      "tags": [
-        "Comptes"
-      ],
-      "operationId": "AccountsController_findOne",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Path parameter \"id\" for `/accounts/{id}`."
-          }
-        },
-        "required": [
-          "id"
-        ]
-      }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "accounts balance balances check currency get"
     },
     {
       "name": "lomi_get_charge_card_id",
@@ -258,10 +237,10 @@
         "id"
       ],
       "queryParamNames": [],
-      "title": "Obtenir un encaissement carte",
-      "description": "Obtenir un encaissement carte\n\nREST: GET /charge/card/{id}",
+      "title": "Get Advanced Direct Charges",
+      "description": "Get Advanced Direct Charges via the lomi. merchant REST API.\n\nREST: GET /charge/card/{id}",
       "tags": [
-        "Encaissements"
+        "Advanced Direct Charges"
       ],
       "operationId": "ChargesController_getCardCharge",
       "write": false,
@@ -269,6 +248,11 @@
       "inputSchema": {
         "type": "object",
         "properties": {
+          "header_Lomi-Account": {
+            "type": "string",
+            "example": "acct_1234567890",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
+          },
           "id": {
             "description": "Card payment id (pi_...)"
           }
@@ -276,7 +260,11 @@
         "required": [
           "id"
         ]
-      }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "advanced card charge charges direct get id"
     },
     {
       "name": "lomi_get_checkout_sessions",
@@ -289,10 +277,10 @@
         "limit",
         "status"
       ],
-      "title": "Lister les sessions de paiement",
-      "description": "Lister les sessions de paiement\n\nRenvoie les sessions de l'organisation avec pagination et filtre de statut optionnel.\n\nREST: GET /checkout-sessions",
+      "title": "List Checkout Sessions",
+      "description": "List Checkout Sessions via the lomi. merchant REST API.\n\nREST: GET /checkout-sessions",
       "tags": [
-        "Sessions de paiement"
+        "Checkout Sessions"
       ],
       "operationId": "CheckoutSessionsController_findAll",
       "write": false,
@@ -300,6 +288,11 @@
       "inputSchema": {
         "type": "object",
         "properties": {
+          "header_Lomi-Account": {
+            "type": "string",
+            "example": "acct_1234567890",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
+          },
           "limit": {
             "example": 20,
             "type": "number",
@@ -320,7 +313,11 @@
             "description": "Filtrer par statut de session (valeur checkout_session_status)"
           }
         }
-      }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": true,
+      "searchHint": "checkout get sessions"
     },
     {
       "name": "lomi_get_checkout_sessions_id",
@@ -331,10 +328,10 @@
         "id"
       ],
       "queryParamNames": [],
-      "title": "Obtenir une session de paiement par ID",
-      "description": "Obtenir une session de paiement par ID\n\nRenvoie le détail d’une session (statut, client et produits associés).\n\nREST: GET /checkout-sessions/{id}",
+      "title": "Get Checkout Sessions",
+      "description": "Get Checkout Sessions via the lomi. merchant REST API.\n\nREST: GET /checkout-sessions/{id}",
       "tags": [
-        "Sessions de paiement"
+        "Checkout Sessions"
       ],
       "operationId": "CheckoutSessionsController_findOne",
       "write": false,
@@ -342,6 +339,11 @@
       "inputSchema": {
         "type": "object",
         "properties": {
+          "header_Lomi-Account": {
+            "type": "string",
+            "example": "acct_1234567890",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
+          },
           "id": {
             "type": "string",
             "description": "UUID de la session"
@@ -350,7 +352,11 @@
         "required": [
           "id"
         ]
-      }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "checkout get id sessions"
     },
     {
       "name": "lomi_get_customer_subscriptions",
@@ -364,10 +370,10 @@
         "status",
         "customer_id"
       ],
-      "title": "List customer subscriptions",
+      "title": "List Subscriptions",
       "description": "List customer subscriptions\n\nREST: GET /customer-subscriptions",
       "tags": [
-        "Customer subscriptions"
+        "Subscriptions"
       ],
       "operationId": "CustomerSubscriptionsController_findAll",
       "write": false,
@@ -384,7 +390,11 @@
           },
           "status": {}
         }
-      }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "customer get subscriptions"
     },
     {
       "name": "lomi_get_customer_subscriptions_subscription_id",
@@ -395,10 +405,10 @@
         "subscription_id"
       ],
       "queryParamNames": [],
-      "title": "Get customer subscription",
+      "title": "Get Subscriptions",
       "description": "Get customer subscription\n\nREST: GET /customer-subscriptions/{subscription_id}",
       "tags": [
-        "Customer subscriptions"
+        "Subscriptions"
       ],
       "operationId": "CustomerSubscriptionsController_findOne",
       "write": false,
@@ -413,7 +423,11 @@
         "required": [
           "subscription_id"
         ]
-      }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "customer get id subscription subscriptions"
     },
     {
       "name": "lomi_get_customers",
@@ -428,10 +442,10 @@
         "type",
         "search"
       ],
-      "title": "Lister les clients",
-      "description": "Lister les clients\n\nRenvoie tous les clients de l'organisation du marchand authentifié. Filtres possibles : recherche, type de client et statut d'activité.\n\nREST: GET /customers",
+      "title": "List Customers",
+      "description": "List Customers via the lomi. merchant REST API.\n\nREST: GET /customers",
       "tags": [
-        "Clients"
+        "Customers"
       ],
       "operationId": "CustomersController_findAll",
       "write": false,
@@ -439,6 +453,11 @@
       "inputSchema": {
         "type": "object",
         "properties": {
+          "header_Lomi-Account": {
+            "type": "string",
+            "example": "acct_1234567890",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
+          },
           "page": {
             "example": 1,
             "type": "number",
@@ -472,7 +491,11 @@
             "description": "Filtrer par type de client"
           }
         }
-      }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": true,
+      "searchHint": "customers get"
     },
     {
       "name": "lomi_get_customers_id",
@@ -483,10 +506,10 @@
         "id"
       ],
       "queryParamNames": [],
-      "title": "Obtenir un client par ID",
-      "description": "Obtenir un client par ID\n\nRenvoie un client. Réponse 404 si le client n'existe pas ou n'est pas accessible avec cette clé API.\n\nREST: GET /customers/{id}",
+      "title": "Get Customers",
+      "description": "Get Customers via the lomi. merchant REST API.\n\nREST: GET /customers/{id}",
       "tags": [
-        "Clients"
+        "Customers"
       ],
       "operationId": "CustomersController_findOne",
       "write": false,
@@ -494,6 +517,11 @@
       "inputSchema": {
         "type": "object",
         "properties": {
+          "header_Lomi-Account": {
+            "type": "string",
+            "example": "acct_1234567890",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
+          },
           "id": {
             "type": "string",
             "description": "UUID du client"
@@ -502,7 +530,11 @@
         "required": [
           "id"
         ]
-      }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "customers get id"
     },
     {
       "name": "lomi_get_customers_id_portal_audit",
@@ -517,10 +549,10 @@
         "pageSize",
         "page"
       ],
-      "title": "Hosted customer portal audit",
-      "description": "Hosted customer portal audit\n\nListe les évènements portal (sessions, OTP, souscriptions self-service) pour ce client.\n\nREST: GET /customers/{id}/portal-audit",
+      "title": "Get Customers",
+      "description": "Get Customers via the lomi. merchant REST API.\n\nREST: GET /customers/{id}/portal-audit",
       "tags": [
-        "Clients"
+        "Customers"
       ],
       "operationId": "CustomersController_getPortalAudit",
       "write": false,
@@ -531,6 +563,11 @@
           "eventType": {
             "type": "string",
             "description": "Filtre sur customer_portal_audit_events.event_type"
+          },
+          "header_Lomi-Account": {
+            "type": "string",
+            "example": "acct_1234567890",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
           },
           "id": {
             "type": "string",
@@ -548,7 +585,11 @@
         "required": [
           "id"
         ]
-      }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "audit customers get id portal"
     },
     {
       "name": "lomi_get_customers_id_transactions",
@@ -559,10 +600,10 @@
         "id"
       ],
       "queryParamNames": [],
-      "title": "Transactions du client",
-      "description": "Transactions du client\n\nRenvoie les transactions d'un client. Réponse 404 si le client n'existe pas ou n'est pas accessible avec cette clé API.\n\nREST: GET /customers/{id}/transactions",
+      "title": "Get Customers",
+      "description": "Get Customers via the lomi. merchant REST API.\n\nREST: GET /customers/{id}/transactions",
       "tags": [
-        "Clients"
+        "Customers"
       ],
       "operationId": "CustomersController_getTransactions",
       "write": false,
@@ -570,6 +611,11 @@
       "inputSchema": {
         "type": "object",
         "properties": {
+          "header_Lomi-Account": {
+            "type": "string",
+            "example": "acct_1234567890",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
+          },
           "id": {
             "type": "string",
             "description": "UUID du client"
@@ -578,7 +624,11 @@
         "required": [
           "id"
         ]
-      }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "customers get id transactions"
     },
     {
       "name": "lomi_get_discount_coupons",
@@ -587,10 +637,10 @@
       "pathTemplate": "/discount-coupons",
       "pathParamNames": [],
       "queryParamNames": [],
-      "title": "Lister les coupons",
-      "description": "Lister les coupons\n\nRenvoie tous les coupons de réduction de l'organisation du marchand authentifié.\n\nREST: GET /discount-coupons",
+      "title": "List Discount Coupons",
+      "description": "List Discount Coupons via the lomi. merchant REST API.\n\nREST: GET /discount-coupons",
       "tags": [
-        "Coupons de réduction"
+        "Discount Coupons"
       ],
       "operationId": "DiscountCouponsController_findAll",
       "write": false,
@@ -598,7 +648,11 @@
       "inputSchema": {
         "type": "object",
         "properties": {}
-      }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "coupons discount get"
     },
     {
       "name": "lomi_get_discount_coupons_id",
@@ -609,10 +663,10 @@
         "id"
       ],
       "queryParamNames": [],
-      "title": "Obtenir un coupon par ID",
-      "description": "Obtenir un coupon par ID\n\nRenvoie un coupon. Réponse 404 s'il n'existe pas ou n'est pas accessible avec cette clé API.\n\nREST: GET /discount-coupons/{id}",
+      "title": "Get Discount Coupons",
+      "description": "Get Discount Coupons via the lomi. merchant REST API.\n\nREST: GET /discount-coupons/{id}",
       "tags": [
-        "Coupons de réduction"
+        "Discount Coupons"
       ],
       "operationId": "DiscountCouponsController_findOne",
       "write": false,
@@ -628,7 +682,11 @@
         "required": [
           "id"
         ]
-      }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "coupons discount get id"
     },
     {
       "name": "lomi_get_discount_coupons_id_performance",
@@ -639,10 +697,10 @@
         "id"
       ],
       "queryParamNames": [],
-      "title": "Indicateurs de performance du coupon",
-      "description": "Indicateurs de performance du coupon\n\nRenvoie les statistiques d'utilisation et l'impact sur le chiffre d'affaires pour un coupon donné.\n\nREST: GET /discount-coupons/{id}/performance",
+      "title": "Get Discount Coupons",
+      "description": "Get Discount Coupons via the lomi. merchant REST API.\n\nREST: GET /discount-coupons/{id}/performance",
       "tags": [
-        "Coupons de réduction"
+        "Discount Coupons"
       ],
       "operationId": "DiscountCouponsController_getPerformance",
       "write": false,
@@ -658,204 +716,11 @@
         "required": [
           "id"
         ]
-      }
-    },
-    {
-      "name": "lomi_get_merchants_id",
-      "operationKey": "GET /merchants/{id}",
-      "method": "get",
-      "pathTemplate": "/merchants/{id}",
-      "pathParamNames": [
-        "id"
-      ],
-      "queryParamNames": [],
-      "title": "Get merchant details",
-      "description": "Get merchant details\n\nReturns merchant profile and organization metrics (MRR, ARR, LTV). Metrics are refreshed daily and on subscription changes.\n\nREST: GET /merchants/{id}",
-      "tags": [
-        "Merchants"
-      ],
-      "operationId": "MerchantsController_getDetails",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "description": "Merchant UUID"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      }
-    },
-    {
-      "name": "lomi_get_merchants_id_arr",
-      "operationKey": "GET /merchants/{id}/arr",
-      "method": "get",
-      "pathTemplate": "/merchants/{id}/arr",
-      "pathParamNames": [
-        "id"
-      ],
-      "queryParamNames": [],
-      "title": "Get merchant ARR",
-      "description": "Get merchant ARR\n\nREST: GET /merchants/{id}/arr",
-      "tags": [
-        "Merchants"
-      ],
-      "operationId": "MerchantsController_getArr",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "description": "Merchant UUID"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      }
-    },
-    {
-      "name": "lomi_get_merchants_id_balance",
-      "operationKey": "GET /merchants/{id}/balance",
-      "method": "get",
-      "pathTemplate": "/merchants/{id}/balance",
-      "pathParamNames": [
-        "id"
-      ],
-      "queryParamNames": [
-        "currency_code"
-      ],
-      "title": "Get merchant account balance for a currency",
-      "description": "Get merchant account balance for a currency\n\nREST: GET /merchants/{id}/balance",
-      "tags": [
-        "Merchants"
-      ],
-      "operationId": "MerchantsController_getBalance",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "currency_code": {
-            "enum": [
-              "XOF",
-              "USD",
-              "EUR"
-            ],
-            "type": "string"
-          },
-          "id": {
-            "description": "Merchant UUID"
-          }
-        },
-        "required": [
-          "currency_code",
-          "id"
-        ]
-      }
-    },
-    {
-      "name": "lomi_get_merchants_id_mrr",
-      "operationKey": "GET /merchants/{id}/mrr",
-      "method": "get",
-      "pathTemplate": "/merchants/{id}/mrr",
-      "pathParamNames": [
-        "id"
-      ],
-      "queryParamNames": [],
-      "title": "Get merchant MRR",
-      "description": "Get merchant MRR\n\nREST: GET /merchants/{id}/mrr",
-      "tags": [
-        "Merchants"
-      ],
-      "operationId": "MerchantsController_getMrr",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "description": "Merchant UUID"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      }
-    },
-    {
-      "name": "lomi_get_organizations",
-      "operationKey": "GET /organizations",
-      "method": "get",
-      "pathTemplate": "/organizations",
-      "pathParamNames": [],
-      "queryParamNames": [],
-      "title": "Détails de l'organisation",
-      "description": "Détails de l'organisation\n\nRenvoie les informations de l'organisation du marchand authentifié\n\nREST: GET /organizations",
-      "tags": [
-        "Organisations"
-      ],
-      "operationId": "OrganizationsController_findAll",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {}
-      }
-    },
-    {
-      "name": "lomi_get_organizations_id",
-      "operationKey": "GET /organizations/{id}",
-      "method": "get",
-      "pathTemplate": "/organizations/{id}",
-      "pathParamNames": [
-        "id"
-      ],
-      "queryParamNames": [],
-      "title": "Organisation par ID",
-      "description": "Organisation par ID\n\nRenvoie les détails d'une organisation par son identifiant (doit correspondre à l'organisation authentifiée)\n\nREST: GET /organizations/{id}",
-      "tags": [
-        "Organisations"
-      ],
-      "operationId": "OrganizationsController_findOne",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Path parameter \"id\" for `/organizations/{id}`."
-          }
-        },
-        "required": [
-          "id"
-        ]
-      }
-    },
-    {
-      "name": "lomi_get_organizations_metrics",
-      "operationKey": "GET /organizations/metrics",
-      "method": "get",
-      "pathTemplate": "/organizations/metrics",
-      "pathParamNames": [],
-      "queryParamNames": [],
-      "title": "Indicateurs de l'organisation",
-      "description": "Indicateurs de l'organisation\n\nRenvoie le MRR, l'ARR, la LTV, le chiffre d'affaires et le nombre de clients pour votre organisation.\n\nREST: GET /organizations/metrics",
-      "tags": [
-        "Organisations"
-      ],
-      "operationId": "OrganizationsController_getMetrics",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {}
-      }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "coupons discount get id performance"
     },
     {
       "name": "lomi_get_payment_links",
@@ -869,10 +734,10 @@
         "isActive",
         "linkType"
       ],
-      "title": "Lister les liens de paiement",
-      "description": "Lister les liens de paiement\n\nRenvoie tous les liens de l'organisation avec pagination et filtres optionnels (type, actif).\n\nREST: GET /payment-links",
+      "title": "List Payment Links",
+      "description": "List Payment Links via the lomi. merchant REST API.\n\nREST: GET /payment-links",
       "tags": [
-        "Liens de paiement"
+        "Payment Links"
       ],
       "operationId": "PaymentLinksController_findAll",
       "write": false,
@@ -903,7 +768,11 @@
             "description": "Décalage pour la pagination"
           }
         }
-      }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get links payment"
     },
     {
       "name": "lomi_get_payment_links_id",
@@ -914,10 +783,10 @@
         "id"
       ],
       "queryParamNames": [],
-      "title": "Obtenir un lien de paiement par ID",
-      "description": "Obtenir un lien de paiement par ID\n\nRenvoie le détail d’un lien (URL, configuration et statut).\n\nREST: GET /payment-links/{id}",
+      "title": "Get Payment Links",
+      "description": "Get Payment Links via the lomi. merchant REST API.\n\nREST: GET /payment-links/{id}",
       "tags": [
-        "Liens de paiement"
+        "Payment Links"
       ],
       "operationId": "PaymentLinksController_findOne",
       "write": false,
@@ -933,7 +802,11 @@
         "required": [
           "id"
         ]
-      }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get id links payment"
     },
     {
       "name": "lomi_get_payment_requests",
@@ -947,10 +820,10 @@
         "customerId",
         "status"
       ],
-      "title": "Lister les demandes de paiement",
-      "description": "Lister les demandes de paiement\n\nRenvoie toutes les demandes de l'organisation avec pagination et filtres optionnels (statut, client).\n\nREST: GET /payment-requests",
+      "title": "List Payment Requests",
+      "description": "List Payment Requests via the lomi. merchant REST API.\n\nREST: GET /payment-requests",
       "tags": [
-        "Demandes de paiement"
+        "Payment Requests"
       ],
       "operationId": "PaymentRequestsController_findAll",
       "write": false,
@@ -983,7 +856,11 @@
             "description": "Filtrer par statut"
           }
         }
-      }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get payment requests"
     },
     {
       "name": "lomi_get_payment_requests_id",
@@ -994,10 +871,10 @@
         "id"
       ],
       "queryParamNames": [],
-      "title": "Obtenir une demande de paiement par ID",
-      "description": "Obtenir une demande de paiement par ID\n\nRenvoie le détail d’une demande (statut actuel, informations de paiement).\n\nREST: GET /payment-requests/{id}",
+      "title": "Get Payment Requests",
+      "description": "Get Payment Requests via the lomi. merchant REST API.\n\nREST: GET /payment-requests/{id}",
       "tags": [
-        "Demandes de paiement"
+        "Payment Requests"
       ],
       "operationId": "PaymentRequestsController_findOne",
       "write": false,
@@ -1013,7 +890,11 @@
         "required": [
           "id"
         ]
-      }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get id payment requests"
     },
     {
       "name": "lomi_get_payouts",
@@ -1028,10 +909,10 @@
         "startDate",
         "status"
       ],
-      "title": "Lister les virements",
-      "description": "Lister les virements\n\nREST: GET /payouts",
+      "title": "List Payouts",
+      "description": "List Payouts via the lomi. merchant REST API.\n\nREST: GET /payouts",
       "tags": [
-        "Virements"
+        "Payouts"
       ],
       "operationId": "PayoutsUnifiedController_findAll",
       "write": false,
@@ -1055,7 +936,11 @@
             "type": "string"
           }
         }
-      }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get payouts"
     },
     {
       "name": "lomi_get_payouts_id",
@@ -1066,10 +951,10 @@
         "id"
       ],
       "queryParamNames": [],
-      "title": "Obtenir un virement",
-      "description": "Obtenir un virement\n\nREST: GET /payouts/{id}",
+      "title": "Get Payouts",
+      "description": "Get Payouts via the lomi. merchant REST API.\n\nREST: GET /payouts/{id}",
       "tags": [
-        "Virements"
+        "Payouts"
       ],
       "operationId": "PayoutsUnifiedController_findOne",
       "write": false,
@@ -1084,7 +969,11 @@
         "required": [
           "id"
         ]
-      }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get id payouts"
     },
     {
       "name": "lomi_get_products",
@@ -1097,10 +986,10 @@
         "limit",
         "isActive"
       ],
-      "title": "Lister les produits",
-      "description": "Lister les produits\n\nRenvoie tous les produits de l'organisation du marchand authentifié, avec prix et frais intégrés. Utile pour afficher le catalogue ou intégrer des systèmes externes.\n\nREST: GET /products",
+      "title": "List Products",
+      "description": "List Products via the lomi. merchant REST API.\n\nREST: GET /products",
       "tags": [
-        "Produits"
+        "Products"
       ],
       "operationId": "ProductsController_findAll",
       "write": false,
@@ -1123,7 +1012,11 @@
             "description": "Décalage pour la pagination"
           }
         }
-      }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": true,
+      "searchHint": "get products"
     },
     {
       "name": "lomi_get_products_id",
@@ -1134,10 +1027,10 @@
         "id"
       ],
       "queryParamNames": [],
-      "title": "Obtenir un produit par ID",
-      "description": "Obtenir un produit par ID\n\nRenvoie un produit avec ses prix et frais. Réponse 404 s'il n'existe pas ou n'est pas accessible avec cette clé API.\n\nREST: GET /products/{id}",
+      "title": "Get Products",
+      "description": "Get Products via the lomi. merchant REST API.\n\nREST: GET /products/{id}",
       "tags": [
-        "Produits"
+        "Products"
       ],
       "operationId": "ProductsController_findOne",
       "write": false,
@@ -1153,39 +1046,11 @@
         "required": [
           "id"
         ]
-      }
-    },
-    {
-      "name": "lomi_get_providers",
-      "operationKey": "GET /providers",
-      "method": "get",
-      "pathTemplate": "/providers",
-      "pathParamNames": [],
-      "queryParamNames": [
-        "provider_code"
-      ],
-      "title": "List payment providers",
-      "description": "List payment providers\n\nReturns connection status for payment providers configured for your organization.\n\nREST: GET /providers",
-      "tags": [
-        "Providers"
-      ],
-      "operationId": "ProvidersController_findAll",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "provider_code": {
-            "enum": [
-              "STRIPE",
-              "WAVE",
-              "MTN",
-              "SPI"
-            ],
-            "type": "string"
-          }
-        }
-      }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get id products"
     },
     {
       "name": "lomi_get_refunds",
@@ -1200,10 +1065,10 @@
         "startDate",
         "status"
       ],
-      "title": "Lister les remboursements",
-      "description": "Lister les remboursements\n\nREST: GET /refunds",
+      "title": "List Refunds",
+      "description": "List Refunds via the lomi. merchant REST API.\n\nREST: GET /refunds",
       "tags": [
-        "Remboursements"
+        "Refunds"
       ],
       "operationId": "RefundsController_findAll",
       "write": false,
@@ -1213,6 +1078,11 @@
         "properties": {
           "endDate": {
             "type": "string"
+          },
+          "header_Lomi-Account": {
+            "type": "string",
+            "example": "acct_1234567890",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
           },
           "limit": {
             "type": "number"
@@ -1227,7 +1097,11 @@
             "type": "string"
           }
         }
-      }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get refunds"
     },
     {
       "name": "lomi_get_refunds_id",
@@ -1238,10 +1112,10 @@
         "id"
       ],
       "queryParamNames": [],
-      "title": "Obtenir un remboursement",
-      "description": "Obtenir un remboursement\n\nREST: GET /refunds/{id}",
+      "title": "Get Refunds",
+      "description": "Get Refunds via the lomi. merchant REST API.\n\nREST: GET /refunds/{id}",
       "tags": [
-        "Remboursements"
+        "Refunds"
       ],
       "operationId": "RefundsController_findOne",
       "write": false,
@@ -1249,6 +1123,11 @@
       "inputSchema": {
         "type": "object",
         "properties": {
+          "header_Lomi-Account": {
+            "type": "string",
+            "example": "acct_1234567890",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
+          },
           "id": {
             "description": "Refund ID"
           }
@@ -1256,7 +1135,11 @@
         "required": [
           "id"
         ]
-      }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get id refunds"
     },
     {
       "name": "lomi_get_subscriptions",
@@ -1268,10 +1151,10 @@
         "pageSize",
         "page"
       ],
-      "title": "Lister les abonnements",
-      "description": "Lister les abonnements\n\nRenvoie tous les abonnements de l'organisation du marchand authentifié. Les abonnements sont créés automatiquement lorsque les clients effectuent des paiements récurrents.\n\nREST: GET /subscriptions",
+      "title": "List Subscriptions",
+      "description": "List Subscriptions via the lomi. merchant REST API.\n\nREST: GET /subscriptions",
       "tags": [
-        "Abonnements"
+        "Subscriptions"
       ],
       "operationId": "SubscriptionsController_findAll",
       "write": false,
@@ -1290,7 +1173,11 @@
             "description": "Nombre d'éléments par page"
           }
         }
-      }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get subscriptions"
     },
     {
       "name": "lomi_get_subscriptions_customer_customerId",
@@ -1301,10 +1188,10 @@
         "customerId"
       ],
       "queryParamNames": [],
-      "title": "Abonnements d’un client",
-      "description": "Abonnements d’un client\n\nRenvoie les abonnements d'un client. Réponse 404 si le client n'existe pas ou n'est pas accessible avec cette clé API.\n\nREST: GET /subscriptions/customer/{customerId}",
+      "title": "Get Subscriptions",
+      "description": "Get Subscriptions via the lomi. merchant REST API.\n\nREST: GET /subscriptions/customer/{customerId}",
       "tags": [
-        "Abonnements"
+        "Subscriptions"
       ],
       "operationId": "SubscriptionsController_findByCustomer",
       "write": false,
@@ -1320,7 +1207,11 @@
         "required": [
           "customerId"
         ]
-      }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "customer customerId get subscriptions"
     },
     {
       "name": "lomi_get_subscriptions_id",
@@ -1331,10 +1222,10 @@
         "id"
       ],
       "queryParamNames": [],
-      "title": "Obtenir un abonnement par ID",
-      "description": "Obtenir un abonnement par ID\n\nRenvoie un abonnement. Réponse 404 s'il n'existe pas ou n'est pas accessible avec cette clé API.\n\nREST: GET /subscriptions/{id}",
+      "title": "Get Subscriptions",
+      "description": "Get Subscriptions via the lomi. merchant REST API.\n\nREST: GET /subscriptions/{id}",
       "tags": [
-        "Abonnements"
+        "Subscriptions"
       ],
       "operationId": "SubscriptionsController_findOne",
       "write": false,
@@ -1350,7 +1241,11 @@
         "required": [
           "id"
         ]
-      }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get id subscriptions"
     },
     {
       "name": "lomi_get_transactions",
@@ -1370,8 +1265,8 @@
         "status",
         "provider"
       ],
-      "title": "Lister les transactions",
-      "description": "Lister les transactions\n\nRenvoie les transactions de l'organisation du marchand authentifié avec filtres avancés. Les transactions sont créées par le système lors du traitement des paiements.\n\nREST: GET /transactions",
+      "title": "List Transactions",
+      "description": "List Transactions via the lomi. merchant REST API.\n\nREST: GET /transactions",
       "tags": [
         "Transactions"
       ],
@@ -1390,6 +1285,11 @@
             "example": "2024-12-31T23:59:59Z",
             "type": "string",
             "description": "Jusqu'à cette date (format ISO 8601)"
+          },
+          "header_Lomi-Account": {
+            "type": "string",
+            "example": "acct_1234567890",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
           },
           "isPos": {
             "example": false,
@@ -1432,7 +1332,11 @@
             "description": "Filtrer par type de transaction (séparés par des virgules pour plusieurs valeurs)"
           }
         }
-      }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": true,
+      "searchHint": "get transactions"
     },
     {
       "name": "lomi_get_transactions_id",
@@ -1443,8 +1347,8 @@
         "id"
       ],
       "queryParamNames": [],
-      "title": "Obtenir une transaction par ID",
-      "description": "Obtenir une transaction par ID\n\nRenvoie une transaction. Réponse 404 si elle n'existe pas ou n'est pas accessible avec cette clé API.\n\nREST: GET /transactions/{id}",
+      "title": "Get Transactions",
+      "description": "Get Transactions via the lomi. merchant REST API.\n\nREST: GET /transactions/{id}",
       "tags": [
         "Transactions"
       ],
@@ -1454,6 +1358,11 @@
       "inputSchema": {
         "type": "object",
         "properties": {
+          "header_Lomi-Account": {
+            "type": "string",
+            "example": "acct_1234567890",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
+          },
           "id": {
             "type": "string",
             "description": "UUID de la transaction"
@@ -1462,7 +1371,11 @@
         "required": [
           "id"
         ]
-      }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get id transactions"
     },
     {
       "name": "lomi_get_webhook_delivery_logs",
@@ -1477,10 +1390,10 @@
         "successOnly",
         "webhookId"
       ],
-      "title": "Lister les journaux de livraison",
-      "description": "Lister les journaux de livraison\n\nRenvoie les journaux de livraison pour un webhook donné. Ils sont créés automatiquement lors des tentatives d'envoi. Filtrez avec le paramètre de requête webhookId.\n\nREST: GET /webhook-delivery-logs",
+      "title": "List Webhooks",
+      "description": "List Webhooks via the lomi. merchant REST API.\n\nREST: GET /webhook-delivery-logs",
       "tags": [
-        "Journaux de livraison webhooks"
+        "Webhooks"
       ],
       "operationId": "WebhookDeliveryLogsController_findAll",
       "write": false,
@@ -1516,7 +1429,11 @@
         "required": [
           "webhookId"
         ]
-      }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "delivery get logs webhook webhooks"
     },
     {
       "name": "lomi_get_webhook_delivery_logs_id",
@@ -1527,10 +1444,10 @@
         "id"
       ],
       "queryParamNames": [],
-      "title": "Obtenir un journal de livraison par ID",
-      "description": "Obtenir un journal de livraison par ID\n\nRenvoie un journal. Réponse 404 s'il n'existe pas ou n'est pas accessible avec cette clé API.\n\nREST: GET /webhook-delivery-logs/{id}",
+      "title": "Get Webhooks",
+      "description": "Get Webhooks via the lomi. merchant REST API.\n\nREST: GET /webhook-delivery-logs/{id}",
       "tags": [
-        "Journaux de livraison webhooks"
+        "Webhooks"
       ],
       "operationId": "WebhookDeliveryLogsController_findOne",
       "write": false,
@@ -1546,7 +1463,11 @@
         "required": [
           "id"
         ]
-      }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "delivery get id logs webhook webhooks"
     },
     {
       "name": "lomi_get_webhooks",
@@ -1555,8 +1476,8 @@
       "pathTemplate": "/webhooks",
       "pathParamNames": [],
       "queryParamNames": [],
-      "title": "Lister les webhooks",
-      "description": "Lister les webhooks\n\nREST: GET /webhooks",
+      "title": "List Webhooks",
+      "description": "List Webhooks via the lomi. merchant REST API.\n\nREST: GET /webhooks",
       "tags": [
         "Webhooks"
       ],
@@ -1566,7 +1487,11 @@
       "inputSchema": {
         "type": "object",
         "properties": {}
-      }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": true,
+      "searchHint": "get webhooks"
     },
     {
       "name": "lomi_get_webhooks_id",
@@ -1577,8 +1502,8 @@
         "id"
       ],
       "queryParamNames": [],
-      "title": "Obtenir un webhook par ID",
-      "description": "Obtenir un webhook par ID\n\nREST: GET /webhooks/{id}",
+      "title": "Get Webhooks",
+      "description": "Get Webhooks via the lomi. merchant REST API.\n\nREST: GET /webhooks/{id}",
       "tags": [
         "Webhooks"
       ],
@@ -1596,7 +1521,11 @@
         "required": [
           "id"
         ]
-      }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get id webhooks"
     },
     {
       "name": "lomi_patch_customer_subscriptions_subscription_id",
@@ -1607,10 +1536,10 @@
         "subscription_id"
       ],
       "queryParamNames": [],
-      "title": "Update customer subscription",
+      "title": "Update Subscriptions",
       "description": "Update customer subscription\n\nREST: PATCH /customer-subscriptions/{subscription_id}",
       "tags": [
-        "Customer subscriptions"
+        "Subscriptions"
       ],
       "operationId": "CustomerSubscriptionsController_update",
       "write": true,
@@ -1630,7 +1559,11 @@
         "required": [
           "subscription_id"
         ]
-      }
+      },
+      "readOnly": false,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "customer id patch subscription subscriptions"
     },
     {
       "name": "lomi_patch_customers_id",
@@ -1641,10 +1574,10 @@
         "id"
       ],
       "queryParamNames": [],
-      "title": "Mettre à jour un client",
-      "description": "Mettre à jour un client\n\nMet à jour un client. N'envoyez que les champs à modifier. Réponse 404 si le client n'existe pas ou n'est pas accessible avec cette clé API.\n\nREST: PATCH /customers/{id}",
+      "title": "Update Customers",
+      "description": "Update Customers via the lomi. merchant REST API.\n\nREST: PATCH /customers/{id}",
       "tags": [
-        "Clients"
+        "Customers"
       ],
       "operationId": "CustomersController_update",
       "write": true,
@@ -1690,6 +1623,11 @@
             },
             "description": "JSON request body for this operation."
           },
+          "header_Lomi-Account": {
+            "type": "string",
+            "example": "acct_1234567890",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
+          },
           "id": {
             "type": "string",
             "description": "UUID du client"
@@ -1703,7 +1641,11 @@
           "body",
           "id"
         ]
-      }
+      },
+      "readOnly": false,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "customers id patch"
     },
     {
       "name": "lomi_patch_subscriptions_id",
@@ -1714,10 +1656,10 @@
         "id"
       ],
       "queryParamNames": [],
-      "title": "Mettre à jour un abonnement",
-      "description": "Mettre à jour un abonnement\n\nMet à jour le statut ou les métadonnées (ex. pause). Les champs tarifaires restent gérés par le système.\n\nREST: PATCH /subscriptions/{id}",
+      "title": "Update Subscriptions",
+      "description": "Update Subscriptions via the lomi. merchant REST API.\n\nREST: PATCH /subscriptions/{id}",
       "tags": [
-        "Abonnements"
+        "Subscriptions"
       ],
       "operationId": "SubscriptionsController_update",
       "write": true,
@@ -1736,7 +1678,11 @@
         "required": [
           "id"
         ]
-      }
+      },
+      "readOnly": false,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "id patch subscriptions"
     },
     {
       "name": "lomi_patch_webhooks_id",
@@ -1747,8 +1693,8 @@
         "id"
       ],
       "queryParamNames": [],
-      "title": "Mettre à jour un webhook",
-      "description": "Mettre à jour un webhook\n\nREST: PATCH /webhooks/{id}",
+      "title": "Update Webhooks",
+      "description": "Update Webhooks via the lomi. merchant REST API.\n\nREST: PATCH /webhooks/{id}",
       "tags": [
         "Webhooks"
       ],
@@ -1794,7 +1740,11 @@
           "body",
           "id"
         ]
-      }
+      },
+      "readOnly": false,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "id patch webhooks"
     },
     {
       "name": "lomi_post_charge_card",
@@ -1803,10 +1753,10 @@
       "pathTemplate": "/charge/card",
       "pathParamNames": [],
       "queryParamNames": [],
-      "title": "Créer un encaissement carte (client_secret)",
-      "description": "Créer un encaissement carte (client_secret)\n\nCrée un encaissement carte embarqué et renvoie le client_secret pour votre interface de paiement.\n\nREST: POST /charge/card",
+      "title": "Create Advanced Direct Charges",
+      "description": "Create Advanced Direct Charges via the lomi. merchant REST API.\n\nREST: POST /charge/card",
       "tags": [
-        "Encaissements"
+        "Advanced Direct Charges"
       ],
       "operationId": "ChargesController_createCardCharge",
       "write": true,
@@ -1926,6 +1876,11 @@
             ],
             "description": "JSON request body for this operation."
           },
+          "header_Lomi-Account": {
+            "type": "string",
+            "example": "acct_1234567890",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
+          },
           "idempotency_key": {
             "type": "string",
             "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
@@ -1934,7 +1889,11 @@
         "required": [
           "body"
         ]
-      }
+      },
+      "readOnly": false,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "advanced card charge charges direct post"
     },
     {
       "name": "lomi_post_charge_card_id_cancel",
@@ -1945,10 +1904,10 @@
         "id"
       ],
       "queryParamNames": [],
-      "title": "Annuler un encaissement carte",
-      "description": "Annuler un encaissement carte\n\nREST: POST /charge/card/{id}/cancel",
+      "title": "Create Advanced Direct Charges",
+      "description": "Create Advanced Direct Charges via the lomi. merchant REST API.\n\nREST: POST /charge/card/{id}/cancel",
       "tags": [
-        "Encaissements"
+        "Advanced Direct Charges"
       ],
       "operationId": "ChargesController_cancelCardCharge",
       "write": true,
@@ -1956,6 +1915,11 @@
       "inputSchema": {
         "type": "object",
         "properties": {
+          "header_Lomi-Account": {
+            "type": "string",
+            "example": "acct_1234567890",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
+          },
           "id": {
             "description": "Card payment id (pi_...)"
           },
@@ -1967,7 +1931,11 @@
         "required": [
           "id"
         ]
-      }
+      },
+      "readOnly": false,
+      "destructive": true,
+      "alwaysLoad": false,
+      "searchHint": "advanced cancel card charge charges direct id post"
     },
     {
       "name": "lomi_post_charge_mtn",
@@ -1976,10 +1944,10 @@
       "pathTemplate": "/charge/mtn",
       "pathParamNames": [],
       "queryParamNames": [],
-      "title": "Lancer un encaissement direct MTN MoMo",
-      "description": "Lancer un encaissement direct MTN MoMo\n\nREST: POST /charge/mtn",
+      "title": "Create Advanced Direct Charges",
+      "description": "Create Advanced Direct Charges via the lomi. merchant REST API.\n\nREST: POST /charge/mtn",
       "tags": [
-        "Encaissements"
+        "Advanced Direct Charges"
       ],
       "operationId": "ChargesController_createMtnCharge",
       "write": true,
@@ -1987,13 +1955,22 @@
       "inputSchema": {
         "type": "object",
         "properties": {
+          "header_Lomi-Account": {
+            "type": "string",
+            "example": "acct_1234567890",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
+          },
           "idempotency_key": {
             "type": "string",
             "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
           }
         },
         "required": []
-      }
+      },
+      "readOnly": false,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "advanced charge charges direct mtn post"
     },
     {
       "name": "lomi_post_charge_wave",
@@ -2002,10 +1979,10 @@
       "pathTemplate": "/charge/wave",
       "pathParamNames": [],
       "queryParamNames": [],
-      "title": "Lancer un encaissement direct Wave",
-      "description": "Lancer un encaissement direct Wave\n\nREST: POST /charge/wave",
+      "title": "Create Advanced Direct Charges",
+      "description": "Create Advanced Direct Charges via the lomi. merchant REST API.\n\nREST: POST /charge/wave",
       "tags": [
-        "Encaissements"
+        "Advanced Direct Charges"
       ],
       "operationId": "ChargesController_createWaveCharge",
       "write": true,
@@ -2013,13 +1990,22 @@
       "inputSchema": {
         "type": "object",
         "properties": {
+          "header_Lomi-Account": {
+            "type": "string",
+            "example": "acct_1234567890",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
+          },
           "idempotency_key": {
             "type": "string",
             "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
           }
         },
         "required": []
-      }
+      },
+      "readOnly": false,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "advanced charge charges direct post wave"
     },
     {
       "name": "lomi_post_checkout_sessions",
@@ -2028,10 +2014,10 @@
       "pathTemplate": "/checkout-sessions",
       "pathParamNames": [],
       "queryParamNames": [],
-      "title": "Créer une session de paiement",
-      "description": "Créer une session de paiement\n\nCrée une page de paiement hébergée pour que le client finalise son achat. La session expire après 60 minutes par défaut. Renvoie un identifiant de session et une URL de redirection.\n\nREST: POST /checkout-sessions",
+      "title": "Create Checkout Sessions",
+      "description": "Create Checkout Sessions via the lomi. merchant REST API.\n\nREST: POST /checkout-sessions",
       "tags": [
-        "Sessions de paiement"
+        "Checkout Sessions"
       ],
       "operationId": "CheckoutSessionsController_create",
       "write": true,
@@ -2155,6 +2141,11 @@
             },
             "description": "JSON request body for this operation."
           },
+          "header_Lomi-Account": {
+            "type": "string",
+            "example": "acct_1234567890",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
+          },
           "idempotency_key": {
             "type": "string",
             "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
@@ -2163,7 +2154,11 @@
         "required": [
           "body"
         ]
-      }
+      },
+      "readOnly": false,
+      "destructive": false,
+      "alwaysLoad": true,
+      "searchHint": "checkout post sessions"
     },
     {
       "name": "lomi_post_customers",
@@ -2172,10 +2167,10 @@
       "pathTemplate": "/customers",
       "pathParamNames": [],
       "queryParamNames": [],
-      "title": "Créer un client",
-      "description": "Créer un client\n\nCrée un client dans votre organisation. Il est automatiquement rattaché à votre organisation.\n\nREST: POST /customers",
+      "title": "Create Customers",
+      "description": "Create Customers via the lomi. merchant REST API.\n\nREST: POST /customers",
       "tags": [
-        "Clients"
+        "Customers"
       ],
       "operationId": "CustomersController_create",
       "write": true,
@@ -2225,6 +2220,11 @@
             },
             "description": "JSON request body for this operation."
           },
+          "header_Lomi-Account": {
+            "type": "string",
+            "example": "acct_1234567890",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
+          },
           "idempotency_key": {
             "type": "string",
             "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
@@ -2233,7 +2233,11 @@
         "required": [
           "body"
         ]
-      }
+      },
+      "readOnly": false,
+      "destructive": false,
+      "alwaysLoad": true,
+      "searchHint": "customers post"
     },
     {
       "name": "lomi_post_customers_id_portal_launch_session",
@@ -2244,10 +2248,10 @@
         "id"
       ],
       "queryParamNames": [],
-      "title": "Créer une session de lancement du portail client",
-      "description": "Créer une session de lancement du portail client\n\nGénère un lien hébergé à usage unique vers le portail client pour un client de votre organisation. Destiné aux applications marchandes (backend) via clé API.\n\nREST: POST /customers/{id}/portal-launch-session",
+      "title": "Create Customers",
+      "description": "Create Customers via the lomi. merchant REST API.\n\nREST: POST /customers/{id}/portal-launch-session",
       "tags": [
-        "Clients"
+        "Customers"
       ],
       "operationId": "CustomersController_createPortalLaunchSession",
       "write": true,
@@ -2281,6 +2285,11 @@
             },
             "description": "JSON request body for this operation."
           },
+          "header_Lomi-Account": {
+            "type": "string",
+            "example": "acct_1234567890",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
+          },
           "id": {
             "type": "string",
             "description": "UUID du client"
@@ -2294,7 +2303,11 @@
           "body",
           "id"
         ]
-      }
+      },
+      "readOnly": false,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "customers id launch portal post session"
     },
     {
       "name": "lomi_post_discount_coupons",
@@ -2303,10 +2316,10 @@
       "pathTemplate": "/discount-coupons",
       "pathParamNames": [],
       "queryParamNames": [],
-      "title": "Créer un coupon",
-      "description": "Créer un coupon\n\nCrée un coupon dans votre organisation. Le code sera automatiquement mis en majuscules.\n\nREST: POST /discount-coupons",
+      "title": "Create Discount Coupons",
+      "description": "Create Discount Coupons via the lomi. merchant REST API.\n\nREST: POST /discount-coupons",
       "tags": [
-        "Coupons de réduction"
+        "Discount Coupons"
       ],
       "operationId": "DiscountCouponsController_create",
       "write": true,
@@ -2320,7 +2333,11 @@
           }
         },
         "required": []
-      }
+      },
+      "readOnly": false,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "coupons discount post"
     },
     {
       "name": "lomi_post_payment_links",
@@ -2329,10 +2346,10 @@
       "pathTemplate": "/payment-links",
       "pathParamNames": [],
       "queryParamNames": [],
-      "title": "Créer un lien de paiement",
-      "description": "Créer un lien de paiement\n\nCrée un lien de paiement partageable : produit (lien produit) ou montant fixe (lien instantané). Les liens produit référencent un produit et un prix optionnel ; les liens instantanés ont un montant fixe.\n\nREST: POST /payment-links",
+      "title": "Create Payment Links",
+      "description": "Create Payment Links via the lomi. merchant REST API.\n\nREST: POST /payment-links",
       "tags": [
-        "Liens de paiement"
+        "Payment Links"
       ],
       "operationId": "PaymentLinksController_create",
       "write": true,
@@ -2416,7 +2433,11 @@
         "required": [
           "body"
         ]
-      }
+      },
+      "readOnly": false,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "links payment post"
     },
     {
       "name": "lomi_post_payment_requests",
@@ -2425,10 +2446,10 @@
       "pathTemplate": "/payment-requests",
       "pathParamNames": [],
       "queryParamNames": [],
-      "title": "Créer une demande de paiement",
-      "description": "Créer une demande de paiement\n\nCrée une demande de paiement pour un client. Elle a une date d’expiration et peut être suivie jusqu’à réussite ou expiration.\n\nREST: POST /payment-requests",
+      "title": "Create Payment Requests",
+      "description": "Create Payment Requests via the lomi. merchant REST API.\n\nREST: POST /payment-requests",
       "tags": [
-        "Demandes de paiement"
+        "Payment Requests"
       ],
       "operationId": "PaymentRequestsController_create",
       "write": true,
@@ -2484,7 +2505,11 @@
         "required": [
           "body"
         ]
-      }
+      },
+      "readOnly": false,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "payment post requests"
     },
     {
       "name": "lomi_post_payouts",
@@ -2493,10 +2518,10 @@
       "pathTemplate": "/payouts",
       "pathParamNames": [],
       "queryParamNames": [],
-      "title": "Créer un virement",
-      "description": "Créer un virement\n\nVirement vers votre compte enregistré (self) ou vers un tiers sur mobile money / SPI (beneficiary).\n\nREST: POST /payouts",
+      "title": "Create Payouts",
+      "description": "Create Payouts via the lomi. merchant REST API.\n\nREST: POST /payouts",
       "tags": [
-        "Virements"
+        "Payouts"
       ],
       "operationId": "PayoutsUnifiedController_create",
       "write": true,
@@ -2510,7 +2535,11 @@
           }
         },
         "required": []
-      }
+      },
+      "readOnly": false,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "payouts post"
     },
     {
       "name": "lomi_post_products",
@@ -2519,10 +2548,10 @@
       "pathTemplate": "/products",
       "pathParamNames": [],
       "queryParamNames": [],
-      "title": "Créer un produit",
-      "description": "Créer un produit\n\nCrée un produit avec un ou plusieurs tarifs en une seule requête. Au moins un prix est requis. Le premier prix, ou celui avec `is_default`, est utilisé lorsque aucun prix n'est précisé au paiement.\n\nREST: POST /products",
+      "title": "Create Products",
+      "description": "Create Products via the lomi. merchant REST API.\n\nREST: POST /products",
       "tags": [
-        "Produits"
+        "Products"
       ],
       "operationId": "ProductsController_create",
       "write": true,
@@ -2536,7 +2565,11 @@
           }
         },
         "required": []
-      }
+      },
+      "readOnly": false,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "post products"
     },
     {
       "name": "lomi_post_products_id_prices",
@@ -2547,10 +2580,10 @@
         "id"
       ],
       "queryParamNames": [],
-      "title": "Ajouter un prix à un produit",
-      "description": "Ajouter un prix à un produit\n\nAjoute une nouvelle option tarifaire à un produit (palier, devise ou période). Un produit ne peut avoir au plus 3 prix actifs. Les prix existants ne se modifient pas : créez-en un nouveau.\n\nREST: POST /products/{id}/prices",
+      "title": "Create Products",
+      "description": "Create Products via the lomi. merchant REST API.\n\nREST: POST /products/{id}/prices",
       "tags": [
-        "Produits"
+        "Products"
       ],
       "operationId": "ProductsController_addPrice",
       "write": true,
@@ -2570,7 +2603,11 @@
         "required": [
           "id"
         ]
-      }
+      },
+      "readOnly": false,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "id post prices products"
     },
     {
       "name": "lomi_post_products_id_prices_priceId_set_default",
@@ -2582,10 +2619,10 @@
         "priceId"
       ],
       "queryParamNames": [],
-      "title": "Définir le prix par défaut",
-      "description": "Définir le prix par défaut\n\nIndique le prix utilisé par défaut pour ce produit (par exemple si le paiement ne fournit pas d'ID de prix). Un seul défaut à la fois ; un nouveau défaut remplace l'ancien.\n\nREST: POST /products/{id}/prices/{priceId}/set-default",
+      "title": "Create Products",
+      "description": "Create Products via the lomi. merchant REST API.\n\nREST: POST /products/{id}/prices/{priceId}/set-default",
       "tags": [
-        "Produits"
+        "Products"
       ],
       "operationId": "ProductsController_setDefaultPrice",
       "write": true,
@@ -2610,7 +2647,11 @@
           "id",
           "priceId"
         ]
-      }
+      },
+      "readOnly": false,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "default id post priceId prices products set"
     },
     {
       "name": "lomi_post_refunds",
@@ -2619,10 +2660,10 @@
       "pathTemplate": "/refunds",
       "pathParamNames": [],
       "queryParamNames": [],
-      "title": "Créer un remboursement",
-      "description": "Créer un remboursement\n\nRembourse une transaction terminée (carte ou mobile money). Le solde marchand est mis à jour immédiatement. Prise en charge des remboursements totaux et partiels.\n\nREST: POST /refunds",
+      "title": "Create Refunds",
+      "description": "Create Refunds via the lomi. merchant REST API.\n\nREST: POST /refunds",
       "tags": [
-        "Remboursements"
+        "Refunds"
       ],
       "operationId": "RefundsController_create",
       "write": true,
@@ -2630,13 +2671,22 @@
       "inputSchema": {
         "type": "object",
         "properties": {
+          "header_Lomi-Account": {
+            "type": "string",
+            "example": "acct_1234567890",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
+          },
           "idempotency_key": {
             "type": "string",
             "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
           }
         },
         "required": []
-      }
+      },
+      "readOnly": false,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "post refunds"
     },
     {
       "name": "lomi_post_subscriptions_id_cancel",
@@ -2647,10 +2697,10 @@
         "id"
       ],
       "queryParamNames": [],
-      "title": "Résilier un abonnement",
-      "description": "Résilier un abonnement\n\nRésilie un abonnement actif. C'est la seule modification autorisée sur un abonnement. Prix, dates de facturation et autres champs sont gérés par le système.\n\nREST: POST /subscriptions/{id}/cancel",
+      "title": "Create Subscriptions",
+      "description": "Create Subscriptions via the lomi. merchant REST API.\n\nREST: POST /subscriptions/{id}/cancel",
       "tags": [
-        "Abonnements"
+        "Subscriptions"
       ],
       "operationId": "SubscriptionsController_cancel",
       "write": true,
@@ -2680,7 +2730,11 @@
           "body",
           "id"
         ]
-      }
+      },
+      "readOnly": false,
+      "destructive": true,
+      "alwaysLoad": false,
+      "searchHint": "cancel id post subscriptions"
     },
     {
       "name": "lomi_post_webhooks",
@@ -2689,8 +2743,8 @@
       "pathTemplate": "/webhooks",
       "pathParamNames": [],
       "queryParamNames": [],
-      "title": "Créer un webhook",
-      "description": "Créer un webhook\n\nREST: POST /webhooks",
+      "title": "Create Webhooks",
+      "description": "Create Webhooks via the lomi. merchant REST API.\n\nREST: POST /webhooks",
       "tags": [
         "Webhooks"
       ],
@@ -2706,7 +2760,11 @@
           }
         },
         "required": []
-      }
+      },
+      "readOnly": false,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "post webhooks"
     },
     {
       "name": "lomi_post_webhooks_id_test",
@@ -2717,8 +2775,8 @@
         "id"
       ],
       "queryParamNames": [],
-      "title": "Envoyer un événement test au webhook",
-      "description": "Envoyer un événement test au webhook\n\nREST: POST /webhooks/{id}/test",
+      "title": "Create Webhooks",
+      "description": "Create Webhooks via the lomi. merchant REST API.\n\nREST: POST /webhooks/{id}/test",
       "tags": [
         "Webhooks"
       ],
@@ -2739,7 +2797,11 @@
         "required": [
           "id"
         ]
-      }
+      },
+      "readOnly": false,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "id post test webhooks"
     },
     {
       "name": "lomi_post_webhooks_webhookId_logs_logId_retry",
@@ -2751,8 +2813,8 @@
         "logId"
       ],
       "queryParamNames": [],
-      "title": "Relancer une livraison webhook",
-      "description": "Relancer une livraison webhook\n\nREST: POST /webhooks/{webhookId}/logs/{logId}/retry",
+      "title": "Create Webhooks",
+      "description": "Create Webhooks via the lomi. merchant REST API.\n\nREST: POST /webhooks/{webhookId}/logs/{logId}/retry",
       "tags": [
         "Webhooks"
       ],
@@ -2777,7 +2839,11 @@
           "logId",
           "webhookId"
         ]
-      }
+      },
+      "readOnly": false,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "logId logs post retry webhookId webhooks"
     }
   ]
 }

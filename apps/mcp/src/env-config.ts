@@ -307,9 +307,27 @@ export function getMcpReadinessChecks(): {
   run('merchant_key_env', () => {
     void getOptionalMerchantApiKey();
   });
+  run('production_transport_bearer', () => {
+    if (process.env.NODE_ENV === 'production' && getMcpHttpBearerTokens().length === 0) {
+      throw new Error(
+        'NODE_ENV=production requires LOMI_MCP_BEARER_TOKEN for hosted MCP transport auth.',
+      );
+    }
+  });
 
   return {
     ok: checks.every((c) => c.ok),
     checks,
   };
+}
+
+/** Max characters returned from a single tool call. Default 100_000. */
+export function mcpMaxResultCharsFromEnv(): number {
+  return parseEnvIntInRange(
+    process.env.LOMI_MCP_MAX_RESULT_CHARS,
+    'LOMI_MCP_MAX_RESULT_CHARS',
+    100_000,
+    1_000,
+    500_000,
+  );
 }

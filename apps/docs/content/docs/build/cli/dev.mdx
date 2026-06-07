@@ -3,7 +3,9 @@ title: 'Local development server'
 description: 'Run lomi dev to receive and inspect webhook events on your machine during development.'
 ---
 
-The `lomi dev` command starts a lightweight local HTTP server that receives webhook POST requests and prints events in the terminal. Use it while building and debugging webhook handlers.
+The `lomi dev` command starts a lightweight local HTTP server that receives webhook POST requests and prints events in the terminal.
+
+For real sandbox webhooks without ngrok, prefer [`lomi listen`](/build/cli/listen).
 
 Requires [`lomi login`](/build/cli/auth).
 
@@ -21,7 +23,7 @@ Default URL: **`http://localhost:4242/webhook`**
 | --- | --- | --- |
 | `-p, --port` | `4242` | Port for the HTTP server |
 | `--env-file` | `.env` | Dotenv file to load |
-| `--verify-signature` | `false` | Verify `lomi-signature` using `LOMI_WEBHOOK_SECRET` |
+| `--verify-signature` | auto when `LOMI_WEBHOOK_SECRET` is set | Verify `X-Lomi-Signature` using `LOMI_WEBHOOK_SECRET` |
 | `--skip-rules-install` | — | Skip agent rules install prompt |
 
 ```bash filename="Terminal"
@@ -56,15 +58,17 @@ curl -X POST http://localhost:4242/webhook \
 
 The CLI prints the event type and payload in the terminal.
 
-### Connect to the dashboard (optional)
+### Receive real sandbox events (recommended)
 
-For end-to-end testing, expose your local server with a tunnel (e.g. [ngrok](https://ngrok.com)) and register the public URL as a webhook endpoint in the Merchant Portal.
+```bash filename="Terminal"
+lomi listen http://localhost:4242/webhook
+```
 
 </Steps>
 
 ## Signature verification
 
-When `--verify-signature` is enabled, the server validates the `lomi-signature` header against `LOMI_WEBHOOK_SECRET` from your `.env` file.
+When verification is enabled, the server validates the `X-Lomi-Signature` header against `LOMI_WEBHOOK_SECRET` from your `.env` file.
 
 Ensure `LOMI_WEBHOOK_SECRET` is set before enabling verification:
 

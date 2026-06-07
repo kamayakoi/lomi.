@@ -3601,7 +3601,12 @@ export type Database = {
         | 'REFUND_FAILED'
         | 'SUBSCRIPTION_CREATED'
         | 'SUBSCRIPTION_RENEWED'
-        | 'SUBSCRIPTION_CANCELLED';
+        | 'SUBSCRIPTION_CANCELLED'
+        | 'USAGE_RECORDED'
+        | 'USAGE_INVOICE_CREATED'
+        | 'USAGE_INVOICE_PAID'
+        | 'USAGE_INVOICE_OVERDUE'
+        | 'SUBSCRIPTION_USAGE_PERIOD_CLOSED';
     };
   };
 };

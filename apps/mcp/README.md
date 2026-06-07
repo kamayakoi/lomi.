@@ -19,16 +19,20 @@ If the host does **not** use a transport secret, some clients can send `Authoriz
 
 **Checks (optional):** `GET /health`, `GET /ready` on the same host.
 
-## Use it locally (Cursor, stdio)
+## Install from npm (stdio)
 
-Build once from this package (`pnpm install && pnpm run build`), then add something like:
+```bash
+npx -y @lomi./mcp
+```
+
+Example Cursor / Claude Desktop config (see [`examples/`](./examples/)):
 
 ```json
 {
   "mcpServers": {
     "lomi": {
-      "command": "node",
-      "args": ["/absolute/path/to/repo/apps/mcp/dist/index.js"],
+      "command": "npx",
+      "args": ["-y", "@lomi./mcp"],
       "env": {
         "LOMI_API_KEY": "your-merchant-secret-key",
         "LOMI_API_BASE_URL": "https://api.lomi.africa"
@@ -38,7 +42,13 @@ Build once from this package (`pnpm install && pnpm run build`), then add someth
 }
 ```
 
-Use `https://sandbox.api.lomi.africa` for sandbox. Set `LOMI_MCP_TRANSPORT=http` only if you run the HTTP entry yourself.
+Use `https://sandbox.api.lomi.africa` for sandbox. For hosted HTTP, copy [`examples/cursor-http.mcp.json`](./examples/cursor-http.mcp.json) and set your MCP host plus `x-lomi-api-key`.
+
+## Tool discovery (large tool catalogs)
+
+Clients that support deferred loading can call **`lomi_search_tools`** with a keyword query. Generated tools include `readOnlyHint`, `destructiveHint`, `anthropic/searchHint`, and `anthropic/alwaysLoad` metadata for Composer-style clients.
+
+MCP **resources** (`lomi://docs/getting-started`, `lomi://docs/errors`, `lomi://tools/index`) and **prompts** (`onboard_merchant`, `debug_failed_payment`, `setup_webhook`) ship with the server.
 
 ## Get a merchant key for HTTP MCP
 

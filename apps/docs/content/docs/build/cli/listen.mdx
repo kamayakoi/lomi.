@@ -1,0 +1,75 @@
+---
+title: 'Listen for webhooks'
+description: 'Use lomi listen to receive sandbox webhooks via cloud relay without ngrok.'
+---
+
+`lomi listen` opens a Server-Sent Events (SSE) connection to the lomi. API and streams real webhook events to your machine. Optionally forward them to a local HTTP handler.
+
+Requires [`lomi login`](/build/cli/auth) with a **sandbox** profile (recommended).
+
+## Usage
+
+```bash filename="Terminal"
+# Print events in the terminal
+lomi listen
+
+# Forward to your local webhook handler
+lomi listen http://localhost:3000/api/webhooks
+```
+
+### Options
+
+| Flag | Description |
+| --- | --- |
+| `FORWARD_URL` | Optional URL to POST signed webhook payloads |
+| `--allow-production` | Opt in to listen on a production profile (requires API `CLI_LISTEN_ALLOW_PRODUCTION=true`) |
+
+## Workflow
+
+<Steps>
+
+### Log in (sandbox)
+
+```bash filename="Terminal"
+lomi login --profile sandbox
+lomi switch sandbox
+```
+
+### Start listening
+
+```bash filename="Terminal"
+lomi listen http://localhost:3000/webhooks
+```
+
+On connect, the CLI prints your organization and `LOMI_WEBHOOK_SECRET`. Add the secret to `.env`:
+
+```dotenv filename=".env"
+LOMI_WEBHOOK_SECRET=whsec_...
+```
+
+### Trigger a test event
+
+```bash filename="Terminal"
+lomi webhooks list
+lomi webhooks test <webhook-id>
+```
+
+Events appear in the terminal and are forwarded to your local URL with production headers (`X-Lomi-Signature`, `X-Lomi-Event`).
+
+</Steps>
+
+## Compared to `lomi dev`
+
+| | `lomi listen` | `lomi dev` |
+| --- | --- | --- |
+| Receives real sandbox events | Yes | Only if dashboard points to localhost/ngrok |
+| Requires ngrok | No | Often yes for E2E |
+| Runs local HTTP server | No (optional forward) | Yes (`:4242/webhook`) |
+
+Use **`lomi listen`** as the primary integration path. Use **`lomi dev`** when you only need a local receiver.
+
+## Next steps
+
+- [Local development server](/build/cli/dev)
+- [Webhooks reference](/build/webhooks)
+- [Initialize a project](/build/cli/init)

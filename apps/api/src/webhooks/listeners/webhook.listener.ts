@@ -87,6 +87,52 @@ export class WebhookListener {
     );
   }
 
+  @OnEvent('USAGE_RECORDED')
+  async handleUsageRecorded(payload: any) {
+    this.logger.log(`Handling USAGE_RECORDED event ${payload.id}`);
+    await this.queueWebhook(
+      payload.organization_id,
+      'USAGE_RECORDED',
+      payload,
+    );
+  }
+
+  @OnEvent('USAGE_INVOICE_CREATED')
+  async handleUsageInvoiceCreated(payload: any) {
+    await this.queueWebhook(
+      payload.organization_id,
+      'USAGE_INVOICE_CREATED',
+      payload,
+    );
+  }
+
+  @OnEvent('USAGE_INVOICE_PAID')
+  async handleUsageInvoicePaid(payload: any) {
+    await this.queueWebhook(
+      payload.organization_id,
+      'USAGE_INVOICE_PAID',
+      payload,
+    );
+  }
+
+  @OnEvent('USAGE_INVOICE_OVERDUE')
+  async handleUsageInvoiceOverdue(payload: any) {
+    await this.queueWebhook(
+      payload.organization_id,
+      'USAGE_INVOICE_OVERDUE',
+      payload,
+    );
+  }
+
+  @OnEvent('SUBSCRIPTION_USAGE_PERIOD_CLOSED')
+  async handleUsagePeriodClosed(payload: any) {
+    await this.queueWebhook(
+      payload.organization_id,
+      'SUBSCRIPTION_USAGE_PERIOD_CLOSED',
+      payload,
+    );
+  }
+
   @OnEvent('SUBSCRIPTION_CANCELLED')
   async handleSubscriptionCanceled(payload: any) {
     this.logger.log(

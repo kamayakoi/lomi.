@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Optional } from '@nestjs/common';
 import { SupabaseService } from '../utils/supabase/supabase.service';
 import axios from 'axios';
 import * as crypto from 'crypto';
@@ -10,6 +10,8 @@ import {
   resolveSafeMerchantWebhookTarget,
   UnsafeWebhookUrlError,
 } from './merchant-webhook-url';
+import { CliListenerService } from '../cli/cli-listener.service';
+import { CliStreamService } from '../cli/cli-stream.service';
 
 export interface Webhook {
   id: string;
@@ -43,7 +45,11 @@ export interface WebhookSendResult {
 export class WebhookSenderService {
   private readonly logger = new Logger(WebhookSenderService.name);
 
-  constructor(private readonly supabase: SupabaseService) {}
+  constructor(
+    private readonly supabase: SupabaseService,
+    @Optional() private readonly cliListener?: CliListenerService,
+    @Optional() private readonly cliStream?: CliStreamService,
+  ) {}
 
   /**
    * Feature flag + optional canary list: WEBHOOK_OUTBOX_CANARY_ORG_IDS=uuid1,uuid2
@@ -136,6 +142,14 @@ export class WebhookSenderService {
     const payload = this.prepareWebhookPayload(event, data, stablePayloadId);
     const payloadString = JSON.stringify(payload);
     const signature = this.generateSignature(payloadString, webhook.secret);
+
+    await this.maybePublishCliStream(
+      webhook.organization_id,
+      event,
+      payloadString,
+      signature,
+      payload,
+    );
 
     const started = Date.now();
 
@@ -581,5 +595,34 @@ export class WebhookSenderService {
     await Promise.allSettled(
       relevantWebhooks.map((w) => this.sendWebhook(w, event, data)),
     );
+  }
+
+  private async maybePublishCliStream(
+    organizationId: string,
+    event: WebhookEvent,
+    payloadString: string,
+    signature: string,
+    payload: unknown,
+  ): Promise<void> {
+    if (!this.cliListener || !this.cliStream) {
+      return;
+    }
+
+    const listening = await this.cliListener.hasActiveListener(organizationId);
+    if (!listening) {
+      return;
+    }
+
+    this.cliStream.emit(organizationId, {
+      type: 'webhook',
+      event,
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Lomi-Signature': signature,
+        'X-Lomi-Event': event,
+        'User-Agent': 'Lomi-Webhook/1.0',
+      },
+      payload: JSON.parse(payloadString) as unknown,
+    });
   }
 }

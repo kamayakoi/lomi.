@@ -1,0 +1,38 @@
+---
+title: Digital products
+description: Upload files, deliver instantly after payment, and let customers re-download from their library.
+---
+
+# Digital products
+
+Sell downloadable files (PDFs, templates, courses) with automatic fulfillment after payment.
+
+## Setup
+
+1. Open **Catalog** and create or edit a product.
+2. Set **Fulfillment** to **Digital** or **Hybrid**.
+3. Open the **Files** tab and upload deliverables (up to 500 MB per file).
+4. Share via payment link, storefront, or embed widget.
+
+## Buyer experience
+
+After a successful payment, buyers receive:
+
+- Download links on the checkout success page
+- A delivery email with file links
+- A permanent library at [customers.lomi.africa](https://customers.lomi.africa) to re-download purchases
+
+## Webhooks
+
+Subscribe to `PURCHASE_FULFILLED` to run automations when digital entitlements are granted.
+
+Payload fields:
+
+- `transaction_id` — completed payment
+- `customer_id` — buyer
+- `product_ids` — digital products fulfilled
+- `entitlement_ids` — file entitlements granted
+
+## File updates
+
+When you add or remove deliverable files on a product with past sales, existing buyers receive updated entitlements and an email with refreshed download links.

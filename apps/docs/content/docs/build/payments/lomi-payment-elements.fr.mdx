@@ -22,7 +22,7 @@ Trois façons d’intégrer les paiements lomi. :
 | ------------------------------------------- | ---------------------------------------------------------- |
 | **SDK JS (`@lomi/js`)**                     | Applications web en JavaScript vanilla ou framework |
 | **SDK React Native (`@lomi/react-native`)** | Applications natives iOS et Android                     |
-| **Tunnel intégré (`@lomi/embed`)**       | Intégration en iframe conservant l’interface complète du tunnel lomi.         |
+| **Tunnel intégré (`@lomi./embed`)**       | Intégration en iframe conservant l’interface complète du tunnel lomi.         |
 
 ---
 
@@ -31,7 +31,7 @@ Trois façons d’intégrer les paiements lomi. :
 <Tabs items={['Web (JS)', 'React Native', 'Tunnel intégré']}>
   <Tab value="Web (JS)">```bash npm install @lomi/js ```</Tab>
   <Tab value="React Native">```bash npm install @lomi/react-native ```</Tab>
-  <Tab value="Tunnel intégré">```bash npm install @lomi/embed ```</Tab>
+  <Tab value="Tunnel intégré">```bash npm install @lomi./embed ```</Tab>
 </Tabs>
 
 ---
@@ -149,26 +149,21 @@ Détails : [Créer un encaissement carte](/api/charge/ChargesController_createCa
   </Tab>
 
   <Tab value="Tunnel intégré">
-    ```html
-    <!DOCTYPE html>
-    <html>
-    <body>
-      <div id="lomi-checkout"></div>
-      
-      &lt;script type="module"&gt;
-        import { loadLomiCheckout } from '@lomi/embed';
-        
-        loadLomiCheckout({
-          elementId: 'lomi-checkout',
-          sessionId: 'cs_your_checkout_session_id',
-          publicKey: 'lomi_pk_your_publishable_key',
-        });
-      &lt;/script&gt;
-    </body>
-    </html>
+    Guide complet : [Tunnel de paiement intégré](/build/embed-widget).
+
+    ```javascript
+    import { loadLomiCheckout } from '@lomi./embed';
+
+    loadLomiCheckout({
+      checkoutUrl: session.checkout_url,
+      mode: 'modal',
+      onComplete: (payload) => {
+        console.log(payload.transactionId, payload.hasDigitalDeliverables);
+      },
+    });
     ```
 
-    Le tunnel intégré conserve l’interface et le parcours lomi. et se redimensionne automatiquement au conteneur.
+    Pour un tunnel inline déclaratif, utilisez `data-lomi-checkout-url` sur un conteneur, puis chargez le bundle IIFE (`dist/lomi.js`) ou importez le package npm.
 
   </Tab>
 </Tabs>

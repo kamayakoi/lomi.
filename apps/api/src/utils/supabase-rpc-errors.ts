@@ -1,5 +1,16 @@
 import { BadRequestException, ConflictException } from '@nestjs/common';
 
+const USAGE_ERROR_CODES = [
+  'product_not_usage_based',
+  'usage_price_not_found',
+  'meter_not_found',
+  'active_usage_subscription_required',
+  'transaction_id_required',
+  'code_required',
+  'customer_id_required',
+  'meter_product_must_be_usage_based',
+] as const;
+
 const LINE_ITEM_ERROR_CODES = [
   'line_items_recurring_not_supported',
   'line_items_pwyw_not_supported',
@@ -18,6 +29,15 @@ export function throwMappedSupabaseRpcError(message: string): never {
     throw new BadRequestException(
       'Invalid idempotency fingerprint for Idempotency-Key header',
     );
+  }
+
+  for (const code of USAGE_ERROR_CODES) {
+    if (message.includes(code)) {
+      throw new BadRequestException({
+        message: code.replace(/_/g, ' '),
+        code,
+      });
+    }
   }
 
   for (const code of LINE_ITEM_ERROR_CODES) {

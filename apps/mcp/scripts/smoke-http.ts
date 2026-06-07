@@ -58,6 +58,45 @@ async function main(): Promise<void> {
     throw new Error('Expected non-empty tools list from MCP server');
   }
 
+  const searchTool = listed.tools.find((t) => t.name === 'lomi_search_tools');
+  if (!searchTool) {
+    throw new Error('smoke-http: expected lomi_search_tools in tools/list');
+  }
+
+  const sample = listed.tools.find((t) => t.name !== 'lomi_search_tools');
+  if (sample) {
+    const meta = sample as {
+      annotations?: { readOnlyHint?: boolean; destructiveHint?: boolean };
+      _meta?: Record<string, unknown>;
+    };
+    if (typeof meta.annotations?.readOnlyHint !== 'boolean') {
+      throw new Error(
+        `smoke-http: tool ${sample.name} missing readOnlyHint annotation`,
+      );
+    }
+    if (typeof meta._meta?.['anthropic/searchHint'] !== 'string') {
+      throw new Error(
+        `smoke-http: tool ${sample.name} missing anthropic/searchHint _meta`,
+      );
+    }
+  }
+
+  const searchResult = await client.callTool({
+    name: 'lomi_search_tools',
+    arguments: { query: 'customers', limit: 3 },
+  });
+  const searchText = searchResult.content
+    ?.map((c) => ('text' in c ? c.text : ''))
+    .join('');
+  if (!searchText?.includes('customers')) {
+    throw new Error('smoke-http: lomi_search_tools returned unexpected payload');
+  }
+
+  const resources = await client.listResources();
+  if (!resources.resources?.some((r) => r.uri === 'lomi://docs/getting-started')) {
+    throw new Error('smoke-http: expected lomi://docs/getting-started resource');
+  }
+
   await client.close();
   await new Promise<void>((resolve, reject) => {
     server.close((err) => (err ? reject(err) : resolve()));

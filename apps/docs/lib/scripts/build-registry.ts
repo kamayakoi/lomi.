@@ -142,8 +142,29 @@ async function buildLomiUiRegistry(): Promise<void> {
       {
         $schema: 'https://ui.shadcn.com/schema/registry.json',
         name: lomiUiRegistry.name,
+        version: lomiUiRegistry.version,
         homepage: lomiUiRegistry.homepage,
         items,
+      },
+      null,
+      2,
+    )}\n`,
+  );
+
+  await writeFile(
+    path.join(outDir, 'index.json'),
+    `${JSON.stringify(
+      {
+        name: lomiUiRegistry.name,
+        version: lomiUiRegistry.version,
+        homepage: lomiUiRegistry.homepage,
+        registry_url: 'https://docs.lomi.africa/r/registry.json',
+        items: items.map((item) => ({
+          name: item.name,
+          title: item.title,
+          description: item.description,
+          ...(item.dependencies ? { dependencies: item.dependencies } : {}),
+        })),
       },
       null,
       2,

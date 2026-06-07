@@ -37,30 +37,30 @@ export function PaymentFailureCard({
   return (
     <section
       className={cn(
-        'w-full max-w-md rounded-sm border border-red-100 bg-white p-5 text-gray-950 shadow-sm',
+        'w-full max-w-md rounded-sm border border-destructive/20 bg-card p-5 text-card-foreground shadow-sm',
         className,
       )}
     >
       <div className="flex gap-3">
-        <span className="rounded-sm border border-red-100 bg-red-50 p-2 text-red-600">
+        <span className="rounded-sm border border-destructive/20 bg-destructive/10 p-2 text-destructive">
           <AlertTriangle className="h-5 w-5" />
         </span>
         <div>
           <h3 className="text-base font-semibold">{title}</h3>
-          <p className="mt-1 text-sm leading-5 text-gray-500">{message}</p>
+          <p className="mt-1 text-sm leading-5 text-muted-foreground">{message}</p>
         </div>
       </div>
       {amount || provider ? (
-        <dl className="mt-5 grid gap-2 rounded-sm bg-gray-50 p-3 text-sm">
+        <dl className="mt-5 grid gap-2 rounded-sm bg-muted/50 p-3 text-sm">
           {amount ? (
             <div className="flex justify-between gap-4">
-              <dt className="text-gray-500">Amount</dt>
+              <dt className="text-muted-foreground">Amount</dt>
               <dd className="font-medium">{formatMoney(amount, currency)}</dd>
             </div>
           ) : null}
           {provider ? (
             <div className="flex justify-between gap-4">
-              <dt className="text-gray-500">Provider</dt>
+              <dt className="text-muted-foreground">Provider</dt>
               <dd className="font-medium">{provider}</dd>
             </div>
           ) : null}
@@ -70,7 +70,7 @@ export function PaymentFailureCard({
         <button
           type="button"
           onClick={onRetry}
-          className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-sm bg-[#374151] px-4 text-sm font-medium text-white transition hover:bg-[#4B5563] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#56A5F9] focus-visible:ring-offset-2"
+          className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-sm bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           <RefreshCw className="h-4 w-4" />
           Retry payment
@@ -78,7 +78,7 @@ export function PaymentFailureCard({
         {supportHref ? (
           <a
             href={supportHref}
-            className="inline-flex h-10 flex-1 items-center justify-center rounded-sm border border-gray-200 bg-white px-4 text-sm font-medium text-gray-700 transition hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#56A5F9] focus-visible:ring-offset-2"
+            className="inline-flex h-10 flex-1 items-center justify-center rounded-sm border border-input bg-background px-4 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
             Contact support
           </a>

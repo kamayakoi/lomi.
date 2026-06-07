@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "lomi": {
+      "url": "https://mcp.lomi.africa/mcp",
+      "headers": {
+        "Authorization": "Bearer YOUR_TRANSPORT_SECRET",
+        "x-lomi-api-key": "YOUR_MERCHANT_API_KEY"
+      }
+    }
+  }
+}

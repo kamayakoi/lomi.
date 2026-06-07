@@ -3,6 +3,7 @@ import type { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/se
 export type SessionRegistryEntry = {
   transport: StreamableHTTPServerTransport;
   lastActivity: number;
+  merchantApiKey: string | null;
 };
 
 /**
@@ -10,6 +11,7 @@ export type SessionRegistryEntry = {
  */
 export class McpSessionRegistry {
   private readonly sessions = new Map<string, SessionRegistryEntry>();
+  private pruneTimer: ReturnType<typeof setInterval> | null = null;
 
   constructor(
     private readonly maxSessions: number,
@@ -18,6 +20,24 @@ export class McpSessionRegistry {
 
   get size(): number {
     return this.sessions.size;
+  }
+
+  /** Start periodic idle session eviction (call once at HTTP server startup). */
+  startPeriodicPrune(intervalMs: number = 60_000): void {
+    if (this.pruneTimer) return;
+    this.pruneTimer = setInterval(() => {
+      this.prune();
+    }, intervalMs);
+    if (typeof this.pruneTimer.unref === 'function') {
+      this.pruneTimer.unref();
+    }
+  }
+
+  stopPeriodicPrune(): void {
+    if (this.pruneTimer) {
+      clearInterval(this.pruneTimer);
+      this.pruneTimer = null;
+    }
   }
 
   /** Remove idle sessions past TTL; closes transports. */
@@ -33,6 +53,16 @@ export class McpSessionRegistry {
   touch(sessionId: string, now: number = Date.now()): void {
     const e = this.sessions.get(sessionId);
     if (e) e.lastActivity = now;
+  }
+
+  updateMerchantApiKey(sessionId: string, apiKey: string | null): void {
+    const e = this.sessions.get(sessionId);
+    if (!e || !apiKey) return;
+    e.merchantApiKey = apiKey;
+  }
+
+  getMerchantApiKey(sessionId: string): string | null {
+    return this.sessions.get(sessionId)?.merchantApiKey ?? null;
   }
 
   /**
@@ -57,10 +87,12 @@ export class McpSessionRegistry {
   attachSession(
     sessionId: string,
     transport: StreamableHTTPServerTransport,
+    merchantApiKey: string | null,
   ): void {
     this.sessions.set(sessionId, {
       transport,
       lastActivity: Date.now(),
+      merchantApiKey,
     });
     transport.onclose = () => {
       this.sessions.delete(sessionId);

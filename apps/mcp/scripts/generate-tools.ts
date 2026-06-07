@@ -2,7 +2,7 @@
  * Generates src/generated/tools-manifest.json from apps/docs/openapi.json
  * and the public merchant operation allowlist (same contract as SDKs).
  */
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
@@ -10,11 +10,20 @@ import {
   buildInputJsonSchema,
   toolNameFromOperation,
 } from '../src/generator/openapi-helpers.ts';
+import {
+  type EnglishCopyOverride,
+  resolveEnglishCopy,
+} from '../src/generator/mcp-english-copy.ts';
+import {
+  loadAlwaysLoadKeys,
+  resolveToolPolicy,
+} from '../src/tool-policy.ts';
 import { validateManifestToolEntry } from './validate-manifest-entry.ts';
 import {
   readSpecAndAllowlist,
   getNormalizedOperations,
   HTTP_WITH_BODY,
+  METHOD_NAME_BY_OP,
 } from '../../sdks/scripts/public-sdk-operations.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -24,6 +33,8 @@ const allowlistPath = join(
   mcpRoot,
   '../docs/lib/scripts/manual-api/_expected-public-operations.json',
 );
+const policyPath = join(__dirname, 'mcp-tool-policy.json');
+const copyOverridesPath = join(__dirname, 'mcp-tool-copy.en.json');
 const outDir = join(mcpRoot, 'src/generated');
 const outFile = join(outDir, 'tools-manifest.json');
 
@@ -37,13 +48,25 @@ function assertUniqueToolNames(names: string[]): void {
   }
 }
 
+function loadCopyOverrides(): Record<string, EnglishCopyOverride> {
+  const raw = readFileSync(copyOverridesPath, 'utf-8');
+  return JSON.parse(raw) as Record<string, EnglishCopyOverride>;
+}
+
 function main(): void {
   const { spec, allowed } = readSpecAndAllowlist(openapiPath, allowlistPath);
   const apiSpec = spec as OpenAPISpec;
   const { operations } = getNormalizedOperations(spec, allowed);
+  const alwaysLoadKeys = loadAlwaysLoadKeys(
+    JSON.parse(readFileSync(policyPath, 'utf-8')) as {
+      alwaysLoadOperationKeys?: string[];
+    },
+  );
+  const copyOverrides = loadCopyOverrides();
 
   const tools = operations.map((op) => {
     const name = toolNameFromOperation(op.httpMethodLower, op.pathTemplate);
+    const tags = op.openApiOp.tags ?? [];
 
     const write = WRITE_METHODS.has(op.httpMethodLower);
     const wantsBody =
@@ -59,11 +82,29 @@ function main(): void {
       includeIdempotencyKey: write,
     });
 
-    const descriptionParts = [
-      op.summary?.trim(),
-      op.openApiOp.description?.trim(),
-      `REST: ${op.operationKey}`,
-    ].filter(Boolean);
+    const { title, description } = resolveEnglishCopy({
+      operationKey: op.operationKey,
+      httpMethodLower: op.httpMethodLower,
+      tags,
+      methodNameByOp: METHOD_NAME_BY_OP,
+      override: copyOverrides[op.operationKey],
+      openApiSummary: op.summary,
+      openApiDescription:
+        typeof op.openApiOp.description === 'string'
+          ? op.openApiOp.description
+          : undefined,
+    });
+
+    const policy = resolveToolPolicy(
+      {
+        name,
+        method: op.httpMethodLower,
+        operationKey: op.operationKey,
+        pathTemplate: op.pathTemplate,
+        tags,
+      },
+      alwaysLoadKeys,
+    );
 
     return {
       name,
@@ -72,13 +113,17 @@ function main(): void {
       pathTemplate: op.pathTemplate,
       pathParamNames: op.pathParamNames,
       queryParamNames: op.queryParams.map((q) => q.name),
-      title: op.summary?.trim() ?? op.operationKey,
-      description: descriptionParts.join('\n\n'),
-      tags: op.openApiOp.tags ?? [],
+      title,
+      description,
+      tags,
       operationId: op.operationId,
       write,
       wantsBody,
       inputSchema,
+      readOnly: policy.readOnly,
+      destructive: policy.destructive,
+      alwaysLoad: policy.alwaysLoad,
+      searchHint: policy.searchHint,
     };
   });
 

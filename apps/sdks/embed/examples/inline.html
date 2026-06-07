@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>lomi. Embedded Checkout — Inline</title>
+    <style>#lomi-checkout { max-width: 520px; margin: 2rem auto; }</style>
+  </head>
+  <body>
+    <!--
+      Preferred: data-lomi-checkout-url only (no embedded=true — SDK adds it).
+      Local dev: http://localhost:3000/checkout/cs_...
+    -->
+    <div
+      id="lomi-checkout"
+      data-lomi-checkout-url="http://localhost:3000/checkout/cs_replace_me"
+    ></div>
+    <script src="../dist/lomi.js"></script>
+  </body>
+</html>

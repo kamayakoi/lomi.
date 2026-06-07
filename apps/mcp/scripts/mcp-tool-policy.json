@@ -1,0 +1,12 @@
+{
+  "alwaysLoadOperationKeys": [
+    "GET /accounts/balance",
+    "GET /customers",
+    "GET /products",
+    "GET /checkout-sessions",
+    "POST /checkout-sessions",
+    "GET /transactions",
+    "GET /webhooks",
+    "POST /customers"
+  ]
+}

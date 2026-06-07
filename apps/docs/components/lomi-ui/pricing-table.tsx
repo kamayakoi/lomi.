@@ -47,25 +47,25 @@ export function PricingTable({
   );
 
   return (
-    <section className={cn('w-full text-gray-950', className)}>
+    <section className={cn('w-full text-foreground', className)}>
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h2 className="text-2xl font-semibold tracking-tight">{title}</h2>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-gray-500">
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
             {description}
           </p>
         </div>
-        <div className="inline-flex w-fit rounded-sm border border-gray-200 bg-white p-1 shadow-sm">
+        <div className="inline-flex w-fit rounded-sm border border-input bg-background p-1 shadow-sm">
           {(['monthly', 'yearly'] as const).map((value) => (
             <button
               key={value}
               type="button"
               onClick={() => setInterval(value)}
               className={cn(
-                'h-8 rounded-sm px-3 text-sm font-medium capitalize transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#56A5F9] focus-visible:ring-offset-2',
+                'h-8 rounded-sm px-3 text-sm font-medium capitalize transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
                 interval === value
-                  ? 'bg-[#374151] text-white'
-                  : 'text-gray-500 hover:bg-gray-50 hover:text-gray-950',
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-muted-foreground hover:bg-muted hover:text-foreground',
               )}
             >
               {value}
@@ -85,27 +85,27 @@ export function PricingTable({
             <article
               key={plan.id}
               className={cn(
-                'relative flex min-h-full flex-col rounded-sm border bg-white p-5 shadow-sm transition',
+                'relative flex min-h-full flex-col rounded-sm border bg-card text-card-foreground p-5 shadow-sm transition-all',
                 plan.highlighted
-                  ? 'border-[#56A5F9] shadow-[0_2px_0_rgba(0,0,0,0.08),0_18px_48px_rgba(86,165,249,0.16)]'
-                  : 'border-gray-200',
+                  ? 'border-primary shadow-md'
+                  : 'border-border',
               )}
             >
               {plan.highlighted ? (
-                <span className="mb-4 inline-flex w-fit items-center gap-1 rounded-sm bg-sky-50 px-2 py-1 text-xs font-medium text-[#2478d4]">
+                <span className="mb-4 inline-flex w-fit items-center gap-1 rounded-sm bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
                   <Sparkles className="h-3.5 w-3.5" />
                   Popular
                 </span>
               ) : null}
               <h3 className="text-lg font-semibold">{plan.name}</h3>
-              <p className="mt-1 min-h-10 text-sm leading-5 text-gray-500">
+              <p className="mt-1 min-h-10 text-sm leading-5 text-muted-foreground">
                 {plan.description}
               </p>
               <div className="mt-5">
                 <span className="text-3xl font-semibold tracking-tight">
                   {formatMoney(price, plan.currency)}
                 </span>
-                <span className="text-sm text-gray-500">
+                <span className="text-sm text-muted-foreground">
                   /{interval === 'monthly' ? 'mo' : 'yr'}
                 </span>
               </div>
@@ -113,18 +113,18 @@ export function PricingTable({
                 type="button"
                 onClick={() => onPlanSelect?.(plan.id, interval)}
                 className={cn(
-                  'mt-5 inline-flex h-10 items-center justify-center rounded-sm px-4 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#56A5F9] focus-visible:ring-offset-2',
+                  'mt-5 inline-flex h-10 items-center justify-center rounded-sm px-4 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
                   plan.highlighted
-                    ? 'bg-[#374151] text-white hover:bg-[#4B5563]'
-                    : 'border border-gray-200 bg-white text-gray-950 hover:bg-gray-50',
+                    ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                    : 'border border-input bg-background text-foreground hover:bg-accent hover:text-accent-foreground',
                 )}
               >
                 {plan.ctaLabel ?? 'Select plan'}
               </button>
               <ul className="mt-5 space-y-2 text-sm">
                 {plan.features.map((feature) => (
-                  <li key={feature} className="flex gap-2 text-gray-600">
-                    <Check className="mt-0.5 h-4 w-4 flex-none text-[#56A5F9]" />
+                  <li key={feature} className="flex gap-2 text-muted-foreground">
+                    <Check className="mt-0.5 h-4 w-4 flex-none text-primary" />
                     <span>{feature}</span>
                   </li>
                 ))}

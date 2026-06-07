@@ -7,7 +7,6 @@ import express, {
   type Request,
   type Response,
 } from 'express';
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import {
   hostHeaderValidation,
@@ -18,7 +17,6 @@ import { isInitializeRequest } from '@modelcontextprotocol/sdk/types.js';
 import manifestJson from './generated/tools-manifest.json' with { type: 'json' };
 import type { ToolsManifest } from './manifest.js';
 import { parseManifest } from './manifest-parse.js';
-import { registerMerchantTools } from './register-tools.js';
 import {
   getLomiApiBaseUrl,
   getMcpHttpBearerTokens,
@@ -35,8 +33,12 @@ import {
 import { extractSessionMerchantApiKey } from './session-merchant-key.js';
 import { McpSessionRegistry } from './session-registry.js';
 import { mcpLog, mcpRequestAls } from './mcp-request-context.js';
+import { wireMcpServer } from './wire-mcp-server.js';
 
 type TransportEntry = StreamableHTTPServerTransport;
+
+const MISSING_MERCHANT_KEY_MESSAGE =
+  'Missing merchant API key: send x-lomi-api-key or x-api-key on MCP initialize, or configure server-side LOMI_API_KEY. See https://docs.lomi.africa/build/ecommerce-extensions/mcp';
 
 /** Rolling 60s window per IP for MCP routes */
 type RateBucket = { count: number; windowStart: number };
@@ -99,7 +101,7 @@ function createLomiMcpExpressApp(hostOpts: ReturnType<typeof listenHostOptions>)
 function warnProductionWithoutBearer(): void {
   if (process.env.NODE_ENV === 'production' && getMcpHttpBearerTokens().length === 0) {
     console.warn(
-      '[lomi-mcp] NODE_ENV=production but LOMI_MCP_BEARER_TOKEN is unset; MCP HTTP endpoints are world-readable.',
+      '[lomi-mcp] NODE_ENV=production but LOMI_MCP_BEARER_TOKEN is unset; /ready will fail.',
     );
   }
 }
@@ -137,27 +139,27 @@ function bearerAuthMiddleware(
   next();
 }
 
-/** One MCP server instance per Streamable HTTP session (SDK pattern). */
-function createSessionMcpServer(
-  manifest: ToolsManifest,
-  sessionMerchantApiKey: string | null,
-): McpServer {
-  const server = new McpServer(
-    { name: 'lomi.', version: manifest.apiVersion },
-    {
-      instructions: [
-        'Hosted MCP server for the lomi. merchant REST API.',
-        'Client auth for MCP transport can use LOMI_MCP_BEARER_TOKEN when configured (comma-separated for rotation).',
-        'Merchant REST auth: prefer x-lomi-api-key / x-api-key (e.g. lomi_mcp_* from dashboard connect).',
-        'When LOMI_MCP_BEARER_TOKEN is unset, Authorization: Bearer <lomi_* merchant key> is accepted.',
-        'Server-side LOMI_API_KEY is a fallback for single-tenant deployments only.',
-      ].join('\n'),
-    },
+function resolveMerchantKey(
+  registry: McpSessionRegistry,
+  sessionId: string | undefined,
+  initialKey: string | null,
+): string | null {
+  if (sessionId) {
+    return registry.getMerchantApiKey(sessionId) ?? getOptionalMerchantApiKey();
+  }
+  return initialKey ?? getOptionalMerchantApiKey();
+}
+
+function hasMerchantCredential(
+  registry: McpSessionRegistry,
+  sessionId: string | undefined,
+  headerKey: string | null,
+): boolean {
+  return Boolean(
+    headerKey ??
+      (sessionId ? registry.getMerchantApiKey(sessionId) : null) ??
+      getOptionalMerchantApiKey(),
   );
-  registerMerchantTools(server, manifest, {
-    getApiKey: () => sessionMerchantApiKey ?? getOptionalMerchantApiKey(),
-  });
-  return server;
 }
 
 export function createHttpApplication(manifest: ToolsManifest): Express {
@@ -166,6 +168,7 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
   const hostOpts = listenHostOptions();
   const app = createLomiMcpExpressApp(hostOpts);
   const registry = new McpSessionRegistry(mcpMaxSessions(), mcpSessionTtlMs());
+  registry.startPeriodicPrune();
   const rateBuckets = new Map<string, RateBucket>();
 
   function rateLimitMiddleware(
@@ -246,12 +249,17 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
           ? sessionHeader[0]
           : sessionHeader;
 
+        const headerMerchantKey = extractSessionMerchantApiKey(req);
+        if (sessionId && registry.has(sessionId) && headerMerchantKey) {
+          registry.updateMerchantApiKey(sessionId, headerMerchantKey);
+        }
+
         let transport: TransportEntry | undefined;
 
         if (sessionId && registry.has(sessionId)) {
           transport = registry.get(sessionId)!.transport;
           registry.touch(sessionId);
-          if (store.sessionId === undefined) store.sessionId = sessionId;
+          store.sessionId = sessionId;
         } else if (!sessionId && isInitializeRequest(req.body)) {
           if (!registry.canAcceptNewSession()) {
             mcpLog('mcp_session_rejected', {
@@ -270,16 +278,47 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
             return;
           }
 
-          const sessionMerchantApiKey = extractSessionMerchantApiKey(req);
+          if (!hasMerchantCredential(registry, undefined, headerMerchantKey)) {
+            res.status(401).json({
+              jsonrpc: '2.0',
+              error: {
+                code: -32002,
+                message: MISSING_MERCHANT_KEY_MESSAGE,
+              },
+              id:
+                req.body &&
+                typeof req.body === 'object' &&
+                'id' in req.body
+                  ? (req.body as { id: unknown }).id
+                  : null,
+            });
+            return;
+          }
+
+          const sessionState = {
+            sessionId: null as string | null,
+            merchantApiKey: headerMerchantKey,
+          };
+
           transport = new StreamableHTTPServerTransport({
             sessionIdGenerator: () => randomUUID(),
             onsessioninitialized: (sid) => {
-              registry.attachSession(sid, transport!);
+              sessionState.sessionId = sid;
+              registry.attachSession(sid, transport!, sessionState.merchantApiKey);
               store.sessionId = sid;
             },
           });
 
-          const server = createSessionMcpServer(manifest, sessionMerchantApiKey);
+          const server = wireMcpServer({
+            manifest,
+            mode: 'http',
+            getApiKey: () =>
+              resolveMerchantKey(
+                registry,
+                sessionState.sessionId ?? undefined,
+                sessionState.merchantApiKey,
+              ),
+          });
           await server.connect(transport);
           await transport.handleRequest(
             req as IncomingMessage,
@@ -357,8 +396,43 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
     });
   };
 
+  const mcpDeleteHandler = async (req: Request, res: Response): Promise<void> => {
+    const headerRequestIdDel = req.headers['x-request-id'];
+    const requestId =
+      (typeof headerRequestIdDel === 'string' && headerRequestIdDel.trim()) ||
+      randomUUID();
+    const store: { requestId: string; sessionId?: string } = { requestId };
+
+    await mcpRequestAls.run(store, async () => {
+      try {
+        const sessionHeader = req.headers['mcp-session-id'];
+        const sessionId = Array.isArray(sessionHeader)
+          ? sessionHeader[0]
+          : sessionHeader;
+        if (!sessionId || !registry.has(sessionId)) {
+          res.status(400).send('Invalid or missing MCP session ID');
+          return;
+        }
+        store.sessionId = sessionId;
+        const transport = registry.get(sessionId)!.transport;
+        await transport.handleRequest(
+          req as IncomingMessage,
+          res as ServerResponse,
+        );
+      } catch (error) {
+        mcpLog('mcp_delete_error', {
+          error: error instanceof Error ? error.message : String(error),
+        });
+        if (!res.headersSent) {
+          res.status(500).send('Internal server error');
+        }
+      }
+    });
+  };
+
   app.post(basePath, rateLimitMiddleware, bearerAuthMiddleware, mcpPostHandler);
   app.get(basePath, rateLimitMiddleware, bearerAuthMiddleware, mcpGetHandler);
+  app.delete(basePath, rateLimitMiddleware, bearerAuthMiddleware, mcpDeleteHandler);
 
   app.use(
     (err: unknown, _req: Request, res: Response, next: NextFunction) => {

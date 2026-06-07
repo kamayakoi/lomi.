@@ -89,6 +89,30 @@ describe('createHttpApplication', () => {
     expect(body.error_code).toBe('invalid_bearer');
   });
 
+  it('DELETE /mcp without session returns 400', async () => {
+    const manifest = parseManifest(manifestJson);
+    const app = createHttpApplication(manifest);
+    const ctx = await listen(app);
+    server = ctx.server;
+    const res = await fetch(`http://127.0.0.1:${ctx.port}/mcp`, {
+      method: 'DELETE',
+    });
+    expect(res.status).toBe(400);
+  });
+
+  it('GET /ready returns 503 in production without transport bearer', async () => {
+    process.env.NODE_ENV = 'production';
+    delete process.env.LOMI_MCP_BEARER_TOKEN;
+    const manifest = parseManifest(manifestJson);
+    const app = createHttpApplication(manifest);
+    const ctx = await listen(app);
+    server = ctx.server;
+    const res = await fetch(`http://127.0.0.1:${ctx.port}/ready`);
+    expect(res.status).toBe(503);
+    const body = await res.json();
+    expect(body.ready).toBe(false);
+  });
+
   it('rate limits MCP routes when LOMI_MCP_RATE_LIMIT_RPM is low', async () => {
     process.env.LOMI_MCP_RATE_LIMIT_RPM = '2';
     const manifest = parseManifest(manifestJson);

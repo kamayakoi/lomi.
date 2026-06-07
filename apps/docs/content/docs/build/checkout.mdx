@@ -37,6 +37,22 @@ curl -sS -X POST "https://sandbox.api.lomi.africa/checkout-sessions" \
 
 Redirect the customer to the `checkout_url` returned by the API.
 
+## Embed instead of redirect
+
+To keep the customer on your page, use the embed SDK with the same `checkout_url`:
+
+```javascript
+import { loadLomiCheckout } from '@lomi./embed';
+
+loadLomiCheckout({
+  checkoutUrl: session.checkout_url,
+  mode: 'modal',
+  onComplete: (payload) => console.log(payload.transactionId),
+});
+```
+
+See [Embed checkout widget](/build/embed-widget) for modal, inline, and self-hosted setup.
+
 ## Confirm the payment
 
 Use redirects for customer experience, not final reconciliation. Your server should rely on webhooks or a server-side API read before fulfilling an order.

@@ -31,6 +31,10 @@ import { MerchantsModule } from './core/merchants/merchants.module';
 import { ProvidersModule } from './core/providers/providers.module';
 import { CustomerSubscriptionsModule } from './core/customer-subscriptions/customer-subscriptions.module';
 import { InvoicesModule } from './core/invoices/invoices.module';
+import { MeteringModule } from './core/metering/metering.module';
+import { MeModule } from './core/me/me.module';
+import { CliModule } from './cli/cli.module';
+import { CustomerPortalModule } from './core/customer-portal/customer-portal.module';
 
 const logger = new Logger('RedisConfig');
 
@@ -138,7 +142,11 @@ const logger = new Logger('RedisConfig');
     ProvidersModule,
     CustomerSubscriptionsModule,
     InvoicesModule,
+    MeteringModule,
     AgentModule,
+    MeModule,
+    CliModule,
+    CustomerPortalModule,
   ],
 
   controllers: [AppController],

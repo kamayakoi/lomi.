@@ -101,11 +101,11 @@ export function PaymentProviderSelector({
             disabled={isDisabled}
             onClick={() => onProviderChange?.(provider.id)}
             className={cn(
-              'relative flex min-h-[78px] min-w-[112px] flex-1 flex-col items-start justify-center rounded-sm border bg-white p-4 text-left text-gray-950 shadow-sm transition-all',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#56A5F9] focus-visible:ring-offset-2',
+              'relative flex min-h-[78px] min-w-[112px] flex-1 flex-col items-start justify-center rounded-sm border bg-card p-4 text-left text-card-foreground shadow-sm transition-all',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
               isSelected
-                ? 'border-[#56A5F9] bg-slate-50 shadow-md'
-                : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50',
+                ? 'border-primary bg-primary/5 shadow-md'
+                : 'border-border hover:border-border/80 hover:bg-accent',
               isDisabled && 'cursor-not-allowed opacity-50 grayscale',
             )}
           >
@@ -121,12 +121,12 @@ export function PaymentProviderSelector({
             </span>
             <span className="text-xs font-medium">{provider.label}</span>
             {variant === 'grid' && provider.description ? (
-              <span className="mt-1 text-xs leading-4 text-gray-500">
+              <span className="mt-1 text-xs leading-4 text-muted-foreground">
                 {provider.description}
               </span>
             ) : null}
             {isSelected ? (
-              <span className="absolute right-2 top-2 rounded-full bg-[#56A5F9] p-0.5 text-white shadow-sm">
+              <span className="absolute right-2 top-2 rounded-full bg-primary p-0.5 text-primary-foreground shadow-sm">
                 <Check className="h-3 w-3" strokeWidth={3} />
               </span>
             ) : null}

@@ -392,8 +392,7 @@ export class CustomersService {
       throw new Error('Failed to create portal launch token');
     }
 
-    const baseUrl = 'https://customers.lomi.africa';
-    const launchUrl = `${baseUrl}/launch?token=${encodeURIComponent(launchToken)}`;
+    const launchUrl = `https://customers.lomi.africa/launch?token=${encodeURIComponent(launchToken)}`;
 
     return {
       customer_id: id,

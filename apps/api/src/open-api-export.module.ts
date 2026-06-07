@@ -34,6 +34,8 @@ import { ChargesModule } from './core/charges/charges.module';
 import { GlobalJsonExceptionFilter } from './core/filters/json-exception.filter';
 import { THROTTLE_LIMIT, THROTTLE_TTL_MS } from './config/http.constants';
 import { AgentModule } from './agent/agent.module';
+import { MeteringOpenApiModule } from './core/metering/metering-open-api.module';
+import { InvoicesModule } from './core/invoices/invoices.module';
 
 @Module({
   imports: [
@@ -67,6 +69,8 @@ import { AgentModule } from './agent/agent.module';
     WebhookDeliveryLogsModule,
     WebhooksOpenApiModule,
     ChargesModule,
+    InvoicesModule,
+    MeteringOpenApiModule,
     AgentModule,
   ],
   controllers: [AppController],

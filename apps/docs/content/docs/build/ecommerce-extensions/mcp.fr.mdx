@@ -49,9 +49,21 @@ Le chemin MCP peut différer si l’hôte définit un `LOMI_MCP_HTTP_PATH` perso
 
 Vous pouvez aussi utiliser toute **clé secrète** valide depuis **Développeurs → Clés API** comme `x-lomi-api-key`.
 
-## Développement local (Cursor, stdio)
+## Package npm (`@lomi./mcp`)
 
-Compilez `apps/mcp` (`pnpm install` && `pnpm run build`), puis configurez Cursor pour pointer vers `dist/index.js` avec les variables **`LOMI_API_KEY`** (ou **`X_API_KEY`**) et **`LOMI_API_BASE_URL`** (`https://api.lomi.africa` ou `https://sandbox.api.lomi.africa`). Un exemple JSON se trouve dans le README du package dans le dépôt.
+```bash
+npx -y @lomi./mcp
+```
+
+Les modèles de configuration stdio/HTTP sont dans `apps/mcp/examples/`. Définissez **`LOMI_API_KEY`** (ou **`X_API_KEY`**) et **`LOMI_API_BASE_URL`** (`https://api.lomi.africa` ou `https://sandbox.api.lomi.africa`).
+
+## Recherche d’outils, ressources et prompts
+
+- **`lomi_search_tools`** — recherche par mot-clé dans le catalogue généré.
+- **Ressources** — `lomi://docs/getting-started`, `lomi://docs/errors`, `lomi://tools/index`.
+- **Prompts** — `onboard_merchant`, `debug_failed_payment`, `setup_webhook`.
+
+Dans **Développeurs → Clés API**, le panneau **Connecter MCP** fournit des extraits à copier. Définissez **`VITE_LOMI_MCP_URL`** pour préremplir l’URL MCP hébergée.
 
 ## Sandbox
 

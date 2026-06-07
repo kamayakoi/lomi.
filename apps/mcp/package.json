@@ -1,7 +1,13 @@
 {
   "name": "@lomi./mcp",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
+  "files": [
+    "dist",
+    "src/generated",
+    "README.md",
+    ".env.example"
+  ],
   "description": "Model Context Protocol server for the lomi. merchant REST API",
   "type": "module",
   "bin": {
@@ -13,6 +19,7 @@
     "generate": "tsx scripts/generate-tools.ts",
     "generate:check": "pnpm run generate && git diff --exit-code src/generated/",
     "prebuild": "pnpm run generate",
+    "prepublishOnly": "pnpm run build",
     "start": "node dist/index.js",
     "start:http": "node dist/http-entry.js",
     "dev": "tsx src/index.ts",

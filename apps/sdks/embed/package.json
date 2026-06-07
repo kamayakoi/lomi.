@@ -1,15 +1,15 @@
 {
   "name": "@lomi./embed",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "lomi. Embedded Checkout SDK",
   "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
-      "require": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.js"
     }
   },
   "files": [
@@ -17,11 +17,15 @@
     "README.md"
   ],
   "scripts": {
-    "build": "tsc",
-    "prepublishOnly": "npm run build"
+    "build": "tsc && vite build",
+    "build:iife": "vite build",
+    "prepublishOnly": "npm run build",
+    "test": "vitest run"
   },
   "devDependencies": {
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "vite": "^6.0.0",
+    "vitest": "^3.2.6"
   },
   "repository": {
     "type": "git",

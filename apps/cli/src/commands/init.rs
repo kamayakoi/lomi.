@@ -134,6 +134,10 @@ pub async fn run(common: &CommonOptions, args: InitArgs) -> Result<()> {
         templates::webhook_example(&language),
     )?;
     fs::write(
+        examples_dir.join("embed-checkout.html"),
+        templates::embed_checkout_html(),
+    )?;
+    fs::write(
         project_dir.join("lomi.config.ts"),
         templates::lomi_config(environment.as_str()),
     )?;
@@ -168,6 +172,7 @@ pub async fn run(common: &CommonOptions, args: InitArgs) -> Result<()> {
     println!("  - lib/lomi./client.{ext}");
     println!("  - examples/create-checkout-session.{ext}");
     println!("  - examples/webhook-handler.{ext}");
+    println!("  - examples/embed-checkout.html");
     println!("  - lomi.config.ts");
     println!("  - .env");
     println!();
@@ -549,6 +554,39 @@ server.listen(PORT, () => console.log(`Webhook server listening on http://localh
 "#
             )
         }
+    }
+
+    pub fn embed_checkout_html() -> String {
+        r#"<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>lomi. Embed checkout</title>
+  </head>
+  <body>
+    <!--
+      1. Run: lomi checkout create
+      2. Replace CHECKOUT_URL below with the printed checkout_url
+      3. npm install @lomi./embed (or copy node_modules/@lomi./embed/dist/lomi.js)
+    -->
+    <button id="pay">Pay with lomi.</button>
+    <script type="module">
+      import { loadLomiCheckout } from '@lomi./embed';
+
+      const CHECKOUT_URL = 'CHECKOUT_URL';
+
+      document.getElementById('pay').addEventListener('click', () => {
+        loadLomiCheckout({
+          checkoutUrl: CHECKOUT_URL,
+          mode: 'modal',
+          onComplete: (payload) => console.log('Paid', payload),
+        });
+      });
+    </script>
+  </body>
+</html>
+"#
+        .to_string()
     }
 
     pub fn lomi_config(environment: &str) -> String {

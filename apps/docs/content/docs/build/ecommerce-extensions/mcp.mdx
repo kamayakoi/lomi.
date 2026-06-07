@@ -49,9 +49,25 @@ The MCP path may differ if your host sets a custom `LOMI_MCP_HTTP_PATH`.
 
 Alternatively, use any valid **secret** key from **Developers → API keys** as `x-lomi-api-key`.
 
-## Local development (Cursor, stdio)
+## npm package (`@lomi./mcp`)
 
-Build `apps/mcp` (`pnpm install` && `pnpm run build`), then point Cursor at `dist/index.js` with env vars **`LOMI_API_KEY`** (or **`X_API_KEY`**) and **`LOMI_API_BASE_URL`** (`https://api.lomi.africa` or `https://sandbox.api.lomi.africa`). See the package README in the repo for a JSON snippet.
+```bash
+npx -y @lomi./mcp
+```
+
+Stdio config templates live in the repo under `apps/mcp/examples/` (`cursor-stdio.mcp.json`, `cursor-http.mcp.json`, `claude-desktop-http.mcp.json`). Set **`LOMI_API_KEY`** (or **`X_API_KEY`**) and **`LOMI_API_BASE_URL`** (`https://api.lomi.africa` or `https://sandbox.api.lomi.africa`).
+
+## Tool search, resources, and prompts
+
+- **`lomi_search_tools`** — keyword search over the generated catalog when your client defers tool loading.
+- **Resources** — `lomi://docs/getting-started`, `lomi://docs/errors`, `lomi://tools/index`.
+- **Prompts** — `onboard_merchant`, `debug_failed_payment`, `setup_webhook`.
+
+Tool metadata includes `readOnlyHint`, `destructiveHint`, and Composer-compatible `_meta` (`anthropic/searchHint`, `anthropic/alwaysLoad`).
+
+## Dashboard connect panel
+
+In **Developers → API keys**, use **Connect MCP** for copy-paste snippets. Set deployment env **`VITE_LOMI_MCP_URL`** to pre-fill your hosted MCP URL; merchants can edit it in the UI.
 
 ## Sandbox
 

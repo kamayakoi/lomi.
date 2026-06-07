@@ -1,0 +1,44 @@
+---
+title: Payment Provider Selector
+description: A toggleable list of payment providers for the user to choose during checkout.
+---
+
+The `PaymentProviderSelector` is a standalone, copy-pasteable UI component built with standard HTML elements and Tailwind CSS semantic utility classes. It adapts automatically to your theme without requiring additional Shadcn primitives.
+
+## Preview
+
+<Tabs items={['Preview', 'Code']}>
+  <Tab value="Preview" className="p-0 mt-4 border-none bg-transparent">
+    <ComponentPreview>
+      <PaymentProviderSelector 
+        providers={[
+          { id: 'wave', name: 'Wave', type: 'mobile_money', logoUrl: 'https://cdn.lomi.africa/logos/wave.png' },
+          { id: 'orange', name: 'Orange Money', type: 'mobile_money', logoUrl: 'https://cdn.lomi.africa/logos/orange.png' },
+          { id: 'card', name: 'Credit Card', type: 'card', logoUrl: 'https://cdn.lomi.africa/logos/card.png' }
+        ]} 
+        selectedId="wave" 
+        onSelect={(id) => alert(`Selected provider: ${id}`)} 
+      />
+    </ComponentPreview>
+  </Tab>
+
+  <Tab value="Code" className="mt-4">
+    ```tsx
+    import { PaymentProviderSelector } from '@/components/lomi-ui/payment-provider-selector';
+
+    export default function Demo() {
+      return (
+        <PaymentProviderSelector 
+          providers={[
+            { id: 'wave', name: 'Wave', type: 'mobile_money' },
+            { id: 'orange', name: 'Orange Money', type: 'mobile_money' },
+            { id: 'card', name: 'Credit Card', type: 'card' }
+          ]} 
+          selectedId="wave" 
+          onSelect={(id) => console.log(id)} 
+        />
+      );
+    }
+    ```
+  </Tab>
+</Tabs>

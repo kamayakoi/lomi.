@@ -44,11 +44,13 @@ const paymentChannelAssets: LomiUiRegistryAsset[] = [
 export const lomiUiRegistry: {
   dir: string;
   name: string;
+  version: string;
   homepage: string;
   items: LomiUiRegistryItem[];
 } = {
   dir: docsDir,
   name: 'lomi-ui',
+  version: '1.0.0',
   homepage: 'https://docs.lomi.africa/ui',
   items: [
     {

@@ -20,6 +20,13 @@
           "applyTo": "**/*.{ts,tsx,js,jsx}"
         },
         {
+          "name": "embed-checkout",
+          "title": "Embed Checkout",
+          "label": "Iframe modal and inline checkout with @lomi./embed",
+          "path": "embed-checkout.md",
+          "applyTo": "**/*.{ts,tsx,js,jsx,html}"
+        },
+        {
           "name": "webhooks",
           "title": "Webhooks",
           "label": "Verify and handle lomi. webhook events",

@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>lomi. Embedded Checkout — Modal</title>
+  </head>
+  <body>
+    <button id="open-checkout">Pay with lomi.</button>
+    <!--
+      Replace CHECKOUT_URL with the checkout_url from POST /checkout-sessions
+      or from: lomi checkout create
+
+      Local dev: http://localhost:3000/checkout/cs_...
+      Production: https://checkout.lomi.africa/checkout/cs_...
+    -->
+    <script type="module">
+      import { loadLomiCheckout } from '../dist/index.js';
+
+      const CHECKOUT_URL = 'http://localhost:3000/checkout/cs_replace_me';
+
+      document.getElementById('open-checkout').addEventListener('click', () => {
+        loadLomiCheckout({
+          checkoutUrl: CHECKOUT_URL,
+          mode: 'modal',
+          onComplete: (payload) => {
+            console.log('Checkout complete', payload);
+          },
+        });
+      });
+    </script>
+  </body>
+</html>

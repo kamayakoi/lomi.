@@ -104,5 +104,26 @@ async fn create_checkout_session(common: &CommonOptions) -> Result<()> {
     println!("URL: {}", response.checkout_url.bright_blue());
     println!();
     println!("Redirect your customer to the URL above to complete payment.");
+    println!();
+    println!("{}", "Embed snippet (paste into your site):".bold());
+    println!();
+    print_embed_snippet(&response.checkout_url);
     Ok(())
+}
+
+fn print_embed_snippet(checkout_url: &str) {
+    println!(
+        r#"<!-- npm install @lomi./embed -->
+<script type="module">
+  import {{ loadLomiCheckout }} from '@lomi./embed';
+  document.getElementById('pay').addEventListener('click', () => {{
+    loadLomiCheckout({{
+      checkoutUrl: '{checkout_url}',
+      mode: 'modal',
+      onComplete: (p) => console.log(p),
+    }});
+  }});
+</script>
+<button id="pay">Pay</button>"#
+    );
 }

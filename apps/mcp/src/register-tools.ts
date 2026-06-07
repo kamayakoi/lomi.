@@ -5,6 +5,8 @@ import type { ManifestTool, ToolsManifest } from './manifest.js';
 import { callLomiRest, formatHttpResult } from './lomi-http.js';
 import { getLomiApiBaseUrl, getOptionalMerchantApiKey } from './env-config.js';
 import { mcpLog } from './mcp-request-context.js';
+import { truncateToolResultText } from './truncate-result.js';
+import { registerSearchToolsMetaTool } from './register-search-tools.js';
 
 export type ToolRegistrationContext = {
   baseUrl: string;
@@ -26,6 +28,14 @@ function registerOneTool(
       title: tool.title,
       description: tool.description,
       inputSchema,
+      annotations: {
+        readOnlyHint: tool.readOnly,
+        destructiveHint: tool.destructive,
+      },
+      _meta: {
+        'anthropic/searchHint': tool.searchHint,
+        'anthropic/alwaysLoad': tool.alwaysLoad,
+      },
     },
     async (args: unknown) => {
       const input = args as Record<string, unknown>;
@@ -36,7 +46,7 @@ function registerOneTool(
             {
               type: 'text',
               text:
-                'Missing merchant API key: provide x-lomi-api-key (or x-api-key) when creating MCP session, or set server-side LOMI_API_KEY fallback.',
+                'Missing merchant API key: provide x-lomi-api-key (or x-api-key) when creating MCP session, or set server-side LOMI_API_KEY fallback. See https://docs.lomi.africa/build/ecommerce-extensions/mcp',
             },
           ],
           isError: true,
@@ -55,7 +65,7 @@ function registerOneTool(
           upstreamStatus: result.status,
           latencyMs,
         });
-        const text = formatHttpResult(result);
+        const text = truncateToolResultText(formatHttpResult(result));
         const ok = result.status >= 200 && result.status < 300;
         return {
           content: [{ type: 'text', text }],
@@ -80,6 +90,9 @@ export function registerMerchantTools(
   const baseUrl = ctx?.baseUrl ?? getLomiApiBaseUrl();
   const getApiKey = ctx?.getApiKey ?? getOptionalMerchantApiKey;
   const fullCtx: ToolRegistrationContext = { baseUrl, getApiKey };
+
+  registerSearchToolsMetaTool(server, manifest);
+
   for (const tool of manifest.tools) {
     registerOneTool(server, tool, fullCtx);
   }
