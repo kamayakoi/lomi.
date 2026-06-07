@@ -51,7 +51,6 @@
 :root {
   --radius: 0.3rem;
   --background: hsl(60 9% 97.5%);
-  --color-fd-background: hsl(60 9% 97.5%);
   --foreground: oklch(0.129 0.042 264.695);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.129 0.042 264.695);
@@ -90,7 +89,6 @@
 .dark {
   /* --background: hsl(240 7.7% 7.1%); */
   --background: hsl(20 4.5% 13.1%);
-  --color-fd-background: hsl(20 4.5% 13.1%);
   --foreground: hsl(210 40% 98%);
   /* --card: hsl(240 9.1% 6.5%); */
   /* --card: hsl(240 5.9% 10%); */
