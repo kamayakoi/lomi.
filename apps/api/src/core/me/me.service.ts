@@ -23,8 +23,9 @@ export class MeService {
 
     const rows = (data as Record<string, unknown>[]) || [];
     const org = rows[0] ?? {};
-    const organizationName =
-      String(org.name ?? org.organization_name ?? 'Organization');
+    const organizationName = String(
+      org.name ?? org.organization_name ?? 'Organization',
+    );
 
     return {
       merchant_id: user.merchantId,

@@ -43,9 +43,9 @@ function stripNoiseOpenApiPaths<T extends { paths?: Record<string, unknown> }>(
   return { ...document, paths };
 }
 
-function stripNonPublicRestApiPaths<T extends { paths?: Record<string, unknown> }>(
-  document: T,
-): T {
+function stripNonPublicRestApiPaths<
+  T extends { paths?: Record<string, unknown> },
+>(document: T): T {
   if (!document.paths) return document;
   const paths: Record<string, unknown> = {};
 
@@ -99,7 +99,10 @@ function collectComponentSchemaRefs(value: unknown, refs: Set<string>): void {
 function pruneUnusedOpenApiComponentSchemas<
   T extends {
     paths?: Record<string, unknown>;
-    components?: { schemas?: Record<string, unknown> } & Record<string, unknown>;
+    components?: { schemas?: Record<string, unknown> } & Record<
+      string,
+      unknown
+    >;
   },
 >(document: T): T {
   const schemas = document.components?.schemas;
@@ -247,7 +250,9 @@ async function exportOpenApi(): Promise<void> {
   const document = normalizePublicOperationTags(
     pruneUnusedOpenApiComponentSchemas(
       stripNonPublicRestApiPaths(
-        stripNoiseOpenApiPaths(SwaggerModule.createDocument(app, builderResult)),
+        stripNoiseOpenApiPaths(
+          SwaggerModule.createDocument(app, builderResult),
+        ),
       ),
     ),
   );

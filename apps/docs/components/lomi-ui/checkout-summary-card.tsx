@@ -65,9 +65,7 @@ export function CheckoutSummaryCard({
                 </p>
               ) : null}
             </div>
-            <p className="text-sm">
-              {formatMoney(item.amount, currency)}
-            </p>
+            <p className="text-sm">{formatMoney(item.amount, currency)}</p>
           </div>
         ))}
       </div>

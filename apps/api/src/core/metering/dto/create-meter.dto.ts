@@ -1,7 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateMeterDto {
-  @ApiProperty({ example: 'api_calls', description: 'Unique meter code (slug) per organization' })
+  @ApiProperty({
+    example: 'api_calls',
+    description: 'Unique meter code (slug) per organization',
+  })
   name: string;
 
   @ApiProperty({
@@ -20,7 +23,8 @@ export class CreateMeterDto {
   @ApiProperty({
     required: false,
     example: { type: 'sum', property: 'quantity' },
-    description: 'Aggregation config: sum, count, max, last_during_period, last_ever',
+    description:
+      'Aggregation config: sum, count, max, last_during_period, last_ever',
   })
   aggregation?: Record<string, unknown>;
 }

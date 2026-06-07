@@ -3,7 +3,7 @@ import { SupabaseService } from '../../../utils/supabase/supabase.service';
 
 /**
  * BaseRepository
- * 
+ *
  * Enforces the Repository pattern across the application to abstract away
  * Supabase client calls. All new repositories should extend this class.
  */
@@ -20,10 +20,9 @@ export abstract class BaseRepository {
     rpcName: string,
     args: Record<string, any>,
   ): Promise<R> {
-    const { data, error } = await this.supabase.getClient().rpc(
-      rpcName as any,
-      args as any,
-    );
+    const { data, error } = await this.supabase
+      .getClient()
+      .rpc(rpcName as any, args as any);
 
     if (error) {
       // TODO: Map to a custom DatabaseException

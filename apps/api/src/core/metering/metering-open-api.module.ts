@@ -16,7 +16,11 @@ import { EntitlementsService } from './entitlements.service';
 
 @Module({
   imports: [SupabaseModule],
-  controllers: [MetersController, UsageEventsController, UsageBillingController],
+  controllers: [
+    MetersController,
+    UsageEventsController,
+    UsageBillingController,
+  ],
   providers: [
     MetersService,
     UsageCreditsService,

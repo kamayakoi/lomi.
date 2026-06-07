@@ -16,7 +16,10 @@ export class CreateUsageEventDto {
   @ApiProperty({ description: 'Customer being billed' })
   customer_id: string;
 
-  @ApiProperty({ required: false, description: 'Optional usage subscription anchor' })
+  @ApiProperty({
+    required: false,
+    description: 'Optional usage subscription anchor',
+  })
   subscription_id?: string;
 
   @ApiProperty({

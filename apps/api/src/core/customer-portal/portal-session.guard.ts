@@ -29,10 +29,12 @@ export class PortalSessionGuard implements CanActivate {
       throw new UnauthorizedException('Missing portal session token');
     }
 
-    const { data, error } = await this.supabase.getClient().rpc(
-      'customer_portal_validate_session' as any,
-      { p_session_token: token } as any,
-    );
+    const { data, error } = await this.supabase
+      .getClient()
+      .rpc(
+        'customer_portal_validate_session' as any,
+        { p_session_token: token } as any,
+      );
 
     const rows = (data as unknown[] | null) ?? [];
     if (error || rows.length === 0) {

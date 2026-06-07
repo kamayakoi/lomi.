@@ -90,11 +90,7 @@ export class WebhookListener {
   @OnEvent('USAGE_RECORDED')
   async handleUsageRecorded(payload: any) {
     this.logger.log(`Handling USAGE_RECORDED event ${payload.id}`);
-    await this.queueWebhook(
-      payload.organization_id,
-      'USAGE_RECORDED',
-      payload,
-    );
+    await this.queueWebhook(payload.organization_id, 'USAGE_RECORDED', payload);
   }
 
   @OnEvent('USAGE_INVOICE_CREATED')

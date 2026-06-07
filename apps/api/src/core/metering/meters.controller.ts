@@ -58,7 +58,9 @@ export class MetersController {
     @Query('isActive') isActive?: string,
   ) {
     const active =
-      isActive === undefined ? undefined : isActive === 'true' || isActive === '1';
+      isActive === undefined
+        ? undefined
+        : isActive === 'true' || isActive === '1';
     return this.metersService.findAll(user, productId, active);
   }
 
@@ -73,7 +75,8 @@ export class MetersController {
   @Get(':id/balances/:customerId')
   @ApiOperation({
     summary: 'Get meter balance for a customer',
-    description: 'Returns aggregated consumed units for the meter and customer.',
+    description:
+      'Returns aggregated consumed units for the meter and customer.',
   })
   @ApiResponse({ status: 200, type: MeterBalanceResponseDto })
   getBalance(

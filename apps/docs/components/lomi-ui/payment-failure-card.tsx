@@ -47,7 +47,9 @@ export function PaymentFailureCard({
         </span>
         <div>
           <h3 className="text-base font-semibold">{title}</h3>
-          <p className="mt-1 text-sm leading-5 text-muted-foreground">{message}</p>
+          <p className="mt-1 text-sm leading-5 text-muted-foreground">
+            {message}
+          </p>
         </div>
       </div>
       {amount || provider ? (

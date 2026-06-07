@@ -58,10 +58,7 @@ export class CliListenerService implements OnModuleDestroy {
     if (environment === 'test') {
       return;
     }
-    if (
-      allowProduction &&
-      process.env.CLI_LISTEN_ALLOW_PRODUCTION === 'true'
-    ) {
+    if (allowProduction && process.env.CLI_LISTEN_ALLOW_PRODUCTION === 'true') {
       return;
     }
     throw new ForbiddenException(
@@ -76,7 +73,12 @@ export class CliListenerService implements OnModuleDestroy {
       if (redis.status !== 'ready') {
         await redis.connect();
       }
-      await redis.set(this.key(organizationId), '1', 'EX', LISTENER_TTL_SECONDS);
+      await redis.set(
+        this.key(organizationId),
+        '1',
+        'EX',
+        LISTENER_TTL_SECONDS,
+      );
     } catch (error) {
       this.logger.warn(`Failed to mark CLI listener active: ${error}`);
     }

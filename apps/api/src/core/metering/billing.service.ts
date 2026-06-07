@@ -10,7 +10,9 @@ export class BillingService {
 
   constructor(
     private readonly supabase: SupabaseService,
-    @Optional() @InjectQueue('billing') private readonly billingQueue: Queue | null,
+    @Optional()
+    @InjectQueue('billing')
+    private readonly billingQueue: Queue | null,
   ) {}
 
   async runUsageBillingCycle(asOfDate?: string) {
@@ -33,20 +35,24 @@ export class BillingService {
   }
 
   async executeUsageBillingCycle(asOfDate: string) {
-    const { data, error } = await this.supabase.getClient().rpc(
-      'process_usage_billing_cycle' as never,
-      { p_as_of_date: asOfDate } as never,
-    );
+    const { data, error } = await this.supabase
+      .getClient()
+      .rpc(
+        'process_usage_billing_cycle' as never,
+        { p_as_of_date: asOfDate } as never,
+      );
 
     if (error) throw new Error(error.message);
     return data;
   }
 
   async runDunning(graceDays = 3) {
-    const { data, error } = await this.supabase.getClient().rpc(
-      'process_usage_invoice_dunning' as never,
-      { p_grace_days: graceDays } as never,
-    );
+    const { data, error } = await this.supabase
+      .getClient()
+      .rpc(
+        'process_usage_invoice_dunning' as never,
+        { p_grace_days: graceDays } as never,
+      );
 
     if (error) throw new Error(error.message);
     return { processed: data };

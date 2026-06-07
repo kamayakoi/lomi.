@@ -22,7 +22,8 @@ export interface InvoiceHistoryProps {
 const statusClasses: Record<InvoiceHistoryItem['status'], string> = {
   paid: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-400 dark:border-emerald-900',
   open: 'bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-950/50 dark:text-sky-400 dark:border-sky-900',
-  refunded: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/50 dark:text-amber-400 dark:border-amber-900',
+  refunded:
+    'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/50 dark:text-amber-400 dark:border-amber-900',
   void: 'bg-muted text-muted-foreground border-border',
 };
 
@@ -82,7 +83,10 @@ export function InvoiceHistory({
               </tr>
             ) : null}
             {invoices.map((invoice) => (
-              <tr key={invoice.id} className="hover:bg-muted/50 transition-colors">
+              <tr
+                key={invoice.id}
+                className="hover:bg-muted/50 transition-colors"
+              >
                 <td className="whitespace-nowrap px-5 py-4 text-muted-foreground">
                   {invoice.date}
                 </td>

@@ -15,7 +15,9 @@ export class UsageEventsService {
 
   constructor(
     private readonly supabase: SupabaseService,
-    @Optional() @InjectQueue('metering') private readonly meteringQueue: Queue | null,
+    @Optional()
+    @InjectQueue('metering')
+    private readonly meteringQueue: Queue | null,
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
@@ -78,10 +80,9 @@ export class UsageEventsService {
   }
 
   async processEvent(eventId: string, organizationId: string) {
-    const { data, error } = await this.supabase.getClient().rpc(
-      'process_usage_event' as never,
-      { p_event_id: eventId } as never,
-    );
+    const { data, error } = await this.supabase
+      .getClient()
+      .rpc('process_usage_event' as never, { p_event_id: eventId } as never);
 
     if (error) throw new Error(error.message);
 

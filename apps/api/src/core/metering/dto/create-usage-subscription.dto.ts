@@ -7,7 +7,10 @@ export class CreateUsageSubscriptionDto {
   @ApiProperty({ description: 'usage_based product id' })
   product_id: string;
 
-  @ApiProperty({ required: false, description: 'Price id (defaults to product default price)' })
+  @ApiProperty({
+    required: false,
+    description: 'Price id (defaults to product default price)',
+  })
   price_id?: string;
 
   @ApiProperty({ required: false })

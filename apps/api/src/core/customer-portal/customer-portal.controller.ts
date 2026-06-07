@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CustomerPortalService } from './customer-portal.service';
 import { PortalSession } from './portal-session.decorator';
@@ -47,7 +55,9 @@ export class CustomerPortalController {
   }
 
   @Post('subscriptions/:id/actions')
-  @ApiOperation({ summary: 'Pause, resume, cancel, or uncancel a subscription' })
+  @ApiOperation({
+    summary: 'Pause, resume, cancel, or uncancel a subscription',
+  })
   subscriptionAction(
     @PortalSession() session: PortalSessionContext,
     @Param('id') id: string,

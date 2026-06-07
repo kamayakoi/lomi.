@@ -1,10 +1,5 @@
 import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
-import {
-  ApiOperation,
-  ApiQuery,
-  ApiSecurity,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { ApiKeyGuard } from '../common/guards/api-key.guard';
 import {
   CurrentUser,
@@ -62,7 +57,9 @@ export class UsageBillingController {
   }
 
   @Post('credits')
-  @ApiOperation({ summary: 'Credit prepaid usage units to a customer meter wallet' })
+  @ApiOperation({
+    summary: 'Credit prepaid usage units to a customer meter wallet',
+  })
   creditWallet(
     @Body()
     body: {

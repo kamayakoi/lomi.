@@ -86,9 +86,7 @@ export function PricingTable({
               key={plan.id}
               className={cn(
                 'relative flex min-h-full flex-col rounded-sm border bg-card text-card-foreground p-5 shadow-sm transition-all',
-                plan.highlighted
-                  ? 'border-primary shadow-md'
-                  : 'border-border',
+                plan.highlighted ? 'border-primary shadow-md' : 'border-border',
               )}
             >
               {plan.highlighted ? (
@@ -123,7 +121,10 @@ export function PricingTable({
               </button>
               <ul className="mt-5 space-y-2 text-sm">
                 {plan.features.map((feature) => (
-                  <li key={feature} className="flex gap-2 text-muted-foreground">
+                  <li
+                    key={feature}
+                    className="flex gap-2 text-muted-foreground"
+                  >
                     <Check className="mt-0.5 h-4 w-4 flex-none text-primary" />
                     <span>{feature}</span>
                   </li>

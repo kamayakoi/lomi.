@@ -7,15 +7,21 @@ export class CustomerPortalService {
   constructor(private readonly supabase: SupabaseService) {}
 
   async getMe(session: PortalSessionContext) {
-    const { data, error } = await this.supabase.getClient().rpc(
-      'customer_portal_validate_session' as never,
-      { p_session_token: session.sessionToken } as never,
-    );
+    const { data, error } = await this.supabase
+      .getClient()
+      .rpc(
+        'customer_portal_validate_session' as never,
+        { p_session_token: session.sessionToken } as never,
+      );
     if (error) throw new Error(error.message);
     return (data as unknown[])?.[0] ?? null;
   }
 
-  async listTransactions(session: PortalSessionContext, limit = 50, offset = 0) {
+  async listTransactions(
+    session: PortalSessionContext,
+    limit = 50,
+    offset = 0,
+  ) {
     const { data, error } = await this.supabase.getClient().rpc(
       'customer_portal_list_transactions' as never,
       {
@@ -28,7 +34,11 @@ export class CustomerPortalService {
     return data ?? [];
   }
 
-  async listSubscriptions(session: PortalSessionContext, limit = 50, offset = 0) {
+  async listSubscriptions(
+    session: PortalSessionContext,
+    limit = 50,
+    offset = 0,
+  ) {
     const { data, error } = await this.supabase.getClient().rpc(
       'customer_portal_list_subscriptions' as never,
       {

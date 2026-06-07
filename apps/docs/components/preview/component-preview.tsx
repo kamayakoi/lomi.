@@ -17,7 +17,9 @@ export function ComponentPreview({
   return (
     <div
       className={`not-prose relative flex flex-col rounded-sm border overflow-hidden transition-colors ${
-        isDarkMode ? 'dark border-border bg-background' : 'border-border bg-background'
+        isDarkMode
+          ? 'dark border-border bg-background'
+          : 'border-border bg-background'
       } ${className || ''}`}
       {...props}
     >
@@ -28,13 +30,15 @@ export function ComponentPreview({
           title="Toggle dark mode"
           aria-label="Toggle dark mode"
         >
-          {isDarkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          {isDarkMode ? (
+            <Sun className="h-4 w-4" />
+          ) : (
+            <Moon className="h-4 w-4" />
+          )}
         </button>
       </div>
       <div className="flex min-h-[350px] w-full items-center justify-center p-10">
-        <div className="w-full flex justify-center">
-          {children}
-        </div>
+        <div className="w-full flex justify-center">{children}</div>
       </div>
     </div>
   );

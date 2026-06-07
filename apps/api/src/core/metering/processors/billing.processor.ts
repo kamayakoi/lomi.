@@ -14,8 +14,7 @@ export class BillingProcessor extends WorkerHost {
   async process(job: Job): Promise<unknown> {
     if (job.name === 'run-usage-billing-cycle') {
       const asOfDate =
-        (job.data.asOfDate as string) ??
-        new Date().toISOString().split('T')[0];
+        (job.data.asOfDate as string) ?? new Date().toISOString().split('T')[0];
       this.logger.log(`Running usage billing cycle for ${asOfDate}`);
       return this.billingService.executeUsageBillingCycle(asOfDate);
     }

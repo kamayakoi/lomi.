@@ -27,11 +27,7 @@ export class MetersService {
     return this.findOne(data as string, user);
   }
 
-  async findAll(
-    user: AuthContext,
-    productId?: string,
-    isActive?: boolean,
-  ) {
+  async findAll(user: AuthContext, productId?: string, isActive?: boolean) {
     const { data, error } = await this.supabase.getClient().rpc(
       'list_meters_api' as never,
       {
