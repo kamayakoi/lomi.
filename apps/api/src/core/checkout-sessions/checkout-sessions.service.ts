@@ -38,7 +38,10 @@ export class CheckoutSessionsService {
         p_line_items: createDto.line_items as unknown as Json,
         p_environment: user.environment,
         p_customer_id: createDto.customer_id || null,
-        p_metadata: createDto.metadata || null,
+        p_metadata: mergeCheckoutMetadata(
+          createDto.metadata,
+          createDto.integration_source,
+        ),
         p_title: createDto.title || null,
         p_description: createDto.description || null,
         p_success_url: createDto.success_url || null,
@@ -122,7 +125,10 @@ export class CheckoutSessionsService {
       p_amount: (createDto.amount ?? null) as unknown as number,
       p_currency_code: createDto.currency_code as CurrencyCode,
       p_customer_id: createDto.customer_id || null,
-      p_metadata: createDto.metadata || null,
+      p_metadata: mergeCheckoutMetadata(
+        createDto.metadata,
+        createDto.integration_source,
+      ),
       p_title: createDto.title || null,
       p_description: createDto.description || null,
       p_product_id: createDto.product_id || null,
@@ -276,4 +282,17 @@ function extractCheckoutSessionId(data: unknown): string | null {
 
   const value = (row as Record<string, unknown>).checkout_session_id;
   return typeof value === 'string' ? value : null;
+}
+
+function mergeCheckoutMetadata(
+  metadata: Record<string, unknown> | undefined,
+  integrationSource?: string,
+): Json | null {
+  const merged: Record<string, unknown> = { ...(metadata ?? {}) };
+
+  if (integrationSource) {
+    merged.integration_source = integrationSource;
+  }
+
+  return Object.keys(merged).length > 0 ? (merged as Json) : null;
 }

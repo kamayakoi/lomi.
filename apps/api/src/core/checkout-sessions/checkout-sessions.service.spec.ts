@@ -159,6 +159,32 @@ describe('CheckoutSessionsService', () => {
     );
   });
 
+  it('forwards integration_source into checkout session metadata', async () => {
+    const createDto: CreateCheckoutSessionDto = {
+      amount: 1000,
+      currency_code: 'XOF',
+      integration_source: 'woocommerce',
+      metadata: { wc_order_id: '42' },
+    } as CreateCheckoutSessionDto;
+
+    mockSupabaseService.rpc.mockResolvedValue({
+      data: { checkout_session_id: 'x' },
+      error: null,
+    });
+
+    await service.create(createDto, mockUser as AuthContext);
+
+    expect(mockSupabaseService.rpc).toHaveBeenCalledWith(
+      'create_checkout_session',
+      expect.objectContaining({
+        p_metadata: {
+          wc_order_id: '42',
+          integration_source: 'woocommerce',
+        },
+      }),
+    );
+  });
+
   it('maps idempotency_key_conflict from RPC to ConflictException', async () => {
     const createDto: CreateCheckoutSessionDto = {
       amount: 1000,

@@ -191,6 +191,23 @@ export class CreateCheckoutSessionDto {
   payment_link_id?: string;
 
   @ApiProperty({
+    example: 'woocommerce',
+    description:
+      'Sales channel that created this checkout session. Used for revenue attribution.',
+    enum: [
+      'system',
+      'shopify',
+      'woocommerce',
+      'prestashop',
+      'magento',
+      'odoo',
+      'bubble',
+    ],
+    required: false,
+  })
+  integration_source?: string;
+
+  @ApiProperty({
     example: { custom_field: 'value' },
     description: 'Additional metadata',
     required: false,
