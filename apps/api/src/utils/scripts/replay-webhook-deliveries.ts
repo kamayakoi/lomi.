@@ -34,7 +34,10 @@ interface ReplayConfig {
 }
 
 function sign(payloadString: string, secret: string): string {
-  return crypto.createHmac('sha256', secret).update(payloadString).digest('hex');
+  return crypto
+    .createHmac('sha256', secret)
+    .update(payloadString)
+    .digest('hex');
 }
 
 async function deliver(
@@ -73,7 +76,9 @@ async function main() {
 
   for (const delivery of config.deliveries) {
     const eventId =
-      typeof delivery.payload.id === 'string' ? delivery.payload.id : delivery.log_id;
+      typeof delivery.payload.id === 'string'
+        ? delivery.payload.id
+        : delivery.log_id;
     process.stdout.write(`Replaying ${delivery.log_id} (event ${eventId})... `);
     try {
       const result = await deliver(config.url, config.secret, delivery.payload);
@@ -83,7 +88,9 @@ async function main() {
       failed += 1;
       const status = error.response?.status;
       const body = error.response?.data ?? error.message;
-      console.log(`FAIL HTTP ${status ?? 0}: ${typeof body === 'string' ? body : JSON.stringify(body)}`);
+      console.log(
+        `FAIL HTTP ${status ?? 0}: ${typeof body === 'string' ? body : JSON.stringify(body)}`,
+      );
     }
   }
 

@@ -5,6 +5,9 @@
   "author": "Babacar Diop",
   "private": true,
   "license": "AGPL-3.0",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "build": "nest build",
     "build:local": "nest build",
@@ -25,8 +28,7 @@
     "list:tables": "pnpx tsx src/utils/scripts/list-tables.ts",
     "fix:specs": "pnpx tsx src/utils/scripts/fix-specs.ts",
     "knip": "pnpm dlx knip",
-    "openapi:export": "pnpx tsx src/scripts/export-openapi.ts"
-  },
+    "openapi:export": "pnpx tsx src/scripts/export-openapi.ts"  },
   "keywords": [
     "lomi",
     "payments",

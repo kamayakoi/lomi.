@@ -205,7 +205,9 @@ export function getSafeWwwApexRedirectUrl(
   let redirect: URL;
   try {
     original = parseMerchantWebhookUrl(originalUrl);
-    redirect = parseMerchantWebhookUrl(new URL(location, originalUrl).toString());
+    redirect = parseMerchantWebhookUrl(
+      new URL(location, originalUrl).toString(),
+    );
   } catch {
     return null;
   }
@@ -213,7 +215,10 @@ export function getSafeWwwApexRedirectUrl(
   if (!isWwwApexHostnamePair(original.hostname, redirect.hostname)) {
     return null;
   }
-  if (original.pathname !== redirect.pathname || original.search !== redirect.search) {
+  if (
+    original.pathname !== redirect.pathname ||
+    original.search !== redirect.search
+  ) {
     return null;
   }
 
@@ -268,8 +273,9 @@ export async function deliverMerchantWebhook(
       validateStatus: () => true,
     });
 
-    const usedAlternateHost = normalizeHostname(new URL(target.url).hostname)
-      !== normalizeHostname(new URL(webhookUrl).hostname);
+    const usedAlternateHost =
+      normalizeHostname(new URL(target.url).hostname) !==
+      normalizeHostname(new URL(webhookUrl).hostname);
 
     if (response.status >= 200 && response.status < 300) {
       return {
@@ -393,9 +399,7 @@ type DnsLookupCallback = (
   family?: number,
 ) => void;
 
-function toPinnedLookupRecords(
-  pinnedAddresses: string[],
-): LookupAddress[] {
+function toPinnedLookupRecords(pinnedAddresses: string[]): LookupAddress[] {
   return pinnedAddresses.map((address) => ({
     address,
     family: isIPv6(address) ? 6 : 4,
