@@ -48,7 +48,11 @@ export class UsageEventsController {
   @ApiQuery({ name: 'page_size', required: false, type: Number })
   @ApiQuery({ name: 'customer_id', required: false })
   @ApiQuery({ name: 'code', required: false })
-  @ApiQuery({ name: 'status', required: false, enum: ['pending', 'processed', 'failed'] })
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    enum: ['pending', 'processed', 'failed'],
+  })
   @ApiResponse({ status: 200, type: UsageEventListItemDto, isArray: true })
   findAll(
     @Query() query: ListUsageEventsQueryDto,

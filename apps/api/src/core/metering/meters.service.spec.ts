@@ -37,7 +37,11 @@ describe('MetersService', () => {
   it('scopes balance lookup to organization meters', async () => {
     mockSupabaseClient.rpc
       .mockResolvedValueOnce({
-        data: { meter_id: 'meter-1', organization_id: 'org-1', name: 'api_calls' },
+        data: {
+          meter_id: 'meter-1',
+          organization_id: 'org-1',
+          name: 'api_calls',
+        },
         error: null,
       })
       .mockResolvedValueOnce({

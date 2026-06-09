@@ -12,8 +12,7 @@ export class InternalCronGuard implements CanActivate {
 
   canActivate(context: ExecutionContext): boolean {
     const secret =
-      this.configService.get<string>('CRON_SECRET') ||
-      process.env.CRON_SECRET;
+      this.configService.get<string>('CRON_SECRET') || process.env.CRON_SECRET;
 
     if (!secret) {
       throw new UnauthorizedException('Internal cron operations are disabled');

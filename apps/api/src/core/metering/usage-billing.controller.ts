@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { CreditWalletDto } from './dto/credit-wallet.dto';
 import { ApiOperation, ApiQuery, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { ApiKeyGuard } from '../common/guards/api-key.guard';
@@ -73,7 +81,10 @@ export class UsageBillingController {
   @ApiOperation({
     summary: 'Credit prepaid usage units to a customer meter wallet',
   })
-  creditWallet(@Body() body: CreditWalletDto, @CurrentUser() user: AuthContext) {
+  creditWallet(
+    @Body() body: CreditWalletDto,
+    @CurrentUser() user: AuthContext,
+  ) {
     return this.creditsService.credit(user, body);
   }
 
