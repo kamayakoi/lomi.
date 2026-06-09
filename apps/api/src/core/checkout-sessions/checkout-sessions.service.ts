@@ -1,4 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+const CHECKOUT_SESSION_ID_UUID =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 import { SupabaseService } from '../../utils/supabase/supabase.service';
 import { CreateCheckoutSessionDto } from './dto/create-checkout-session.dto';
 import { AuthContext } from '../common/decorators/current-user.decorator';
@@ -188,10 +194,15 @@ export class CheckoutSessionsService {
   }
 
   async findOne(id: string, user: AuthContext) {
+    const sessionId = id?.trim();
+    if (!sessionId || !CHECKOUT_SESSION_ID_UUID.test(sessionId)) {
+      throw new BadRequestException('Checkout session id must be a UUID');
+    }
+
     const { data, error } = await this.supabase.getClient().rpc(
       'get_checkout_session_api' as any,
       {
-        p_checkout_session_id: id,
+        p_checkout_session_id: sessionId,
         p_organization_id: user.organizationId,
       } as any,
     );
@@ -201,7 +212,7 @@ export class CheckoutSessionsService {
 
     if (error || !session) {
       throw new NotFoundException(
-        `Checkout session with ID ${id} not found or access denied`,
+        `Checkout session with ID ${sessionId} not found or access denied`,
       );
     }
 

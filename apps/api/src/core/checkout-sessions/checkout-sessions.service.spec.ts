@@ -317,8 +317,9 @@ describe('CheckoutSessionsService', () => {
   });
 
   it('should findOne return row when scoped to organization', async () => {
+    const sessionId = '11111111-1111-4111-8111-111111111111';
     const row = {
-      checkout_session_id: 'cs-1',
+      checkout_session_id: sessionId,
       organization_id: mockUser.organizationId,
       amount: 100,
     };
@@ -327,16 +328,24 @@ describe('CheckoutSessionsService', () => {
       error: null,
     });
 
-    const result = await service.findOne('cs-1', mockUser as AuthContext);
+    const result = await service.findOne(sessionId, mockUser as AuthContext);
 
     expect(result).toEqual(row);
     expect(mockSupabaseClient.rpc).toHaveBeenCalledWith(
       'get_checkout_session_api',
       {
-        p_checkout_session_id: 'cs-1',
+        p_checkout_session_id: sessionId,
         p_organization_id: mockUser.organizationId,
       },
     );
+  });
+
+  it('should findOne throw BadRequestException for invalid session id', async () => {
+    await expect(
+      service.findOne('{CHECKOUT_SESSION_ID}', mockUser as AuthContext),
+    ).rejects.toThrow(BadRequestException);
+
+    expect(mockSupabaseClient.rpc).not.toHaveBeenCalled();
   });
 
   it('should findOne throw NotFoundException when missing or wrong org', async () => {
@@ -346,7 +355,10 @@ describe('CheckoutSessionsService', () => {
     });
 
     await expect(
-      service.findOne('missing', mockUser as AuthContext),
+      service.findOne(
+        '22222222-2222-4222-8222-222222222222',
+        mockUser as AuthContext,
+      ),
     ).rejects.toThrow(NotFoundException);
   });
 });
