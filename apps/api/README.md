@@ -4,7 +4,7 @@ RESTful API service for the lomi. payment platform.
 
 ## Overview
 
-NestJS API for payments, subscriptions, webhooks, and metering. Runs as a **long-running process** on [Render](https://render.com). Deployment conventions match [`apps/mcp`](../mcp): `/health`, `/ready`, [`Dockerfile`](Dockerfile), [`render.json`](render.json).
+NestJS API for payments, subscriptions, webhooks, and metering. Runs as a **long-running process** on [Railway](https://railway.app). Deployment conventions match [`apps/mcp`](../mcp): `/health`, `/ready`, [`Dockerfile`](Dockerfile), [`railway.json`](railway.json).
 
 Frontends (dashboard, checkout, docs, storefront) stay on Vercel.
 
@@ -20,11 +20,11 @@ pnpm run start:dev
 | Endpoint | Purpose |
 |----------|---------|
 | `GET /health` | Liveness |
-| `GET /ready` | Readiness (Render health check) |
+| `GET /ready` | Readiness (Railway health check) |
 | `GET /health/redis` | Redis + queue snapshot |
 | `GET /api` | Swagger UI |
 
-## Deployment (Render)
+## Deployment (Railway)
 
 | Setting | Value |
 |---------|--------|
@@ -35,12 +35,12 @@ pnpm run start:dev
 | Health check timeout | 120s |
 | Node version | 22 |
 
-Blueprint: [`render.yaml`](render.yaml). Env vars: [`.env.example`](.env.example).
+Config: [`railway.json`](railway.json). Env vars: [`.env.example`](.env.example).
 
 ### Smoke test
 
 ```bash
-pnpm run smoke:http https://your-service.onrender.com
+pnpm run smoke:http https://your-service.up.railway.app
 ```
 
 ## Documentation
