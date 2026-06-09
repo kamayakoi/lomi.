@@ -4,7 +4,14 @@ RESTful API service for the lomi. payment platform.
 
 ## Overview
 
-NestJS API for payments, subscriptions, webhooks, and metering. Runs as a **long-running process** on [Railway](https://railway.app). Deployment conventions match [`apps/mcp`](../mcp): `/health`, `/ready`, [`Dockerfile`](Dockerfile), [`railway.json`](railway.json).
+NestJS API for payments, subscriptions, webhooks, and metering.
+
+| Environment | Platform | Config |
+|-------------|----------|--------|
+| **Production** | [Railway](https://railway.app) (long-running process) | [`Dockerfile`](Dockerfile), [`railway.json`](railway.json) |
+| **Sandbox** | [Vercel](https://vercel.com) (serverless) | [`vercel.json`](vercel.json) |
+
+Production Railway conventions match [`apps/mcp`](../mcp): `/health`, `/ready`.
 
 Frontends (dashboard, checkout, docs, storefront) stay on Vercel.
 
@@ -24,7 +31,9 @@ pnpm run start:dev
 | `GET /health/redis` | Redis + queue snapshot |
 | `GET /api` | Swagger UI |
 
-## Deployment (Railway)
+## Deployment
+
+### Production (Railway)
 
 | Setting | Value |
 |---------|--------|
@@ -37,11 +46,18 @@ pnpm run start:dev
 
 Config: [`railway.json`](railway.json). Env vars: [`.env.example`](.env.example).
 
-### Smoke test
-
 ```bash
 pnpm run smoke:http https://your-service.up.railway.app
 ```
+
+### Sandbox (Vercel)
+
+| Setting | Value |
+|---------|--------|
+| Root directory | `apps/api` |
+| Framework | Other (`@vercel/node` via [`vercel.json`](vercel.json)) |
+
+Vercel ignores Railway/Docker files; Railway ignores `vercel.json`.
 
 ## Documentation
 

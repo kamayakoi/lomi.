@@ -3,6 +3,7 @@ import { SupabaseService } from '../../../utils/supabase/supabase.service';
 import { WideEventService } from '../../../utils/telemetry/wide-event.service';
 import { WebhookSenderService } from '../../webhook-sender.service';
 import { sanitizeMerchantWebhookTransactionPayload } from '../../sanitize-merchant-webhook-transaction-payload';
+import { maybeNotifySubscriptionRenewed } from '../../subscription-webhook.helper';
 import { WebhookEvent } from '../../../utils/types/api';
 import Stripe from 'stripe';
 import { constructStripeWebhookEvent } from '../../../utils/stripe/stripe-keys';
@@ -706,6 +707,15 @@ export class StripeWebhookService {
     if (!txnData) return;
 
     try {
+      await maybeNotifySubscriptionRenewed(
+        this.supabase,
+        this.webhookSender,
+        organizationId,
+        txnData as Record<string, unknown>,
+        event,
+        this.logger,
+      );
+
       sanitizeMerchantWebhookTransactionPayload(txnData);
 
       await this.webhookSender.notifyOrganization(
