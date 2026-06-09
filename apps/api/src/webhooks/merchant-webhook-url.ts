@@ -2,7 +2,7 @@ import { lookup as dnsLookup } from 'node:dns/promises';
 import type { LookupAddress, LookupOptions } from 'node:dns';
 import { isIPv4, isIPv6 } from 'node:net';
 import * as https from 'node:https';
-import type { AxiosRequestConfig } from 'axios';
+import axios, { type AxiosRequestConfig } from 'axios';
 
 export class UnsafeWebhookUrlError extends Error {
   constructor(message: string) {
@@ -169,6 +169,150 @@ function assertAllowedHostname(hostname: string): void {
       );
     }
   }
+}
+
+const REDIRECT_STATUS_CODES = new Set([301, 302, 307, 308]);
+
+export function isWwwApexHostnamePair(a: string, b: string): boolean {
+  const left = normalizeHostname(a);
+  const right = normalizeHostname(b);
+  if (left === right) {
+    return true;
+  }
+  return left === `www.${right}` || right === `www.${left}`;
+}
+
+/** Same path/query, HTTPS only — toggles www. on the hostname. */
+export function getWwwApexAlternateUrl(url: string): string | null {
+  let parsed: URL;
+  try {
+    parsed = parseMerchantWebhookUrl(url);
+  } catch {
+    return null;
+  }
+
+  const host = normalizeHostname(parsed.hostname);
+  parsed.hostname = host.startsWith('www.') ? host.slice(4) : `www.${host}`;
+  return parsed.toString();
+}
+
+/** Accept redirect targets that only swap apex ↔ www on the same path. */
+export function getSafeWwwApexRedirectUrl(
+  originalUrl: string,
+  location: string,
+): string | null {
+  let original: URL;
+  let redirect: URL;
+  try {
+    original = parseMerchantWebhookUrl(originalUrl);
+    redirect = parseMerchantWebhookUrl(new URL(location, originalUrl).toString());
+  } catch {
+    return null;
+  }
+
+  if (!isWwwApexHostnamePair(original.hostname, redirect.hostname)) {
+    return null;
+  }
+  if (original.pathname !== redirect.pathname || original.search !== redirect.search) {
+    return null;
+  }
+
+  return redirect.toString();
+}
+
+function buildWwwApexDeliveryCandidates(webhookUrl: string): string[] {
+  const candidates = [webhookUrl];
+  const alternate = getWwwApexAlternateUrl(webhookUrl);
+  if (alternate && !candidates.includes(alternate)) {
+    candidates.push(alternate);
+  }
+  return candidates;
+}
+
+export interface MerchantWebhookDeliveryResult {
+  status: number;
+  data: unknown;
+  deliveredUrl: string;
+  usedAlternateHost: boolean;
+}
+
+/**
+ * POST a webhook payload. If the registered URL redirects apex ↔ www (common),
+ * automatically retries the paired hostname once. Redirects are never followed
+ * blindly — only pre-approved www/apex variants after SSRF checks.
+ */
+export async function deliverMerchantWebhook(
+  webhookUrl: string,
+  body: string,
+  headers: Record<string, string>,
+  timeoutMs = 4000,
+): Promise<MerchantWebhookDeliveryResult> {
+  const candidates = buildWwwApexDeliveryCandidates(webhookUrl);
+  let lastResponse:
+    | { status: number; data: unknown; url: string; usedAlternateHost: boolean }
+    | undefined;
+
+  for (let index = 0; index < candidates.length; index++) {
+    const candidateUrl = candidates[index]!;
+    let target: SafeMerchantWebhookTarget;
+    try {
+      target = await resolveSafeMerchantWebhookTarget(candidateUrl);
+    } catch {
+      continue;
+    }
+
+    const response = await axios.post(target.url, body, {
+      ...buildSafeMerchantWebhookAxiosConfig(target),
+      headers,
+      timeout: timeoutMs,
+      validateStatus: () => true,
+    });
+
+    const usedAlternateHost = normalizeHostname(new URL(target.url).hostname)
+      !== normalizeHostname(new URL(webhookUrl).hostname);
+
+    if (response.status >= 200 && response.status < 300) {
+      return {
+        status: response.status,
+        data: response.data,
+        deliveredUrl: target.url,
+        usedAlternateHost,
+      };
+    }
+
+    lastResponse = {
+      status: response.status,
+      data: response.data,
+      url: target.url,
+      usedAlternateHost,
+    };
+
+    if (REDIRECT_STATUS_CODES.has(response.status)) {
+      const location = response.headers?.location;
+      if (typeof location === 'string') {
+        const redirectTarget = getSafeWwwApexRedirectUrl(webhookUrl, location);
+        if (redirectTarget && !candidates.includes(redirectTarget)) {
+          candidates.push(redirectTarget);
+        }
+      }
+      continue;
+    }
+
+    break;
+  }
+
+  if (!lastResponse) {
+    throw new UnsafeWebhookUrlError(
+      'Webhook URL could not be resolved for delivery',
+    );
+  }
+
+  return {
+    status: lastResponse.status,
+    data: lastResponse.data,
+    deliveredUrl: lastResponse.url,
+    usedAlternateHost: lastResponse.usedAlternateHost,
+  };
 }
 
 export function parseMerchantWebhookUrl(url: string): URL {

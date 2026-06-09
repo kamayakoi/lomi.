@@ -1,12 +1,11 @@
 import { Injectable, Logger, Optional } from '@nestjs/common';
 import { SupabaseService } from '../utils/supabase/supabase.service';
-import axios from 'axios';
 import * as crypto from 'crypto';
 import { WebhookEvent } from '../utils/types/api';
 import { resolveMerchantWebhookRelayEnvironment } from '../utils/payment-environment';
 import { Queue } from 'bullmq';
 import {
-  buildSafeMerchantWebhookAxiosConfig,
+  deliverMerchantWebhook,
   resolveSafeMerchantWebhookTarget,
   UnsafeWebhookUrlError,
 } from './merchant-webhook-url';
@@ -126,41 +125,31 @@ export class WebhookSenderService {
     const signature = this.generateSignature(payloadString, webhook.secret);
     const started = Date.now();
 
-    let safeTarget;
     try {
-      safeTarget = await resolveSafeMerchantWebhookTarget(webhook.url);
-    } catch (error) {
-      const message =
-        error instanceof UnsafeWebhookUrlError
-          ? error.message
-          : 'Webhook URL failed outbound safety checks';
-      return {
-        success: false,
-        shouldRetry: false,
-        lastResponseBody: message,
-        deadLetterReason: 'blocked_webhook_url',
-      };
-    }
-
-    try {
-      const response = await axios.post(safeTarget.url, payloadString, {
-        ...buildSafeMerchantWebhookAxiosConfig(safeTarget),
-        headers: {
+      const delivery = await deliverMerchantWebhook(
+        webhook.url,
+        payloadString,
+        {
           'Content-Type': 'application/json',
           'X-Lomi-Signature': signature,
           'X-Lomi-Event': event,
           'User-Agent': 'Lomi-Webhook/1.0',
         },
-        timeout: 4000,
-      });
+      );
+
+      if (delivery.usedAlternateHost) {
+        this.logger.log(
+          `Webhook ${webhook.id} delivered via www/apex fallback to ${delivery.deliveredUrl}`,
+        );
+      }
 
       const durationMs = Date.now() - started;
 
-      if (response.status >= 200 && response.status < 300) {
+      if (delivery.status >= 200 && delivery.status < 300) {
         await this.logDelivery(
           webhook.id,
-          response.status,
-          response.data,
+          delivery.status,
+          delivery.data,
           storedPayload,
           context?.attemptNumber ?? 1,
           context?.merchantId,
@@ -168,33 +157,41 @@ export class WebhookSenderService {
         return {
           success: true,
           shouldRetry: false,
-          lastResponseStatus: response.status,
-          lastResponseBody: response.data,
+          lastResponseStatus: delivery.status,
+          lastResponseBody: delivery.data,
         };
       }
 
       return {
         success: false,
-        shouldRetry: response.status < 400 || response.status >= 500,
-        lastResponseStatus: response.status,
-        lastResponseBody: response.data,
+        shouldRetry: delivery.status < 400 || delivery.status >= 500,
+        lastResponseStatus: delivery.status,
+        lastResponseBody: delivery.data,
         deadLetterReason:
-          response.status >= 400 && response.status < 500
+          delivery.status >= 400 && delivery.status < 500
             ? 'client_error_http'
             : 'server_error_http',
       };
     } catch (error: any) {
       const status = error.response?.status as number | undefined;
       const respBody = error.response?.data ?? error.message;
+      const message =
+        error instanceof UnsafeWebhookUrlError
+          ? error.message
+          : typeof respBody === 'string'
+            ? respBody
+            : 'Webhook URL failed outbound safety checks';
       return {
         success: false,
         shouldRetry: status == null || status >= 500,
         lastResponseStatus: status,
-        lastResponseBody: respBody,
+        lastResponseBody: message,
         deadLetterReason:
-          status != null && status >= 400 && status < 500
-            ? 'client_error_http'
-            : 'network_or_server',
+          error instanceof UnsafeWebhookUrlError
+            ? 'blocked_webhook_url'
+            : status != null && status >= 400 && status < 500
+              ? 'client_error_http'
+              : 'network_or_server',
       };
     }
   }
@@ -254,75 +251,45 @@ export class WebhookSenderService {
 
     const started = Date.now();
 
-    let safeTarget;
     try {
-      safeTarget = await resolveSafeMerchantWebhookTarget(webhook.url);
-    } catch (error) {
-      const message =
-        error instanceof UnsafeWebhookUrlError
-          ? error.message
-          : 'Webhook URL failed outbound safety checks';
-
-      this.logger.warn(
-        `Blocked webhook delivery for ${webhook.id}: ${message}`,
-      );
-
-      if (context?.dispatchId && context.attemptNumber != null) {
-        await this.supabase.rpc('record_webhook_delivery_attempt', {
-          p_dispatch_id: context.dispatchId,
-          p_attempt_number: context.attemptNumber,
-          p_response_status: 0,
-          p_response_body: message,
-          p_error_message: 'blocked_webhook_url',
-          p_request_duration_ms: Date.now() - started,
-        });
-        await this.supabase.rpc('mark_webhook_dispatch_dead_letter', {
-          p_dispatch_id: context.dispatchId,
-          p_reason: 'blocked_webhook_url',
-        });
-      }
-
-      return {
-        success: false,
-        shouldRetry: false,
-        lastResponseBody: message,
-        deadLetterReason: 'blocked_webhook_url',
-      };
-    }
-
-    try {
-      const response = await axios.post(safeTarget.url, payloadString, {
-        ...buildSafeMerchantWebhookAxiosConfig(safeTarget),
-        headers: {
+      const delivery = await deliverMerchantWebhook(
+        webhook.url,
+        payloadString,
+        {
           'Content-Type': 'application/json',
           'X-Lomi-Signature': signature,
           'X-Lomi-Event': event,
           'User-Agent': 'Lomi-Webhook/1.0',
         },
-        timeout: 4000,
-      });
+      );
 
       const durationMs = Date.now() - started;
+
+      if (delivery.usedAlternateHost) {
+        this.logger.log(
+          `Webhook ${webhook.id} delivered via www/apex fallback to ${delivery.deliveredUrl}`,
+        );
+      }
 
       if (context?.dispatchId && context.attemptNumber != null) {
         await this.supabase.rpc('record_webhook_delivery_attempt', {
           p_dispatch_id: context.dispatchId,
           p_attempt_number: context.attemptNumber,
-          p_response_status: response.status,
+          p_response_status: delivery.status,
           p_response_body:
-            typeof response.data === 'string'
-              ? response.data
-              : JSON.stringify(response.data),
+            typeof delivery.data === 'string'
+              ? delivery.data
+              : JSON.stringify(delivery.data),
           p_error_message: '',
           p_request_duration_ms: durationMs,
         });
       }
 
-      if (response.status >= 200 && response.status < 300) {
+      if (delivery.status >= 200 && delivery.status < 300) {
         await this.logDelivery(
           webhook.id,
-          response.status,
-          response.data,
+          delivery.status,
+          delivery.data,
           payload,
           context?.attemptNumber ?? 1,
           context?.merchantId,
@@ -338,63 +305,89 @@ export class WebhookSenderService {
         return {
           success: true,
           shouldRetry: false,
-          lastResponseStatus: response.status,
-          lastResponseBody: response.data,
+          lastResponseStatus: delivery.status,
+          lastResponseBody: delivery.data,
         };
       }
 
       const bodyPreview =
-        typeof response.data === 'string'
-          ? response.data
-          : JSON.stringify(response.data);
+        typeof delivery.data === 'string'
+          ? delivery.data
+          : JSON.stringify(delivery.data);
 
       if (context?.dispatchId && context.attemptNumber != null) {
         await this.supabase.rpc('record_webhook_delivery_attempt', {
           p_dispatch_id: context.dispatchId,
           p_attempt_number: context.attemptNumber,
-          p_response_status: response.status,
+          p_response_status: delivery.status,
           p_response_body: bodyPreview,
-          p_error_message: `non_success_status_${response.status}`,
+          p_error_message: `non_success_status_${delivery.status}`,
           p_request_duration_ms: durationMs,
         });
       }
 
-      const clientErr = response.status >= 400 && response.status < 500;
+      const clientErr = delivery.status >= 400 && delivery.status < 500;
       return {
         success: false,
         shouldRetry: !clientErr,
-        lastResponseStatus: response.status,
-        lastResponseBody: response.data,
+        lastResponseStatus: delivery.status,
+        lastResponseBody: delivery.data,
         deadLetterReason: clientErr ? 'client_error_http' : 'server_error_http',
       };
     } catch (error: any) {
       const durationMs = Date.now() - started;
       const status = error.response?.status as number | undefined;
       const respBody = error.response?.data ?? error.message;
+      const blockedUrl = error instanceof UnsafeWebhookUrlError;
+      const message = blockedUrl
+        ? error.message
+        : typeof respBody === 'string'
+          ? respBody
+          : 'request_failed';
+
+      if (blockedUrl) {
+        this.logger.warn(
+          `Blocked webhook delivery for ${webhook.id}: ${message}`,
+        );
+      }
 
       if (context?.dispatchId && context.attemptNumber != null) {
         await this.supabase.rpc('record_webhook_delivery_attempt', {
           p_dispatch_id: context.dispatchId,
           p_attempt_number: context.attemptNumber,
           p_response_status: status ?? 0,
-          p_response_body:
-            typeof respBody === 'string' ? respBody : JSON.stringify(respBody),
-          p_error_message: error.message ?? 'request_failed',
+          p_response_body: message,
+          p_error_message: blockedUrl
+            ? 'blocked_webhook_url'
+            : (error.message ?? 'request_failed'),
           p_request_duration_ms: durationMs,
         });
+
+        if (blockedUrl) {
+          await this.supabase.rpc('mark_webhook_dispatch_dead_letter', {
+            p_dispatch_id: context.dispatchId,
+            p_reason: 'blocked_webhook_url',
+          });
+        }
       }
 
-      this.logger.warn(
-        `Webhook delivery failed (single attempt): ${error.message}`,
-      );
+      if (!blockedUrl) {
+        this.logger.warn(
+          `Webhook delivery failed (single attempt): ${error.message}`,
+        );
+      }
 
       const clientErr = status != null && status >= 400 && status < 500;
       return {
         success: false,
-        shouldRetry: !clientErr,
+        shouldRetry: !blockedUrl && !clientErr,
         lastResponseStatus: status,
-        lastResponseBody: respBody,
-        deadLetterReason: clientErr ? 'client_error_http' : 'network_or_server',
+        lastResponseBody: message,
+        deadLetterReason: blockedUrl
+          ? 'blocked_webhook_url'
+          : clientErr
+            ? 'client_error_http'
+            : 'network_or_server',
       };
     }
   }

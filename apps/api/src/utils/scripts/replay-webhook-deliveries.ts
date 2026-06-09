@@ -16,13 +16,9 @@
  *   ]
  * }
  */
-import axios from 'axios';
 import * as crypto from 'crypto';
 import * as fs from 'fs';
-import {
-  buildSafeMerchantWebhookAxiosConfig,
-  resolveSafeMerchantWebhookTarget,
-} from '../../webhooks/merchant-webhook-url';
+import { deliverMerchantWebhook } from '../../webhooks/merchant-webhook-url';
 
 interface ReplayConfig {
   webhook_id: string;
@@ -47,25 +43,21 @@ async function deliver(
   payload: Record<string, unknown> & { event: string },
 ) {
   const payloadString = JSON.stringify(payload);
-  const target = await resolveSafeMerchantWebhookTarget(url);
-  const started = Date.now();
-  const response = await axios.post(target.url, payloadString, {
-    ...buildSafeMerchantWebhookAxiosConfig(target),
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Lomi-Signature': sign(payloadString, secret),
-      'X-Lomi-Event': payload.event,
-      'User-Agent': 'Lomi-Webhook/1.0',
-    },
-    timeout: 10000,
+  const result = await deliverMerchantWebhook(url, payloadString, {
+    'Content-Type': 'application/json',
+    'X-Lomi-Signature': sign(payloadString, secret),
+    'X-Lomi-Event': payload.event,
+    'User-Agent': 'Lomi-Webhook/1.0',
   });
   return {
-    status: response.status,
+    status: result.status,
     body:
-      typeof response.data === 'string'
-        ? response.data
-        : JSON.stringify(response.data),
-    durationMs: Date.now() - started,
+      typeof result.data === 'string'
+        ? result.data
+        : JSON.stringify(result.data),
+    durationMs: 0,
+    deliveredUrl: result.deliveredUrl,
+    usedAlternateHost: result.usedAlternateHost,
   };
 }
 
@@ -85,7 +77,8 @@ async function main() {
     process.stdout.write(`Replaying ${delivery.log_id} (event ${eventId})... `);
     try {
       const result = await deliver(config.url, config.secret, delivery.payload);
-      console.log(`OK HTTP ${result.status} (${result.durationMs}ms)`);
+      const via = result.usedAlternateHost ? ' (www/apex fallback)' : '';
+      console.log(`OK HTTP ${result.status}${via} -> ${result.deliveredUrl}`);
     } catch (error: any) {
       failed += 1;
       const status = error.response?.status;
