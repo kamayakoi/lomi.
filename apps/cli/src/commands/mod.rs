@@ -9,6 +9,8 @@ pub mod logout;
 pub mod payments;
 pub mod probe;
 pub mod products;
+pub mod quickstart;
+pub mod refunds;
 pub mod status;
 pub mod switch;
 pub mod transactions;

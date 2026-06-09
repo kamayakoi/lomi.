@@ -53,6 +53,16 @@ pub struct CommonOptions {
     /// Opt-out of sending telemetry
     #[arg(long, global = true)]
     pub skip_telemetry: bool,
+
+    /// Emit machine-readable JSON to stdout (suppresses banners and spinners)
+    #[arg(long, global = true)]
+    pub json: bool,
+}
+
+impl CommonOptions {
+    pub fn use_json(&self) -> bool {
+        self.json || !output::is_tty()
+    }
 }
 
 impl CommonOptions {

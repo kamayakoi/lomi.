@@ -24,6 +24,7 @@ Most teams should start with one of these paths:
 
 | Goal | Best starting point |
 | --- | --- |
+| Get running from the terminal | [CLI quickstart](/start/cli-quickstart) |
 | Accept a first online payment | [Make a test payment](/start/first-payment) |
 | Add checkout to an app or store | [Hosted checkout](/build/checkout) |
 | Sell without writing checkout code | [Payment links](/build/payment-links) |
@@ -35,8 +36,8 @@ Most teams should start with one of these paths:
 The typical flow is:
 
 1. Create an account and complete onboarding.
-2. Get your test API keys from the dashboard.
-3. Create a checkout session, payment link, or payment request.
+2. Get your test API keys from the dashboard (or run `lomi login` for CLI access).
+3. Create a checkout session with `lomi checkout create`, a payment link, or a payment request.
 4. Let the customer pay with a supported method.
 5. Confirm the result from the API, dashboard, or webhook.
 6. Move to live keys when your integration is ready.

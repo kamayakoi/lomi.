@@ -54,6 +54,10 @@ enum Commands {
     Products(commands::products::ProductsArgs),
     /// List transactions
     Transactions(commands::transactions::TransactionsArgs),
+    /// Manage refunds
+    Refunds(commands::refunds::RefundsArgs),
+    /// Golden-path setup checks and next steps
+    Quickstart(commands::quickstart::QuickstartArgs),
     /// Install lomi. agent rules for Cursor, Claude, and other AI tools
     InstallRules(commands::install_rules::InstallRulesArgs),
     /// Update @lomi./sdk to the latest version
@@ -69,7 +73,9 @@ enum Commands {
 #[tokio::main]
 async fn main() -> Result<()> {
     let cli = Cli::parse();
-    cli::banner::print_banner(&cli.common).await?;
+    if !cli.common.use_json() {
+        cli::banner::print_banner(&cli.common).await?;
+    }
 
     match cli.command {
         Commands::Login(args) => commands::login::run(&cli.common, args).await,
@@ -85,6 +91,8 @@ async fn main() -> Result<()> {
         Commands::Webhooks(args) => commands::webhooks_cmd::run(&cli.common, args).await,
         Commands::Products(args) => commands::products::run(&cli.common, args).await,
         Commands::Transactions(args) => commands::transactions::run(&cli.common, args).await,
+        Commands::Refunds(args) => commands::refunds::run(&cli.common, args).await,
+        Commands::Quickstart(args) => commands::quickstart::run(&cli.common, args).await,
         Commands::InstallRules(args) => commands::install_rules::run(&cli.common, args).await,
         Commands::Update(args) => commands::update::run(&cli.common, args).await,
         Commands::Ui(args) => commands::ui::run(&cli.common, args).await,

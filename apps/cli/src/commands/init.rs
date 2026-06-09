@@ -182,28 +182,35 @@ pub async fn run(common: &CommonOptions, args: InitArgs) -> Result<()> {
     );
 
     if !args.skip_rules_install {
-        let install_rules = if args.yes {
-            false
-        } else {
-            cli::prompts::confirm(
-                "Install lomi. agent rules for Cursor / Claude Code?",
-                true,
-            )?
-        };
-
-        if install_rules {
+        if args.yes {
             install_rules::run(
                 common,
                 InstallRulesArgs {
-                    target: None,
+                    target: Some(vec!["cursor".to_string(), "llms.txt".to_string()]),
                     force: false,
                 },
             )
             .await?;
         } else {
-            let mut config = GlobalConfig::load()?;
-            config.settings.has_seen_rules_install_prompt = true;
-            config.save()?;
+            let install_rules_prompt = cli::prompts::confirm(
+                "Install lomi. agent rules for Cursor / Claude Code?",
+                true,
+            )?;
+
+            if install_rules_prompt {
+                install_rules::run(
+                    common,
+                    InstallRulesArgs {
+                        target: None,
+                        force: false,
+                    },
+                )
+                .await?;
+            } else {
+                let mut config = GlobalConfig::load()?;
+                config.settings.has_seen_rules_install_prompt = true;
+                config.save()?;
+            }
         }
     }
 

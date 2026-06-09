@@ -1,4 +1,7 @@
 use colored::Colorize;
+use serde::Serialize;
+
+use super::CommonOptions;
 
 pub fn logo() -> String {
     format!(
@@ -48,4 +51,13 @@ pub fn divider() {
 pub fn is_tty() -> bool {
     use std::io::IsTerminal;
     std::io::stdin().is_terminal()
+}
+
+pub fn should_use_json(common: &CommonOptions) -> bool {
+    common.use_json()
+}
+
+pub fn print_json<T: Serialize>(value: &T) -> anyhow::Result<()> {
+    println!("{}", serde_json::to_string_pretty(value)?);
+    Ok(())
 }
