@@ -15,10 +15,7 @@ import {
   UnsafeWebhookUrlError,
 } from './merchant-webhook-url';
 import { WebhookEvent } from '../utils/types/api';
-import {
-  WebhookSenderService,
-  type Webhook,
-} from './webhook-sender.service';
+import { WebhookSenderService, type Webhook } from './webhook-sender.service';
 
 @Injectable()
 export class WebhooksService {

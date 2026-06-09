@@ -126,7 +126,11 @@ export class HealthService implements OnModuleDestroy {
     checks.push({
       name: 'redis_ping',
       ok: redisResult.ok,
-      detail: redisResult.ok ? undefined : ('error' in redisResult ? redisResult.error : 'unavailable'),
+      detail: redisResult.ok
+        ? undefined
+        : 'error' in redisResult
+          ? redisResult.error
+          : 'unavailable',
     });
 
     const envOk = checks.every((c) => c.ok);

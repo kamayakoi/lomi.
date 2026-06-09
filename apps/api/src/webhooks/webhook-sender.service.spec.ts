@@ -143,9 +143,7 @@ describe('WebhookSenderService', () => {
 
     it('should block unsafe webhook URLs before sending', async () => {
       mockedDeliverMerchantWebhook.mockRejectedValue(
-        new UnsafeWebhookUrlError(
-          'Webhook URL resolves to a private address',
-        ),
+        new UnsafeWebhookUrlError('Webhook URL resolves to a private address'),
       );
 
       const result = await service.sendWebhook(webhook, event, data);

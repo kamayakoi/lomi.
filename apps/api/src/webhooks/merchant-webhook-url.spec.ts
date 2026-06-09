@@ -87,9 +87,15 @@ describe('merchant-webhook-url', () => {
 
   describe('www/apex hostname helpers', () => {
     it('detects apex and www as the same site', () => {
-      expect(isWwwApexHostnamePair('example.com', 'www.example.com')).toBe(true);
-      expect(isWwwApexHostnamePair('www.example.com', 'example.com')).toBe(true);
-      expect(isWwwApexHostnamePair('example.com', 'api.example.com')).toBe(false);
+      expect(isWwwApexHostnamePair('example.com', 'www.example.com')).toBe(
+        true,
+      );
+      expect(isWwwApexHostnamePair('www.example.com', 'example.com')).toBe(
+        true,
+      );
+      expect(isWwwApexHostnamePair('example.com', 'api.example.com')).toBe(
+        false,
+      );
     });
 
     it('builds the alternate webhook URL', () => {
@@ -203,20 +209,14 @@ describe('merchant-webhook-url', () => {
       expect(typeof lookup).toBe('function');
 
       await new Promise<void>((resolve, reject) => {
-        lookup!(
-          'example.com',
-          { all: true },
-          (err, addresses) => {
-            if (err) {
-              reject(err);
-              return;
-            }
-            expect(addresses).toEqual([
-              { address: '93.184.216.34', family: 4 },
-            ]);
-            resolve();
-          },
-        );
+        lookup!('example.com', { all: true }, (err, addresses) => {
+          if (err) {
+            reject(err);
+            return;
+          }
+          expect(addresses).toEqual([{ address: '93.184.216.34', family: 4 }]);
+          resolve();
+        });
       });
     });
   });
