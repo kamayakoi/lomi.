@@ -1,6 +1,8 @@
 import { lookup as dnsLookup } from 'node:dns/promises';
 import type { LookupAddress } from 'node:dns';
+import * as https from 'node:https';
 import {
+  buildSafeMerchantWebhookAxiosConfig,
   isBlockedWebhookAddress,
   parseMerchantWebhookUrl,
   resolveSafeMerchantWebhookTarget,
@@ -103,6 +105,41 @@ describe('merchant-webhook-url', () => {
       await expect(
         resolveSafeMerchantWebhookTarget('https://dual.example/webhook'),
       ).rejects.toThrow(UnsafeWebhookUrlError);
+    });
+  });
+
+  describe('buildSafeMerchantWebhookAxiosConfig', () => {
+    it('supports Node DNS lookup with options.all', async () => {
+      mockedLookup.mockResolvedValue([
+        { address: '93.184.216.34', family: 4 },
+      ] as unknown as LookupAddress);
+
+      const target = await resolveSafeMerchantWebhookTarget(
+        'https://example.com/webhooks/lomi',
+      );
+      const config = buildSafeMerchantWebhookAxiosConfig(target);
+      const lookup = (
+        config.httpsAgent as https.Agent & { options?: https.AgentOptions }
+      ).options?.lookup;
+
+      expect(typeof lookup).toBe('function');
+
+      await new Promise<void>((resolve, reject) => {
+        lookup!(
+          'example.com',
+          { all: true },
+          (err, addresses) => {
+            if (err) {
+              reject(err);
+              return;
+            }
+            expect(addresses).toEqual([
+              { address: '93.184.216.34', family: 4 },
+            ]);
+            resolve();
+          },
+        );
+      });
     });
   });
 });

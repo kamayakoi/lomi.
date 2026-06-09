@@ -348,6 +348,14 @@ describe('CheckoutSessionsService', () => {
     expect(mockSupabaseClient.rpc).not.toHaveBeenCalled();
   });
 
+  it('should findOne explain placeholder misuse for success_url template', async () => {
+    await expect(
+      service.findOne('{CHECKOUT_SESSION_ID}', mockUser as AuthContext),
+    ).rejects.toThrow(
+      'Checkout session id must be the UUID returned by POST /checkout-sessions, not the {CHECKOUT_SESSION_ID} success_url placeholder',
+    );
+  });
+
   it('should findOne throw NotFoundException when missing or wrong org', async () => {
     mockSupabaseClient.rpc.mockResolvedValue({
       data: [],

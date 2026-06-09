@@ -1,5 +1,5 @@
 import { lookup as dnsLookup } from 'node:dns/promises';
-import type { LookupAddress } from 'node:dns';
+import type { LookupAddress, LookupOptions } from 'node:dns';
 import { isIPv4, isIPv6 } from 'node:net';
 import * as https from 'node:https';
 import type { AxiosRequestConfig } from 'axios';
@@ -243,33 +243,74 @@ export async function resolveSafeMerchantWebhookTarget(
   };
 }
 
+type DnsLookupCallback = (
+  err: NodeJS.ErrnoException | Error | null,
+  address: string | LookupAddress[],
+  family?: number,
+) => void;
+
+function toPinnedLookupRecords(
+  pinnedAddresses: string[],
+): LookupAddress[] {
+  return pinnedAddresses.map((address) => ({
+    address,
+    family: isIPv6(address) ? 6 : 4,
+  }));
+}
+
+function createPinnedLookup(
+  target: SafeMerchantWebhookTarget,
+): NonNullable<https.AgentOptions['lookup']> {
+  const allowed = new Set(target.pinnedAddresses);
+  const records = toPinnedLookupRecords(target.pinnedAddresses);
+
+  return (
+    lookupHostname: string,
+    options: LookupOptions | DnsLookupCallback,
+    callback?: DnsLookupCallback,
+  ) => {
+    let opts: LookupOptions;
+    let cb: DnsLookupCallback;
+
+    if (typeof options === 'function') {
+      cb = options;
+      opts = {};
+    } else {
+      opts = options;
+      cb = callback!;
+    }
+
+    if (lookupHostname !== target.hostname) {
+      cb(
+        new Error(
+          `Unexpected webhook hostname during delivery: ${lookupHostname}`,
+        ),
+        '',
+      );
+      return;
+    }
+
+    const first = records[0];
+    if (!first || !allowed.has(first.address)) {
+      cb(new Error('Pinned webhook address mismatch'), '');
+      return;
+    }
+
+    // Node 20+ may request `options.all` when autoSelectFamily is enabled.
+    if (opts.all) {
+      cb(null, records);
+      return;
+    }
+
+    cb(null, first.address, first.family);
+  };
+}
+
 function createPinnedHttpsAgent(
   target: SafeMerchantWebhookTarget,
 ): https.Agent {
-  const allowed = new Set(target.pinnedAddresses);
-
   return new https.Agent({
-    lookup: (lookupHostname, _options, callback) => {
-      if (lookupHostname !== target.hostname) {
-        callback(
-          new Error(
-            `Unexpected webhook hostname during delivery: ${lookupHostname}`,
-          ),
-          '',
-          0,
-        );
-        return;
-      }
-
-      const address = target.pinnedAddresses[0];
-      const family = isIPv6(address) ? 6 : 4;
-      if (!allowed.has(address)) {
-        callback(new Error('Pinned webhook address mismatch'), '', 0);
-        return;
-      }
-
-      callback(null, address, family);
-    },
+    lookup: createPinnedLookup(target),
   });
 }
 

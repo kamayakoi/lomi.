@@ -5,6 +5,8 @@ import {
 } from '@nestjs/common';
 const CHECKOUT_SESSION_ID_UUID =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const CHECKOUT_SESSION_ID_PLACEHOLDER =
+  /(\{\{CHECKOUT_SESSION_ID\}\}|\{CHECKOUT_SESSION_ID\})/i;
 import { SupabaseService } from '../../utils/supabase/supabase.service';
 import { CreateCheckoutSessionDto } from './dto/create-checkout-session.dto';
 import { AuthContext } from '../common/decorators/current-user.decorator';
@@ -195,7 +197,17 @@ export class CheckoutSessionsService {
 
   async findOne(id: string, user: AuthContext) {
     const sessionId = id?.trim();
-    if (!sessionId || !CHECKOUT_SESSION_ID_UUID.test(sessionId)) {
+    if (!sessionId) {
+      throw new BadRequestException('Checkout session id must be a UUID');
+    }
+
+    if (CHECKOUT_SESSION_ID_PLACEHOLDER.test(sessionId)) {
+      throw new BadRequestException(
+        'Checkout session id must be the UUID returned by POST /checkout-sessions, not the {CHECKOUT_SESSION_ID} success_url placeholder',
+      );
+    }
+
+    if (!CHECKOUT_SESSION_ID_UUID.test(sessionId)) {
       throw new BadRequestException('Checkout session id must be a UUID');
     }
 
