@@ -99,6 +99,107 @@ export class WebhookSenderService {
   }
 
   /**
+   * Re-deliver a stored webhook envelope (manual retry from delivery logs).
+   * Sends the exact payload JSON so event id and signature stay stable.
+   */
+  async sendStoredWebhookPayload(
+    webhook: Webhook,
+    storedPayload: {
+      id?: string;
+      event: WebhookEvent;
+      timestamp?: string;
+      data: Record<string, unknown>;
+      lomi_environment?: string;
+    },
+    context?: Pick<WebhookDeliveryContext, 'attemptNumber' | 'merchantId'>,
+  ): Promise<WebhookSendResult> {
+    const event = storedPayload.event;
+    if (!webhook.active || !webhook.events.includes(event)) {
+      return {
+        success: false,
+        shouldRetry: false,
+        inactiveOrUnsubscribed: true,
+      };
+    }
+
+    const payloadString = JSON.stringify(storedPayload);
+    const signature = this.generateSignature(payloadString, webhook.secret);
+    const started = Date.now();
+
+    let safeTarget;
+    try {
+      safeTarget = await resolveSafeMerchantWebhookTarget(webhook.url);
+    } catch (error) {
+      const message =
+        error instanceof UnsafeWebhookUrlError
+          ? error.message
+          : 'Webhook URL failed outbound safety checks';
+      return {
+        success: false,
+        shouldRetry: false,
+        lastResponseBody: message,
+        deadLetterReason: 'blocked_webhook_url',
+      };
+    }
+
+    try {
+      const response = await axios.post(safeTarget.url, payloadString, {
+        ...buildSafeMerchantWebhookAxiosConfig(safeTarget),
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Lomi-Signature': signature,
+          'X-Lomi-Event': event,
+          'User-Agent': 'Lomi-Webhook/1.0',
+        },
+        timeout: 4000,
+      });
+
+      const durationMs = Date.now() - started;
+
+      if (response.status >= 200 && response.status < 300) {
+        await this.logDelivery(
+          webhook.id,
+          response.status,
+          response.data,
+          storedPayload,
+          context?.attemptNumber ?? 1,
+          context?.merchantId,
+        );
+        return {
+          success: true,
+          shouldRetry: false,
+          lastResponseStatus: response.status,
+          lastResponseBody: response.data,
+        };
+      }
+
+      return {
+        success: false,
+        shouldRetry: response.status < 400 || response.status >= 500,
+        lastResponseStatus: response.status,
+        lastResponseBody: response.data,
+        deadLetterReason:
+          response.status >= 400 && response.status < 500
+            ? 'client_error_http'
+            : 'server_error_http',
+      };
+    } catch (error: any) {
+      const status = error.response?.status as number | undefined;
+      const respBody = error.response?.data ?? error.message;
+      return {
+        success: false,
+        shouldRetry: status == null || status >= 500,
+        lastResponseStatus: status,
+        lastResponseBody: respBody,
+        deadLetterReason:
+          status != null && status >= 400 && status < 500
+            ? 'client_error_http'
+            : 'network_or_server',
+      };
+    }
+  }
+
+  /**
    * Single HTTP attempt. BullMQ is the sole retry authority when dispatchId is set.
    */
   async sendWebhookWithContext(
