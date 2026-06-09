@@ -1,0 +1,10 @@
+{
+  "$schema": "https://render.com/schema/render.json",
+  "deploy": {
+    "rootDirectory": "apps/api",
+    "buildCommand": "pnpm install --frozen-lockfile && pnpm run build",
+    "startCommand": "pnpm run start:prod",
+    "healthcheckPath": "/ready",
+    "healthcheckTimeoutSeconds": 120
+  }
+}
