@@ -1,6 +1,17 @@
-import { Body, Controller, HttpCode, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiOperation,
+  ApiParam,
+  ApiQuery,
   ApiResponse,
   ApiSecurity,
   ApiTags,
@@ -20,6 +31,8 @@ import {
   CreateUsageSubscriptionDto,
   UsageSubscriptionResponseDto,
 } from './dto/create-usage-subscription.dto';
+import { ListUsageEventsQueryDto } from './dto/list-usage-events-query.dto';
+import { UsageEventListItemDto } from './dto/usage-event-response.dto';
 
 @ApiTags('Usage events')
 @ApiSecurity('api-key')
@@ -28,6 +41,29 @@ import {
 @Controller()
 export class UsageEventsController {
   constructor(private readonly usageEventsService: UsageEventsService) {}
+
+  @Get('usage-events')
+  @ApiOperation({ summary: 'List usage events' })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'page_size', required: false, type: Number })
+  @ApiQuery({ name: 'customer_id', required: false })
+  @ApiQuery({ name: 'code', required: false })
+  @ApiQuery({ name: 'status', required: false, enum: ['pending', 'processed', 'failed'] })
+  @ApiResponse({ status: 200, type: UsageEventListItemDto, isArray: true })
+  findAll(
+    @Query() query: ListUsageEventsQueryDto,
+    @CurrentUser() user: AuthContext,
+  ) {
+    return this.usageEventsService.findAll(user, query);
+  }
+
+  @Get('usage-events/:id')
+  @ApiOperation({ summary: 'Get a usage event' })
+  @ApiParam({ name: 'id', description: 'Event ID' })
+  @ApiResponse({ status: 200, type: UsageEventListItemDto })
+  findOne(@Param('id') id: string, @CurrentUser() user: AuthContext) {
+    return this.usageEventsService.findOne(id, user);
+  }
 
   @Post('usage-events')
   @HttpCode(202)

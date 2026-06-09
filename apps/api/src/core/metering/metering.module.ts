@@ -9,6 +9,8 @@ import { MeteringProcessor } from './processors/metering.processor';
 import { BillingProcessor } from './processors/billing.processor';
 import { BillingService } from './billing.service';
 import { UsageBillingController } from './usage-billing.controller';
+import { UsageBillingInternalController } from './usage-billing-internal.controller';
+import { InternalCronGuard } from '../common/guards/internal-cron.guard';
 import { UsageCreditsService } from './usage-credits.service';
 import { EntitlementsService } from './entitlements.service';
 
@@ -22,6 +24,7 @@ import { EntitlementsService } from './entitlements.service';
     MetersController,
     UsageEventsController,
     UsageBillingController,
+    UsageBillingInternalController,
   ],
   providers: [
     MetersService,
@@ -31,6 +34,7 @@ import { EntitlementsService } from './entitlements.service';
     BillingProcessor,
     UsageCreditsService,
     EntitlementsService,
+    InternalCronGuard,
   ],
   exports: [UsageEventsService, MetersService, BillingService],
 })

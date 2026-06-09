@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
+import { CreditWalletDto } from './dto/credit-wallet.dto';
 import { ApiOperation, ApiQuery, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { ApiKeyGuard } from '../common/guards/api-key.guard';
 import {
@@ -23,20 +24,32 @@ export class UsageBillingController {
     private readonly entitlementsService: EntitlementsService,
   ) {}
 
-  @Post('run-cycle')
-  @ApiOperation({
-    summary: 'Run usage billing cycle',
-    description:
-      'Closes billing periods, generates usage invoices, and advances subscription dates. Normally run by pg_cron daily.',
-  })
-  runCycle(@Body() body: { as_of_date?: string }) {
-    return this.billingService.runUsageBillingCycle(body?.as_of_date);
+  @Get('periods')
+  @ApiOperation({ summary: 'List usage billing periods' })
+  @ApiQuery({ name: 'subscription_id', required: false })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'page_size', required: false, type: Number })
+  listPeriods(
+    @CurrentUser() user: AuthContext,
+    @Query('subscription_id') subscriptionId?: string,
+    @Query('page') page?: string,
+    @Query('page_size') pageSize?: string,
+  ) {
+    return this.billingService.listBillingPeriods(
+      user,
+      subscriptionId,
+      page ? parseInt(page, 10) : 1,
+      pageSize ? parseInt(pageSize, 10) : 50,
+    );
   }
 
-  @Post('run-dunning')
-  @ApiOperation({ summary: 'Process usage invoice dunning steps' })
-  runDunning(@Body() body: { grace_days?: number }) {
-    return this.billingService.runDunning(body?.grace_days ?? 3);
+  @Get('subscriptions/:subscriptionId/usage')
+  @ApiOperation({ summary: 'Get meter usage for a subscription' })
+  getSubscriptionUsage(
+    @Param('subscriptionId') subscriptionId: string,
+    @CurrentUser() user: AuthContext,
+  ) {
+    return this.billingService.getSubscriptionUsage(subscriptionId, user);
   }
 
   @Get('revenue')
@@ -60,21 +73,8 @@ export class UsageBillingController {
   @ApiOperation({
     summary: 'Credit prepaid usage units to a customer meter wallet',
   })
-  creditWallet(
-    @Body()
-    body: {
-      meter_id: string;
-      customer_id: string;
-      units: number;
-      reason?: string;
-    },
-  ) {
-    return this.creditsService.credit(
-      body.meter_id,
-      body.customer_id,
-      body.units,
-      body.reason,
-    );
+  creditWallet(@Body() body: CreditWalletDto, @CurrentUser() user: AuthContext) {
+    return this.creditsService.credit(user, body);
   }
 
   @Post('entitlements')
