@@ -600,7 +600,9 @@ export class RefundsService {
     return tx;
   }
 
-  private async resolveStripeChargeId(tx: TransactionRow): Promise<string | null> {
+  private async resolveStripeChargeId(
+    tx: TransactionRow,
+  ): Promise<string | null> {
     const metadata = tx.metadata ?? {};
     if (typeof metadata.stripe_charge_id === 'string') {
       return metadata.stripe_charge_id;
@@ -659,7 +661,10 @@ export class RefundsService {
       return new BadRequestException('This charge has already been refunded');
     }
 
-    if (code === 'charge_disputed' || message.toLowerCase().includes('disputed')) {
+    if (
+      code === 'charge_disputed' ||
+      message.toLowerCase().includes('disputed')
+    ) {
       return new BadRequestException(
         'Cannot refund a charge with a pending dispute',
       );

@@ -17,7 +17,9 @@ function readPaymentFlow(txnData: Record<string, unknown>): string | undefined {
   return typeof flow === 'string' ? flow : undefined;
 }
 
-function readSubscriptionId(txnData: Record<string, unknown>): string | undefined {
+function readSubscriptionId(
+  txnData: Record<string, unknown>,
+): string | undefined {
   const id = txnData.subscription_id ?? txnData.subscriptionId;
   return typeof id === 'string' && id.length > 0 ? id : undefined;
 }
