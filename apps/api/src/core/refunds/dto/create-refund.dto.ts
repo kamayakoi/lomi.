@@ -37,4 +37,13 @@ export class CreateRefundDto {
   @IsEnum(['full', 'partial'])
   @IsOptional()
   refund_type?: 'full' | 'partial';
+
+  @ApiPropertyOptional({
+    description:
+      'Subscription side-effect after a full refund: default (cancel initial payment, pause renewal), cancel, pause, or none.',
+    enum: ['default', 'cancel', 'pause', 'none'],
+  })
+  @IsEnum(['default', 'cancel', 'pause', 'none'])
+  @IsOptional()
+  subscription_action?: 'default' | 'cancel' | 'pause' | 'none';
 }

@@ -13,6 +13,8 @@ Créer un remboursement
 
 Rembourse une transaction terminée (carte ou mobile money). Le solde marchand est mis à jour immédiatement. Prise en charge des remboursements totaux et partiels.
 
+Pour les paiements liés à un abonnement, utilisez `subscription_action` (optionnel) : `default` (annulation au remboursement total initial, pause au renouvellement), `cancel`, `pause` ou `none`. Un remboursement partiel ne modifie l’abonnement que si le cumul atteint le montant total de la transaction.
+
 
 ### Quand utiliser cet endpoint
 

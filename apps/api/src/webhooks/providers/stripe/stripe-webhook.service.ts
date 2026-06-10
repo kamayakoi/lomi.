@@ -390,12 +390,16 @@ export class StripeWebhookService {
   }
 
   /**
-   * Handle setup_intent.succeeded — trial subscription card save (no charge).
+   * Handle setup_intent.succeeded — trial or deferred subscription card save (no charge).
    */
   private async handleSetupIntentSucceeded(setupIntent: Stripe.SetupIntent) {
     const metadata = setupIntent.metadata || {};
+    const paymentFlow = metadata.payment_flow;
 
-    if (metadata.payment_flow !== 'subscription_trial_setup') {
+    if (
+      paymentFlow !== 'subscription_trial_setup' &&
+      paymentFlow !== 'subscription_deferred_setup'
+    ) {
       return {
         eventType: 'setup_intent.succeeded',
         setup_intent_id: setupIntent.id,
@@ -416,8 +420,9 @@ export class StripeWebhookService {
       !metadata.merchant_id
     ) {
       this.logger.warn({
-        message: 'setup_intent_succeeded_missing_trial_metadata',
+        message: 'setup_intent_succeeded_missing_metadata',
         setup_intent_id: setupIntent.id,
+        payment_flow: paymentFlow,
       });
       return {
         eventType: 'setup_intent.succeeded',
@@ -426,32 +431,34 @@ export class StripeWebhookService {
       };
     }
 
-    const { error } = await (this.supabase.getClient() as any).rpc(
-      'complete_stripe_trial_setup',
-      {
-        p_merchant_id: metadata.merchant_id,
-        p_organization_id: metadata.organization_id,
-        p_customer_id: metadata.internal_customer_id,
-        p_product_id: metadata.product_id,
-        p_price_id: metadata.price_id || null,
-        p_checkout_session_id: metadata.checkoutSessionId || null,
-        p_stripe_payment_method_id: paymentMethodId,
-      },
-    );
+    const rpcName =
+      paymentFlow === 'subscription_deferred_setup'
+        ? 'complete_stripe_deferred_subscription_setup'
+        : 'complete_stripe_trial_setup';
+
+    const { error } = await (this.supabase.getClient() as any).rpc(rpcName, {
+      p_merchant_id: metadata.merchant_id,
+      p_organization_id: metadata.organization_id,
+      p_customer_id: metadata.internal_customer_id,
+      p_product_id: metadata.product_id,
+      p_price_id: metadata.price_id || null,
+      p_checkout_session_id: metadata.checkoutSessionId || null,
+      p_stripe_payment_method_id: paymentMethodId,
+    });
 
     if (error) {
       this.logger.error({
-        message: 'complete_stripe_trial_setup_failed',
+        message: `${rpcName}_failed`,
         setup_intent_id: setupIntent.id,
         error: error.message,
       });
-      throw new Error('Failed to complete Stripe trial setup');
+      throw new Error(`Failed to complete Stripe setup (${paymentFlow})`);
     }
 
     return {
       eventType: 'setup_intent.succeeded',
       setup_intent_id: setupIntent.id,
-      payment_flow: metadata.payment_flow,
+      payment_flow: paymentFlow,
     };
   }
 

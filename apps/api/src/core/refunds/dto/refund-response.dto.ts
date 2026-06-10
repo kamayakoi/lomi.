@@ -21,6 +21,19 @@ export class CreateRefundResponseDto {
     type: String,
   })
   message?: string;
+
+  @ApiPropertyOptional({
+    description:
+      'Subscription side-effect applied after refund (if transaction was linked to a subscription).',
+    example: { applied: true, action: 'cancel', subscription_id: 'sub-uuid' },
+  })
+  subscription_action?: {
+    applied?: boolean;
+    action?: string;
+    subscription_id?: string | null;
+    previous_status?: string;
+    reason?: string;
+  };
 }
 
 export class RefundListItemDto {

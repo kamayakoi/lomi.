@@ -2,6 +2,15 @@ import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { RefundsService } from './refunds.service';
 import type { AuthContext } from '../common/decorators/current-user.decorator';
 
+const stripeRefundsCreate = jest.fn();
+
+jest.mock('../../utils/stripe/stripe-keys', () => ({
+  resolveStripeSecretKey: jest.fn(() => 'sk_test_mock'),
+  createStripeClient: jest.fn(() => ({
+    refunds: { create: stripeRefundsCreate },
+  })),
+}));
+
 describe('RefundsService', () => {
   const user: AuthContext = {
     merchantId: '904d003c-3736-41d4-90a5-9de74d404fd7',
@@ -20,6 +29,8 @@ describe('RefundsService', () => {
     provider_code: 'STRIPE',
     payment_method_code: 'CARDS',
     status: 'completed',
+    metadata: { stripe_amount_cents: 1520, stripe_charge_id: 'ch_test' },
+    environment: 'test',
   };
 
   const completedWaveTx = {
@@ -49,17 +60,41 @@ describe('RefundsService', () => {
 
   function buildService(
     rpcImpl: (name: string, args: Record<string, unknown>) => unknown,
+    providerChargeId = 'ch_test',
   ) {
     const rpc = jest.fn((name: string, args: Record<string, unknown>) =>
       Promise.resolve(rpcImpl(name, args)),
     );
-    const client = { rpc };
+    const from = jest.fn(() => ({
+      select: jest.fn(() => ({
+        eq: jest.fn(() => ({
+          eq: jest.fn(() => ({
+            limit: jest.fn(() =>
+              Promise.resolve({
+                data: [{ provider_transaction_id: providerChargeId }],
+                error: null,
+              }),
+            ),
+            maybeSingle: jest.fn(() =>
+              Promise.resolve({
+                data: { provider_transaction_id: providerChargeId },
+                error: null,
+              }),
+            ),
+          })),
+        })),
+      })),
+    }));
+    const client = { rpc, from };
     const supabaseService = {
       getClient: () => client,
     };
     const configService = {
-      get: (key: string) =>
-        key === 'SUPABASE_PROJECT_REF' ? 'proj' : 'anon-key',
+      get: (key: string) => {
+        if (key === 'SUPABASE_PROJECT_REF') return 'proj';
+        if (key === 'STRIPE_REFUND_FALLBACK_MANUAL') return 'false';
+        return 'anon-key';
+      },
     };
     const originalFetch = global.fetch;
     global.fetch = jest.fn();
@@ -78,6 +113,7 @@ describe('RefundsService', () => {
 
   afterEach(() => {
     jest.restoreAllMocks();
+    stripeRefundsCreate.mockReset();
   });
 
   it('rejects unsupported provider', async () => {
@@ -107,7 +143,9 @@ describe('RefundsService', () => {
     restore();
   });
 
-  it('creates card refund via create_manual_refund_request_api', async () => {
+  it('creates card refund via Stripe + create_stripe_card_refund_api', async () => {
+    stripeRefundsCreate.mockResolvedValue({ id: 're_test_1' });
+
     const { service, rpc, restore } = buildService((name) => {
       if (name === 'get_transaction') {
         return { data: [completedCardTx], error: null };
@@ -115,7 +153,7 @@ describe('RefundsService', () => {
       if (name.startsWith('get_effective_other_fee_config')) {
         return { data: [{ percentage: 2, fixed_amount: 0 }], error: null };
       }
-      if (name === 'create_manual_refund_request_api') {
+      if (name === 'create_stripe_card_refund_api') {
         return {
           data: {
             success: true,
@@ -135,11 +173,91 @@ describe('RefundsService', () => {
     );
 
     expect(result.refund_id).toBe('ref-1');
+    expect(stripeRefundsCreate).toHaveBeenCalledWith(
+      expect.objectContaining({ charge: 'ch_test' }),
+    );
     expect(rpc).toHaveBeenCalledWith(
-      'create_manual_refund_request_api',
+      'create_stripe_card_refund_api',
       expect.objectContaining({
         p_merchant_id: user.merchantId,
         p_transaction_id: 'tx-card',
+        p_stripe_refund_id: 're_test_1',
+        p_subscription_action: 'default',
+      }),
+    );
+
+    restore();
+  });
+
+  it('maps Stripe charge_disputed to BadRequestException', async () => {
+    stripeRefundsCreate.mockRejectedValue({
+      code: 'charge_disputed',
+      message: 'Charge ch_test has been charged back',
+    });
+
+    const { service, restore } = buildService((name) => {
+      if (name === 'get_transaction') {
+        return { data: [completedCardTx], error: null };
+      }
+      if (name.startsWith('get_effective_other_fee_config')) {
+        return { data: [{ percentage: 2, fixed_amount: 0 }], error: null };
+      }
+      return { data: null, error: null };
+    });
+
+    await expect(
+      service.create(
+        { transaction_id: 'tx-card', amount: 10000, refund_type: 'full' },
+        user,
+      ),
+    ).rejects.toThrow(BadRequestException);
+
+    restore();
+  });
+
+  it('forwards explicit subscription_action none to card refund RPC', async () => {
+    stripeRefundsCreate.mockResolvedValue({ id: 're_test_2' });
+
+    const { service, rpc, restore } = buildService((name) => {
+      if (name === 'get_transaction') {
+        return { data: [completedCardTx], error: null };
+      }
+      if (name.startsWith('get_effective_other_fee_config')) {
+        return { data: [{ percentage: 2, fixed_amount: 0 }], error: null };
+      }
+      if (name === 'create_stripe_card_refund_api') {
+        return {
+          data: {
+            success: true,
+            refund_id: 'ref-1',
+            refunded_amount: 10000,
+            status: 'completed',
+            subscription_action: { applied: false, action: 'none' },
+          },
+          error: null,
+        };
+      }
+      return { data: null, error: null };
+    });
+
+    const result = await service.create(
+      {
+        transaction_id: 'tx-card',
+        amount: 10000,
+        refund_type: 'full',
+        subscription_action: 'none',
+      },
+      user,
+    );
+
+    expect(result.subscription_action).toEqual({
+      applied: false,
+      action: 'none',
+    });
+    expect(rpc).toHaveBeenCalledWith(
+      'create_stripe_card_refund_api',
+      expect.objectContaining({
+        p_subscription_action: 'none',
       }),
     );
 

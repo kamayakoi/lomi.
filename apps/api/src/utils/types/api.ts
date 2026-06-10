@@ -3122,6 +3122,21 @@ export type Database = {
           p_processing_fee_percentage?: number | null;
           p_reason?: string | null;
           p_refund_amount: number;
+          p_subscription_action?: string | null;
+          p_transaction_id: string;
+        };
+        Returns: Json;
+      };
+      create_stripe_card_refund_api: {
+        Args: {
+          p_merchant_id: string;
+          p_organization_id: string;
+          p_processing_fee_percentage?: number | null;
+          p_reason?: string | null;
+          p_refund_amount: number;
+          p_stripe_charge_id?: string | null;
+          p_stripe_refund_id?: string | null;
+          p_subscription_action?: string | null;
           p_transaction_id: string;
         };
         Returns: Json;
@@ -3133,6 +3148,7 @@ export type Database = {
           p_processing_fee_percentage?: number | null;
           p_reason?: string | null;
           p_refund_amount: number;
+          p_subscription_action?: string | null;
           p_transaction_id: string;
         };
         Returns: Json;
@@ -3141,17 +3157,33 @@ export type Database = {
         Args: { p_reason?: string; p_refund_id: string };
         Returns: Json;
       };
+      apply_subscription_refund_action: {
+        Args: {
+          p_initiated_by?: string | null;
+          p_is_full_refund: boolean;
+          p_refund_id: string;
+          p_subscription_action?: string | null;
+          p_transaction_id: string;
+        };
+        Returns: Json;
+      };
       apply_wave_partial_refund_charges: {
         Args: {
           p_processing_fee_percentage?: number | null;
           p_refund_amount: number;
           p_refund_id: string;
+          p_subscription_action?: string | null;
           p_transaction_id: string;
         };
         Returns: {
           error_message: string;
+          subscription_action: Json;
           success: boolean;
         }[];
+      };
+      classify_subscription_transaction: {
+        Args: { p_transaction_id: string };
+        Returns: string;
       };
       create_refund: {
         Args: {
@@ -3162,6 +3194,24 @@ export type Database = {
           p_provider_merchant_id?: string | null;
           p_provider_transaction_id?: string | null;
           p_reason?: string | null;
+          p_subscription_action?: string | null;
+          p_transaction_id: string;
+        };
+        Returns: string;
+      };
+      maybe_apply_subscription_refund_action_after_refund: {
+        Args: {
+          p_initiated_by?: string | null;
+          p_refund_id: string;
+          p_subscription_action?: string | null;
+          p_transaction_id: string;
+        };
+        Returns: Json;
+      };
+      resolve_subscription_refund_action: {
+        Args: {
+          p_explicit_action?: string | null;
+          p_is_full_refund: boolean;
           p_transaction_id: string;
         };
         Returns: string;

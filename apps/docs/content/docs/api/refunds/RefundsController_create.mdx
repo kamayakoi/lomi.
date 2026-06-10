@@ -22,6 +22,8 @@ Use for buyer reversals on eligible completed transactions; supports full and pa
 
 Card customer credit is completed separately by operations. Mobile money partial refunds require a customer phone on file.
 
+For subscription-linked payments, pass optional `subscription_action`: `default` (cancel on initial full refund, pause on renewal full refund), `cancel`, `pause`, or `none`. Partial refunds never change the subscription unless the cumulative refund reaches the full transaction amount.
+
 ### See also
 
 [List refunds](/api/refunds/RefundsController_findAll) · [Retrieve transaction](/api/transactions/TransactionsController_findOne)

@@ -26,8 +26,22 @@ Source: [`apps/plugins/shopify`](https://github.com/lomiafrica/lomi./tree/master
 
 ## Install (custom distribution)
 
-1. Install the app from the **custom install URL** provided by lomi. (Partner Dashboard OAuth link for your shop).
-2. Open the embedded app in Shopify Admin → complete **Settings** onboarding.
+### From the lomi. dashboard (recommended)
+
+1. Go to [dashboard.lomi.africa](https://dashboard.lomi.africa) → **Settings → Payment channels → Integrations**.
+2. Toggle **Shopify** on and enter your store domain (e.g. `my-store.myshopify.com`).
+3. Click **Install on Shopify** — you are redirected to Shopify OAuth to authorize the app.
+4. After install, open the embedded app → **Settings** → paste your lomi. **secret key** and **webhook secret**.
+
+Install URL pattern (also works without the dashboard):
+
+`https://connect.lomi.africa/install?shop={your-store}.myshopify.com`
+
+### Manual / team share
+
+Copy the install link from the dashboard modal and send it to a teammate, or open:
+
+[https://connect.lomi.africa/install](https://connect.lomi.africa/install)
 
 ## Setup checklist
 

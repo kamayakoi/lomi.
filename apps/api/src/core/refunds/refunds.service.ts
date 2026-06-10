@@ -20,6 +20,11 @@ import {
   type RefundFeeConfig,
 } from './refund-fees';
 
+import {
+  createStripeClient,
+  resolveStripeSecretKey,
+} from '../../utils/stripe/stripe-keys';
+
 type TransactionRow = {
   transaction_id: string;
   organization_id: string;
@@ -31,6 +36,17 @@ type TransactionRow = {
   provider_code: string;
   payment_method_code: string;
   status: string;
+  metadata?: Record<string, unknown> | null;
+  environment?: string | null;
+  stripe_payment_intent_id?: string | null;
+};
+
+type SubscriptionRefundActionResult = {
+  applied?: boolean;
+  action?: string;
+  subscription_id?: string | null;
+  previous_status?: string;
+  reason?: string;
 };
 
 type RpcRefundResult = {
@@ -39,6 +55,7 @@ type RpcRefundResult = {
   refund_id?: string;
   refunded_amount?: number;
   status?: string;
+  subscription_action?: SubscriptionRefundActionResult;
 };
 
 type BeneficiaryPayoutEdgeResult = {
@@ -249,6 +266,10 @@ export class RefundsService {
     return dto.amount + 0.01 >= gross;
   }
 
+  private resolveSubscriptionActionParam(dto: CreateRefundDto): string {
+    return dto.subscription_action ?? 'default';
+  }
+
   private async loadTransaction(
     transactionId: string,
     organizationId: string,
@@ -372,6 +393,131 @@ export class RefundsService {
     feePercentage: number,
     refundMerchantId: string,
   ) {
+    const tx = await this.loadTransactionWithStripeContext(
+      dto.transaction_id,
+      user.organizationId,
+    );
+
+    const useManualFallback =
+      this.configService.get<string>('STRIPE_REFUND_FALLBACK_MANUAL') ===
+      'true';
+
+    const chargeId = await this.resolveStripeChargeId(tx);
+    if (!chargeId) {
+      if (useManualFallback) {
+        return this.createManualCardRefund(
+          dto,
+          user,
+          feePercentage,
+          refundMerchantId,
+        );
+      }
+      throw new BadRequestException(
+        'Stripe charge ID not found for this transaction',
+      );
+    }
+
+    const stripeSecret = resolveStripeSecretKey(
+      tx.environment ?? user.environment,
+    );
+    if (!stripeSecret) {
+      if (useManualFallback) {
+        return this.createManualCardRefund(
+          dto,
+          user,
+          feePercentage,
+          refundMerchantId,
+        );
+      }
+      throw new InternalServerErrorException('Stripe is not configured');
+    }
+
+    const stripe = createStripeClient(stripeSecret);
+    const refundCents = this.computeStripeRefundCents(
+      dto.amount,
+      Number(tx.gross_amount),
+      tx.metadata,
+    );
+
+    let stripeRefund;
+    try {
+      stripeRefund = await stripe.refunds.create({
+        charge: chargeId,
+        amount: refundCents,
+        reason: 'requested_by_customer',
+        metadata: {
+          refund_id: '',
+          transaction_id: dto.transaction_id,
+          organization_id: user.organizationId,
+          refunded_by: 'merchant_api',
+        },
+      });
+    } catch (error) {
+      if (useManualFallback) {
+        return this.createManualCardRefund(
+          dto,
+          user,
+          feePercentage,
+          refundMerchantId,
+        );
+      }
+      throw this.mapStripeRefundError(error);
+    }
+
+    const { data, error } = await this.supabaseService.getClient().rpc(
+      'create_stripe_card_refund_api' as never,
+      {
+        p_merchant_id: refundMerchantId,
+        p_organization_id: user.organizationId,
+        p_transaction_id: dto.transaction_id,
+        p_refund_amount: dto.amount,
+        p_processing_fee_percentage: feePercentage,
+        p_reason: dto.reason ?? null,
+        p_stripe_refund_id: stripeRefund.id,
+        p_stripe_charge_id: chargeId,
+        p_subscription_action: this.resolveSubscriptionActionParam(dto),
+      } as never,
+    );
+
+    if (error) {
+      this.logger.error(
+        `create_stripe_card_refund_api failed after Stripe refund ${stripeRefund.id}: ${error.message}`,
+      );
+      throw new InternalServerErrorException(
+        'Refund initiated in Stripe but ledger update failed; webhook will reconcile',
+      );
+    }
+
+    const result = data as RpcRefundResult;
+
+    if (!result?.success) {
+      this.logger.error(
+        `create_stripe_card_refund_api returned failure after Stripe refund ${stripeRefund.id}: ${result?.error ?? 'unknown'}`,
+      );
+      throw new InternalServerErrorException(
+        result?.error ??
+          'Refund initiated in Stripe but ledger update failed; webhook will reconcile',
+      );
+    }
+
+    return {
+      success: true,
+      refund_id: result.refund_id,
+      transaction_id: dto.transaction_id,
+      refunded_amount: result.refunded_amount ?? dto.amount,
+      status: result.status ?? 'completed',
+      message: 'Refund processed successfully.',
+      subscription_action: result.subscription_action,
+      stripe_refund_id: stripeRefund.id,
+    };
+  }
+
+  private async createManualCardRefund(
+    dto: CreateRefundDto,
+    user: AuthContext,
+    feePercentage: number,
+    refundMerchantId: string,
+  ) {
     const { data, error } = await this.supabaseService.getClient().rpc(
       'create_manual_refund_request_api' as never,
       {
@@ -381,6 +527,7 @@ export class RefundsService {
         p_refund_amount: dto.amount,
         p_processing_fee_percentage: feePercentage,
         p_reason: dto.reason ?? null,
+        p_subscription_action: this.resolveSubscriptionActionParam(dto),
       } as never,
     );
 
@@ -403,7 +550,122 @@ export class RefundsService {
       refunded_amount: result.refunded_amount ?? dto.amount,
       status: result.status ?? 'completed',
       message: 'Refund recorded. Customer credit is processed by our team.',
+      subscription_action: result.subscription_action,
+      fallback: 'manual',
     };
+  }
+
+  private async loadTransactionWithStripeContext(
+    transactionId: string,
+    organizationId: string,
+  ): Promise<TransactionRow> {
+    const { data, error } = await this.supabaseService.getClient().rpc(
+      'get_transaction' as never,
+      {
+        p_transaction_id: transactionId,
+        p_organization_id: organizationId,
+      } as never,
+    );
+
+    if (error) {
+      throw new BadRequestException(error.message);
+    }
+
+    const rows = Array.isArray(data) ? data : [];
+    const tx = rows[0] as TransactionRow | undefined;
+    if (!tx?.transaction_id) {
+      throw new NotFoundException(
+        `Transaction with ID ${transactionId} not found or access denied`,
+      );
+    }
+
+    const { data: providerRows } = await this.supabaseService
+      .getClient()
+      .from('providers_transactions' as never)
+      .select('provider_transaction_id' as never)
+      .eq('transaction_id' as never, transactionId as never)
+      .eq('provider_code' as never, 'STRIPE' as never)
+      .limit(1);
+
+    const providerChargeId = (
+      providerRows as { provider_transaction_id?: string }[] | null
+    )?.[0]?.provider_transaction_id;
+
+    const metadata = (tx.metadata ?? {}) as Record<string, unknown>;
+    if (!metadata.stripe_charge_id && providerChargeId) {
+      metadata.stripe_charge_id = providerChargeId;
+    }
+    tx.metadata = metadata;
+
+    return tx;
+  }
+
+  private async resolveStripeChargeId(tx: TransactionRow): Promise<string | null> {
+    const metadata = tx.metadata ?? {};
+    if (typeof metadata.stripe_charge_id === 'string') {
+      return metadata.stripe_charge_id;
+    }
+
+    const { data } = await this.supabaseService
+      .getClient()
+      .from('providers_transactions' as never)
+      .select('provider_transaction_id' as never)
+      .eq('transaction_id' as never, tx.transaction_id as never)
+      .eq('provider_code' as never, 'STRIPE' as never)
+      .limit(1)
+      .maybeSingle();
+
+    const chargeId = (data as { provider_transaction_id?: string } | null)
+      ?.provider_transaction_id;
+    return chargeId ?? null;
+  }
+
+  private computeStripeRefundCents(
+    refundAmountXof: number,
+    grossAmountXof: number,
+    metadata?: Record<string, unknown> | null,
+  ): number {
+    const raw = metadata?.stripe_amount_cents;
+    const stripeAmountCents =
+      typeof raw === 'string'
+        ? parseInt(raw, 10)
+        : typeof raw === 'number'
+          ? raw
+          : null;
+
+    if (
+      stripeAmountCents != null &&
+      stripeAmountCents > 0 &&
+      grossAmountXof > 0
+    ) {
+      return Math.max(
+        1,
+        Math.round((refundAmountXof / grossAmountXof) * stripeAmountCents),
+      );
+    }
+
+    return Math.max(1, Math.round(refundAmountXof));
+  }
+
+  private mapStripeRefundError(error: unknown): BadRequestException {
+    const stripeError = error as { code?: string; message?: string };
+    const code = stripeError?.code ?? '';
+    const message = stripeError?.message ?? 'Stripe refund failed';
+
+    if (
+      code === 'charge_already_refunded' ||
+      message.toLowerCase().includes('already been refunded')
+    ) {
+      return new BadRequestException('This charge has already been refunded');
+    }
+
+    if (code === 'charge_disputed' || message.toLowerCase().includes('disputed')) {
+      return new BadRequestException(
+        'Cannot refund a charge with a pending dispute',
+      );
+    }
+
+    return new BadRequestException(message);
   }
 
   private async createMobileMoneyFullRefund(
@@ -422,6 +684,7 @@ export class RefundsService {
         p_refund_amount: dto.amount,
         p_processing_fee_percentage: feePercentage,
         p_reason: dto.reason ?? null,
+        p_subscription_action: this.resolveSubscriptionActionParam(dto),
       } as never,
     );
 
@@ -438,6 +701,7 @@ export class RefundsService {
     }
 
     const refundId = ledgerResult.refund_id;
+    const subscriptionAction = ledgerResult.subscription_action;
 
     try {
       await this.invokePaymentEdge('/refund', {
@@ -483,6 +747,7 @@ export class RefundsService {
       refunded_amount: dto.amount,
       status: 'completed',
       message: 'Refund initiated and recorded.',
+      subscription_action: subscriptionAction,
     };
   }
 
@@ -537,6 +802,7 @@ export class RefundsService {
         : 'Partial refund via payout',
       providerCode: tx.provider_code,
       merchantId: refundMerchantId,
+      subscriptionAction: this.resolveSubscriptionActionParam(dto),
       feeAmount,
       metadata: {
         processing_fee: feeAmount,
@@ -561,6 +827,7 @@ export class RefundsService {
           p_refund_id: refundId,
           p_refund_amount: dto.amount,
           p_processing_fee_percentage: feePercentage,
+          p_subscription_action: this.resolveSubscriptionActionParam(dto),
         } as never,
       );
 
@@ -576,6 +843,10 @@ export class RefundsService {
       );
     }
 
+    const subscriptionAction = (
+      chargeResult as { subscription_action?: SubscriptionRefundActionResult }
+    )?.subscription_action;
+
     return {
       success: true,
       refund_id: refundId,
@@ -583,6 +854,7 @@ export class RefundsService {
       refunded_amount: dto.amount,
       status: 'completed',
       message: 'Partial refund sent to customer and recorded.',
+      subscription_action: subscriptionAction,
     };
   }
 
@@ -674,6 +946,7 @@ export class RefundsService {
     reason?: string;
     providerCode: string;
     merchantId: string;
+    subscriptionAction?: string;
     feeAmount: number;
     metadata: Record<string, unknown>;
   }): Promise<string> {
@@ -690,6 +963,7 @@ export class RefundsService {
           p_provider_code: params.providerCode,
           p_metadata: params.metadata,
           p_created_by: params.merchantId,
+          p_subscription_action: params.subscriptionAction ?? 'default',
         } as never,
       );
 
