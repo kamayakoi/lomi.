@@ -13,6 +13,12 @@ import { CliModule } from '../cli/cli.module';
   imports: [
     BullModule.registerQueue({
       name: 'webhooks',
+      defaultJobOptions: {
+        // Aggressive retention to keep Redis command volume low.
+        // Webhooks fan out per event + 5 attempts each; old jobs bloat streams/hashes.
+        removeOnComplete: { age: 3600, count: 1000 }, // 1h or last 1k
+        removeOnFail: { age: 86400, count: 5000 }, // 24h or last 5k (for debugging)
+      },
     }),
     WaveWebhookModule,
     StripeWebhookModule,

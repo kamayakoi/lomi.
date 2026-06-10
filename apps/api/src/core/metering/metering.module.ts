@@ -17,8 +17,20 @@ import { EntitlementsService } from './entitlements.service';
 @Module({
   imports: [
     SupabaseModule,
-    BullModule.registerQueue({ name: 'metering' }),
-    BullModule.registerQueue({ name: 'billing' }),
+    BullModule.registerQueue({
+      name: 'metering',
+      defaultJobOptions: {
+        removeOnComplete: { age: 3600, count: 1000 },
+        removeOnFail: { age: 86400, count: 5000 },
+      },
+    }),
+    BullModule.registerQueue({
+      name: 'billing',
+      defaultJobOptions: {
+        removeOnComplete: { age: 3600, count: 100 },
+        removeOnFail: { age: 86400, count: 500 },
+      },
+    }),
   ],
   controllers: [
     MetersController,

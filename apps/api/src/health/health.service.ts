@@ -30,6 +30,13 @@ export class HealthService implements OnModuleDestroy {
   private readonly logger = new Logger(HealthService.name);
   private redis: Redis | null = null;
 
+  // Short TTL cache for full Redis health (ping + queue counts).
+  // Readiness probes (Railway healthcheck + manual /ready) would otherwise
+  // hammer Redis with ping + getJobCounts on every call. 15s is a good
+  // trade-off between freshness and command volume.
+  private lastRedisHealth: { value: RedisHealthResult & { ok: boolean }; at: number } | null = null;
+  private readonly REDIS_HEALTH_CACHE_TTL_MS = 15_000;
+
   constructor(
     @Optional() @InjectQueue('webhooks') private readonly webhooksQueue?: Queue,
     @Optional() @InjectQueue('metering') private readonly meteringQueue?: Queue,
@@ -122,46 +129,62 @@ export class HealthService implements OnModuleDestroy {
       });
     }
 
-    const redisResult = await this.checkRedis();
+    // Use a *cheap* ping for the readiness decision and the 'redis_ping' check item.
+    // This keeps Railway healthcheck probes (and any k8s-style readiness) from
+    // generating a full ping + 15+ getJobCounts commands on every hit.
+    const ping = await this.checkRedisPing();
     checks.push({
       name: 'redis_ping',
-      ok: redisResult.ok,
-      detail: redisResult.ok
-        ? undefined
-        : 'error' in redisResult
-          ? redisResult.error
-          : 'unavailable',
+      ok: ping.ok,
+      detail: ping.ok ? undefined : ping.error,
     });
 
     const envOk = checks.every((c) => c.ok);
-    const ready = envOk && redisResult.ok;
+    const ready = envOk && ping.ok;
+
+    // For the response payload we still try to include rich queue counts, but
+    // checkRedis is internally cached (15s TTL) so this does not add per-probe cost.
+    let redisForResponse: any = ping.ok
+      ? { status: 'ok', redis: 'connected' }
+      : { status: 'degraded', redis: 'unavailable', error: ping.error };
+    try {
+      const full = await this.checkRedis();
+      redisForResponse = full.ok
+        ? {
+            status: 'ok',
+            redis: 'connected',
+            ...('queues' in full && full.queues ? { queues: full.queues } : {}),
+          }
+        : full;
+    } catch (e) {
+      // best effort; keep the ping-derived summary
+    }
 
     return {
       ok: ready,
       ready,
       service: 'lomi-api',
       checks,
-      redis: redisResult.ok
-        ? {
-            status: 'ok',
-            redis: 'connected',
-            ...('queues' in redisResult && redisResult.queues
-              ? { queues: redisResult.queues }
-              : {}),
-          }
-        : redisResult,
+      redis: redisForResponse,
     };
   }
 
   async checkRedis(): Promise<RedisHealthResult & { ok: boolean }> {
+    const now = Date.now();
+    if (this.lastRedisHealth && (now - this.lastRedisHealth.at) < this.REDIS_HEALTH_CACHE_TTL_MS) {
+      return this.lastRedisHealth.value;
+    }
+
     const redis = this.getRedis();
     if (!redis) {
-      return {
+      const value: RedisHealthResult & { ok: boolean } = {
         ok: false,
         status: 'degraded',
         redis: 'unavailable',
         error: 'Redis client could not be initialized',
       };
+      this.lastRedisHealth = { value, at: now };
+      return value;
     }
 
     try {
@@ -170,29 +193,35 @@ export class HealthService implements OnModuleDestroy {
       }
       const pong = await redis.ping();
       if (pong !== 'PONG') {
-        return {
+        const value: RedisHealthResult & { ok: boolean } = {
           ok: false,
           status: 'degraded',
           redis: 'unavailable',
           error: `Unexpected PING response: ${pong}`,
         };
+        this.lastRedisHealth = { value, at: now };
+        return value;
       }
 
       const queues = await this.getQueueCounts();
-      return {
+      const value: RedisHealthResult & { ok: boolean } = {
         ok: true,
         status: 'ok',
         redis: 'connected',
         ...(queues ? { queues } : {}),
       };
+      this.lastRedisHealth = { value, at: now };
+      return value;
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      return {
+      const value: RedisHealthResult & { ok: boolean } = {
         ok: false,
         status: 'degraded',
         redis: 'unavailable',
         error: message,
       };
+      this.lastRedisHealth = { value, at: now };
+      return value;
     }
   }
 
@@ -225,6 +254,31 @@ export class HealthService implements OnModuleDestroy {
       metering: await snapshot(this.meteringQueue),
       billing: await snapshot(this.billingQueue),
     };
+  }
+
+  /**
+   * Cheap ping-only check. Used by readiness so that platform healthchecks
+   * (Railway hitting /health or /ready) do not each cost a full set of
+   * queue.getJobCounts() calls.
+   */
+  private async checkRedisPing(): Promise<{ ok: boolean; error?: string }> {
+    const redis = this.getRedis();
+    if (!redis) {
+      return { ok: false, error: 'Redis client could not be initialized' };
+    }
+    try {
+      if (redis.status !== 'ready') {
+        await redis.connect();
+      }
+      const pong = await redis.ping();
+      if (pong !== 'PONG') {
+        return { ok: false, error: `Unexpected PING response: ${pong}` };
+      }
+      return { ok: true };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      return { ok: false, error: message };
+    }
   }
 
   async onModuleDestroy(): Promise<void> {
