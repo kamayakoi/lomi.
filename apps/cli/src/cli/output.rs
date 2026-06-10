@@ -37,7 +37,7 @@ pub fn print_step(message: &str) {
 
 pub fn print_note(title: &str, body: &str) {
     println!();
-    println!("{} {}", "◇".cyan(), format!("{title}").cyan());
+    println!("{} {}", "◇".cyan(), title.cyan());
     for line in body.lines() {
         println!("{}  {}", "│".bright_black(), line);
     }

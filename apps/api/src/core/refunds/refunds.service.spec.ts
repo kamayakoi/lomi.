@@ -361,7 +361,7 @@ describe('RefundsService', () => {
   });
 
   it('creates Wave partial refund via payout then create_refund only', async () => {
-    const { service, rpc, restore } = buildService((name, args) => {
+    const { service, rpc, restore } = buildService((name, _args) => {
       if (name === 'get_transaction') {
         return { data: [completedWaveTx], error: null };
       }

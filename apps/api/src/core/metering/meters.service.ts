@@ -90,7 +90,7 @@ export class MetersService {
   async update(id: string, dto: UpdateMeterDto, user: AuthContext) {
     await this.findOne(id, user);
 
-    const { data, error } = await this.supabase.getClient().rpc(
+    const { error } = await this.supabase.getClient().rpc(
       'update_meter_api' as never,
       {
         p_meter_id: id,

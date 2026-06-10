@@ -6,7 +6,6 @@ import { resolveMerchantWebhookRelayEnvironment } from '../utils/payment-environ
 import { Queue } from 'bullmq';
 import {
   deliverMerchantWebhook,
-  resolveSafeMerchantWebhookTarget,
   UnsafeWebhookUrlError,
 } from './merchant-webhook-url';
 import { CliListenerService } from '../cli/cli-listener.service';
@@ -123,7 +122,6 @@ export class WebhookSenderService {
 
     const payloadString = JSON.stringify(storedPayload);
     const signature = this.generateSignature(payloadString, webhook.secret);
-    const started = Date.now();
 
     try {
       const delivery = await deliverMerchantWebhook(
@@ -142,8 +140,6 @@ export class WebhookSenderService {
           `Webhook ${webhook.id} delivered via www/apex fallback to ${delivery.deliveredUrl}`,
         );
       }
-
-      const durationMs = Date.now() - started;
 
       if (delivery.status >= 200 && delivery.status < 300) {
         await this.logDelivery(
@@ -696,7 +692,7 @@ export class WebhookSenderService {
     event: WebhookEvent,
     payloadString: string,
     signature: string,
-    payload: unknown,
+    _payload: unknown,
   ): Promise<void> {
     if (!this.cliListener || !this.cliStream) {
       return;

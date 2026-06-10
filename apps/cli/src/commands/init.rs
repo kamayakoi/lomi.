@@ -451,8 +451,7 @@ createCheckout().catch(console.error);
 
     pub fn webhook_example(language: &Language) -> String {
         if language.is_typescript() {
-            format!(
-                r#"import http from 'http';
+            r#"import http from 'http';
 import {{ Buffer }} from 'node:buffer';
 import crypto from 'node:crypto';
 import 'dotenv/config';
@@ -504,10 +503,9 @@ const server = http.createServer(async (req, res) => {{
 const PORT = process.env.PORT || 4242;
 server.listen(PORT, () => console.log(`Webhook server listening on http://localhost:${{PORT}}/webhook`));
 "#
-            )
+            .to_string()
         } else {
-            format!(
-                r#"const http = require('http');
+            r#"const http = require('http');
 const {{ Buffer }} = require('node:buffer');
 const crypto = require('node:crypto');
 require('dotenv').config();
@@ -559,7 +557,7 @@ const server = http.createServer(async (req, res) => {{
 const PORT = process.env.PORT || 4242;
 server.listen(PORT, () => console.log(`Webhook server listening on http://localhost:${{PORT}}/webhook`));
 "#
-            )
+            .to_string()
         }
     }
 

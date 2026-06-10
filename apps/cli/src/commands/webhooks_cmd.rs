@@ -67,7 +67,7 @@ async fn list_webhooks(common: &CommonOptions) -> Result<()> {
         } else {
             "inactive".bright_black()
         };
-        println!("{} {} {} {}", id.cyan(), url.bright_blue(), status, "");
+        println!("{} {} {}", id.cyan(), url.bright_blue(), status);
     }
     Ok(())
 }

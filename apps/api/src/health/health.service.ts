@@ -156,7 +156,7 @@ export class HealthService implements OnModuleDestroy {
             ...('queues' in full && full.queues ? { queues: full.queues } : {}),
           }
         : full;
-    } catch (e) {
+    } catch {
       // best effort; keep the ping-derived summary
     }
 

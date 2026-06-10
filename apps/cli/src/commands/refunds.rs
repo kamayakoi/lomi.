@@ -88,10 +88,10 @@ async fn create_refund(common: &CommonOptions, args: RefundsCreateArgs) -> Resul
     let client = ApiClient::new(&auth)?;
 
     let (transaction_id, amount, reason, refund_type) =
-        if args.transaction_id.is_some() && args.amount.is_some() {
+        if let (Some(transaction_id), Some(amount)) = (&args.transaction_id, args.amount) {
             (
-                args.transaction_id.clone().unwrap(),
-                args.amount.unwrap(),
+                transaction_id.clone(),
+                amount,
                 args.reason.clone(),
                 args.refund_type.clone(),
             )

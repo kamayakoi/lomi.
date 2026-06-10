@@ -65,12 +65,10 @@ async fn create_payment_link(common: &CommonOptions, args: PaymentsCreateArgs) -
     let auth = ensure_authenticated(common, true, false, false).await?;
     let client = ApiClient::new(&auth)?;
 
-    let (title, amount, currency) = if args.title.is_some() && args.amount.is_some() && args.currency.is_some() {
-        (
-            args.title.clone().unwrap(),
-            args.amount.unwrap(),
-            args.currency.clone().unwrap(),
-        )
+    let (title, amount, currency) = if let (Some(title), Some(amount), Some(currency)) =
+        (&args.title, args.amount, &args.currency)
+    {
+        (title.clone(), amount, currency.clone())
     } else if args.title.is_some() || args.amount.is_some() || args.currency.is_some() {
         bail!("Headless mode requires --title, --amount, and --currency");
     } else {

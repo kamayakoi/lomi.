@@ -80,9 +80,9 @@ pub async fn run(common: &CommonOptions, args: QuickstartArgs) -> Result<()> {
                 passed += 1;
                 if !json {
                     println!(
-                        "  {} {} ({})",
+                        "  {} Identity: {} ({})",
                         "✓".green(),
-                        format!("Identity: {}", identity.organization_name),
+                        identity.organization_name,
                         identity.environment
                     );
                 }

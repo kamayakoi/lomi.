@@ -13,6 +13,7 @@ on:
           - python
           - embed
           - mcp
+          - receipt-pdf
           - all
       version_bump:
         description: 'Version bump type (patch/minor/major) or skip'
@@ -220,6 +221,38 @@ jobs:
 
       - name: Publish to npm
         working-directory: apps/sdks/embed
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  publish-receipt-pdf:
+    name: Publish @lomi./receipt-pdf
+    runs-on: ubuntu-latest
+    if: inputs.sdk == 'receipt-pdf' || inputs.sdk == 'all'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Bump version
+        if: inputs.version_bump != 'skip'
+        working-directory: apps/shared/receipt-pdf
+        run: npm version ${{ inputs.version_bump }} --no-git-tag-version
+
+      - name: Install dependencies and build
+        working-directory: apps/shared/receipt-pdf
+        run: |
+          npm ci
+          npm run build
+
+      - name: Publish to npm
+        working-directory: apps/shared/receipt-pdf
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

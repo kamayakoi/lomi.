@@ -7,6 +7,8 @@ use crate::api::ApiClient;
 use crate::auth::session::ensure_authenticated;
 use crate::cli::{self, CommonOptions};
 
+type CheckoutFields = (Option<String>, Option<f64>, String, String, String, Option<String>);
+
 #[derive(Args, Debug)]
 pub struct CheckoutArgs {
     #[command(subcommand)]
@@ -143,7 +145,7 @@ fn is_headless(args: &CheckoutCreateArgs) -> bool {
         && (args.price_id.is_some() || args.amount.is_some())
 }
 
-fn resolve_headless(args: &CheckoutCreateArgs) -> Result<(Option<String>, Option<f64>, String, String, String, Option<String>)> {
+fn resolve_headless(args: &CheckoutCreateArgs) -> Result<CheckoutFields> {
     if args.price_id.is_some() && args.amount.is_some() {
         bail!("Provide either --price-id or --amount, not both");
     }
@@ -161,9 +163,7 @@ fn resolve_headless(args: &CheckoutCreateArgs) -> Result<(Option<String>, Option
     ))
 }
 
-fn resolve_interactive(
-    args: &CheckoutCreateArgs,
-) -> Result<(Option<String>, Option<f64>, String, String, String, Option<String>)> {
+fn resolve_interactive(args: &CheckoutCreateArgs) -> Result<CheckoutFields> {
     if is_headless(args) {
         return resolve_headless(args);
     }

@@ -163,7 +163,7 @@ describe('merchant-webhook-url', () => {
     it('retries www when apex responds with a redirect', async () => {
       mockedLookup.mockImplementation(async (hostname: string) => {
         if (hostname === 'example.com' || hostname === 'www.example.com') {
-          return [{ address: '93.184.216.34', family: 4 }] as LookupAddress[];
+          return [{ address: '93.184.216.34', family: 4 }] as unknown as LookupAddress;
         }
         throw new Error(`unexpected hostname ${hostname}`);
       });
