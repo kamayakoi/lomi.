@@ -137,7 +137,7 @@ export function TryItOpenApiPanel() {
             <Checkbox
               id="tryit-inject"
               checked={ctx.useTestKey}
-              onCheckedChange={(checked: boolean | "indeterminate") =>
+              onCheckedChange={(checked: boolean | 'indeterminate') =>
                 onSwitchChange(checked === true)
               }
               disabled={injectSwitchDisabled}

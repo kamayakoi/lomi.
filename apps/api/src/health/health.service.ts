@@ -34,7 +34,10 @@ export class HealthService implements OnModuleDestroy {
   // Readiness probes (Railway healthcheck + manual /ready) would otherwise
   // hammer Redis with ping + getJobCounts on every call. 15s is a good
   // trade-off between freshness and command volume.
-  private lastRedisHealth: { value: RedisHealthResult & { ok: boolean }; at: number } | null = null;
+  private lastRedisHealth: {
+    value: RedisHealthResult & { ok: boolean };
+    at: number;
+  } | null = null;
   private readonly REDIS_HEALTH_CACHE_TTL_MS = 15_000;
 
   constructor(
@@ -171,7 +174,10 @@ export class HealthService implements OnModuleDestroy {
 
   async checkRedis(): Promise<RedisHealthResult & { ok: boolean }> {
     const now = Date.now();
-    if (this.lastRedisHealth && (now - this.lastRedisHealth.at) < this.REDIS_HEALTH_CACHE_TTL_MS) {
+    if (
+      this.lastRedisHealth &&
+      now - this.lastRedisHealth.at < this.REDIS_HEALTH_CACHE_TTL_MS
+    ) {
       return this.lastRedisHealth.value;
     }
 
