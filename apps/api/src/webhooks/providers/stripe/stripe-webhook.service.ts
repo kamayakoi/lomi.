@@ -350,19 +350,39 @@ export class StripeWebhookService {
    */
   private async handlePaymentFailure(paymentIntent: Stripe.PaymentIntent) {
     const metadata = paymentIntent.metadata || {};
-    const errorCode = paymentIntent.last_payment_error?.code || 'unknown';
-    const errorMessage =
-      paymentIntent.last_payment_error?.message || 'Payment failed';
+    const lastError = paymentIntent.last_payment_error;
+    const errorCode = lastError?.code || 'unknown';
+    const declineCode = lastError?.decline_code || '';
+    const errorMessage = lastError?.message || 'Payment failed';
+    const resolvedErrorCode = declineCode || errorCode;
 
     const txnData = await this.updateStripeCheckoutStatus(
       paymentIntent.id,
       null,
       'cancelled',
-      errorCode,
+      resolvedErrorCode,
       errorMessage,
     );
 
     if (metadata.organization_id) {
+      this.wideEvent.logEvent({
+        eventName: 'stripe_payment_confirm_failed',
+        organizationId: metadata.organization_id,
+        correlationId: metadata.checkout_session_id,
+        attributes: {
+          'organization.id': metadata.organization_id,
+          'checkout.session_id': metadata.checkout_session_id,
+          'stripe.payment_intent_id': paymentIntent.id,
+          'stripe.error_code': errorCode,
+          'stripe.decline_code': declineCode,
+          'stripe.resolved_error_code': resolvedErrorCode,
+          'stripe.error': errorMessage,
+          'payment.amount': paymentIntent.amount,
+          'payment.currency': paymentIntent.currency,
+          'telemetry.source_layer': 'api:webhook',
+        },
+      });
+
       await this.triggerMerchantWebhook(
         paymentIntent.id,
         metadata.organization_id,
