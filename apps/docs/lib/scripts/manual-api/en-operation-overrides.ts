@@ -453,4 +453,69 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     related:
       '[Webhook delivery logs](/api/webhooks/WebhookDeliveryLogsController_findAll)',
   },
+  OrganizationsController_findAll: {
+    summary: 'List organizations',
+    body: 'Returns organizations visible to the authenticated API key (typically your active organization).',
+    whenToUse:
+      'Use to read organization profile fields, pricing mode, and settings scoped to your integration key.',
+    related:
+      '[Organization metrics](/api/organizations/OrganizationsController_getMetrics) · [Organizations guide](/build/platform/organizations)',
+  },
+  OrganizationsController_findOne: {
+    summary: 'Retrieve organization',
+    body: 'Returns one organization by ID. The ID must match the organization tied to your API key.',
+    whenToUse:
+      'Use when you already store an organization ID and need a fresh profile snapshot.',
+    related:
+      '[List organizations](/api/organizations/OrganizationsController_findAll)',
+  },
+  OrganizationsController_getMetrics: {
+    summary: 'Organization metrics',
+    body: 'Returns MRR, ARR, LTV, revenue, and customer counts for your organization.',
+    whenToUse:
+      'Use for partner dashboards, investor reporting, or internal growth analytics.',
+    related:
+      '[Organizations guide](/build/platform/organizations) · [Merchant MRR](/api/merchants/MerchantsController_getMrr)',
+  },
+  MerchantsController_getDetails: {
+    summary: 'Get merchant details',
+    body: 'Returns merchant profile data and organization-level revenue metrics for the given merchant ID.',
+    whenToUse:
+      'Use when your integration still references a merchant ID or you need legacy merchant-scoped reads.',
+    related:
+      '[Organizations](/build/platform/organizations) · [Merchant ARR](/api/merchants/MerchantsController_getArr)',
+  },
+  MerchantsController_getMrr: {
+    summary: 'Get merchant MRR',
+    body: 'Returns monthly recurring revenue for the merchant tied to the given ID.',
+    whenToUse:
+      'Use for subscription analytics when operating on a merchant-scoped identifier.',
+    related:
+      '[Organization metrics](/api/organizations/OrganizationsController_getMetrics)',
+  },
+  MerchantsController_getArr: {
+    summary: 'Get merchant ARR',
+    body: 'Returns annualized recurring revenue for the merchant tied to the given ID.',
+    whenToUse:
+      'Use for annual planning views when you track merchants individually.',
+    related:
+      '[Merchant MRR](/api/merchants/MerchantsController_getMrr)',
+  },
+  MerchantsController_getBalance: {
+    summary: 'Get merchant balance',
+    body: 'Returns account balance for a merchant in the requested currency.',
+    whenToUse:
+      'Use when a merchant ID is the scope key for wallet or treasury displays.',
+    caveats: 'Requires `currency_code` (XOF, USD, or EUR).',
+    related:
+      '[Account balances](/api/balances/AccountsController_getBalance)',
+  },
+  ProvidersController_findAll: {
+    summary: 'List payment providers',
+    body: 'Returns connection status for payment providers configured for your organization.',
+    whenToUse:
+      'Use to show which rails (card, Wave, MTN, SPI) are enabled before rendering checkout options.',
+    related:
+      '[Choose integration](/build/choose-integration) · [Mobile money](/build/mobile-money)',
+  },
 };

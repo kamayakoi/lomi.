@@ -14,6 +14,9 @@ export const REST_API_SECTION_ORDER = [
   'subscriptions',
   'discount-coupons',
   'balances',
+  'organizations',
+  'merchants',
+  'providers',
   'transactions',
   'refunds',
   'payouts',
@@ -42,6 +45,9 @@ const PUBLIC_REST_API_OPERATIONS = [
   'transactions',
   'webhook-delivery-logs',
   'webhooks',
+  'organizations',
+  'merchants',
+  'providers',
 ] as const;
 
 export type RestApiFolder = (typeof REST_API_SECTION_ORDER)[number];

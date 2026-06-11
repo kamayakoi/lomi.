@@ -25,11 +25,9 @@ export const DEFAULT_ALLOWLIST_PATH = join(
 /** @type {Record<string, string>} */
 export const METHOD_NAME_BY_OP = {
   'DELETE /customers/{id}': 'delete',
-  'GET /accounts': 'list',
   'GET /accounts/balance': 'getBalance',
   'GET /accounts/balance/breakdown': 'getBalanceBreakdown',
   'GET /accounts/balance/check/{currency}': 'checkBalance',
-  'GET /accounts/{id}': 'get',
   'GET /checkout-sessions': 'list',
   'GET /checkout-sessions/{id}': 'get',
   'GET /customers': 'list',

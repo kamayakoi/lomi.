@@ -151,17 +151,11 @@ function collectOpenApiTextErrors(spec: JsonObject, errors: string[]): void {
 const FORBIDDEN_PUBLIC_OPENAPI_PATHS = new Set([
   '/accounts',
   '/accounts/{id}',
-  '/organizations',
-  '/providers',
   '/webhooks/stripe',
   '/webhooks/wave',
 ]);
 
-const FORBIDDEN_PUBLIC_OPENAPI_PREFIXES = [
-  '/agent/',
-  '/merchants/',
-  '/organizations/',
-] as const;
+const FORBIDDEN_PUBLIC_OPENAPI_PREFIXES = ['/agent/'] as const;
 
 function collectForbiddenProviderIngressOpenApiPaths(
   spec: JsonObject,

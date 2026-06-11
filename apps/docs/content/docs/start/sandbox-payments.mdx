@@ -301,7 +301,7 @@ Use **test** API keys and [Sandbox payments](/start/sandbox-payments) patterns b
 
 1. **Create a recurring product** with `trial_enabled: true` or `first_payment_type: non_initial` (see [Products](/build/products)).
 2. **Payment link or checkout session** — open hosted checkout or your storefront subscribe URL with the recurring `product_id`.
-3. **Trial + Stripe** — use `4242 4242 4242 4242`; checkout collects a card via SetupIntent and shows **$0** due today. Expect **`SUBSCRIPTION_CREATED`** when signup completes (not mid–card entry).
+3. **Trial + card** — use `4242 4242 4242 4242`; checkout collects a card via SetupIntent and shows **$0** due today. Expect **`SUBSCRIPTION_CREATED`** when signup completes (not mid–card entry).
 4. **Trial + Wave / MTN** — complete customer details and confirm; signup should succeed with **no charge** in test mode.
 5. **Paid signup** — use `first_payment_type: initial` and complete a normal test payment; verify subscription `status` is `active` and a transaction of type `instalment` exists.
 6. **Webhooks** — subscribe to `SUBSCRIPTION_CREATED`, `SUBSCRIPTION_RENEWED`, `SUBSCRIPTION_CANCELLED`, and `PAYMENT_FAILED` for renewal failures.

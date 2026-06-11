@@ -85,7 +85,7 @@ Avec **`line_items`**, chaque ligne doit référencer un tarif **ponctuel** en t
 Lorsque `product_id` désigne un produit **récurrent** :
 
 - **Omettre `amount`** — la session utilise le prix catalogue du `price_id` choisi (la quantité n’est pas multipliée pour les abonnements).
-- **Fournir `amount`** — doit correspondre au prix récurrent catalogue pour la validation (sauf prorata au moment du paiement ; voir [Comportement du tunnel — Abonnements](/build/payments/checkout-behavior#abonnements)).
+- **Fournir `amount`** — doit correspondre au prix récurrent catalogue pour la validation (sauf prorata au moment du paiement ; voir [Comportement du tunnel — Abonnements](/build/payments/checkout-behavior#subscription-checkout)).
 - **Essai ou inscription `non_initial`** — le client peut payer **0** au tunnel, mais la session enregistre souvent le **prix catalogue** pour que `create_checkout_session` respecte `amount > 0`. N’envoyez pas `amount: 0` sans vous appuyer sur le calcul produit.
 - La finalisation crée un **abonnement** (webhook `SUBSCRIPTION_CREATED`), pas seulement une transaction ponctuelle.
 
