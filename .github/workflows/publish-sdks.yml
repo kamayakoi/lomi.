@@ -101,8 +101,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          submodules: recursive
+
+      - name: Checkout Python SDK submodule
+        run: |
+          git submodule sync apps/sdks/python
+          git submodule update --init apps/sdks/python
 
       - name: Set up Python
         uses: actions/setup-python@v5
