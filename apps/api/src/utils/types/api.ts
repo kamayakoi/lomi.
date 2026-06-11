@@ -3650,6 +3650,7 @@ export type Database = {
         | 'REFUND_COMPLETED'
         | 'REFUND_FAILED'
         | 'SUBSCRIPTION_CREATED'
+        | 'SUBSCRIPTION_UPDATED'
         | 'SUBSCRIPTION_RENEWED'
         | 'SUBSCRIPTION_CANCELLED'
         | 'USAGE_RECORDED'

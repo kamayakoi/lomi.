@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-11T16:14:44.968Z",
+  "generatedAt": "2026-06-11T17:32:54.113Z",
   "sdk": {
     "accounts": [
       "checkBalance",
@@ -83,9 +83,11 @@
     ],
     "subscriptions": [
       "cancel",
+      "changePlan",
       "findByCustomer",
       "get",
       "list",
+      "uncancel",
       "update"
     ],
     "transactions": [

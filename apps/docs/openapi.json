@@ -714,9 +714,112 @@
         ]
       }
     },
+    "/subscriptions/{id}/uncancel": {
+      "post": {
+        "description": "Retire une résiliation planifiée en fin de période (`cancel_at_period_end`).",
+        "operationId": "SubscriptionsController_uncancel",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "UUID de l’abonnement",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Annuler une résiliation planifiée",
+        "tags": [
+          "Subscriptions"
+        ]
+      }
+    },
+    "/subscriptions/{id}/change-plan": {
+      "post": {
+        "description": "Met à jour le price_id d’un abonnement actif.",
+        "operationId": "SubscriptionsController_changePlan",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "UUID de l’abonnement",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "price_id"
+                ],
+                "properties": {
+                  "price_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              },
+              "examples": {
+                "upgrade": {
+                  "summary": "Passer à un autre tarif",
+                  "value": {
+                    "price_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Changer le plan tarifaire",
+        "tags": [
+          "Subscriptions"
+        ]
+      }
+    },
     "/subscriptions/{id}/cancel": {
       "post": {
-        "description": "Résilie un abonnement actif. C'est la seule modification autorisée sur un abonnement. Prix, dates de facturation et autres champs sont gérés par le système.",
+        "description": "Résilie un abonnement actif immédiatement ou en fin de période (`cancel_at_period_end`).",
         "operationId": "SubscriptionsController_cancel",
         "parameters": [
           {
@@ -736,15 +839,25 @@
               "schema": {
                 "type": "object",
                 "properties": {
+                  "cancel_at_period_end": {
+                    "type": "boolean"
+                  },
                   "cancellation_reason": {
                     "type": "string"
                   }
                 }
               },
               "examples": {
-                "withReason": {
-                  "summary": "Résiliation avec motif",
+                "immediate": {
+                  "summary": "Résiliation immédiate",
                   "value": {
+                    "cancellation_reason": "Demande du client"
+                  }
+                },
+                "atPeriodEnd": {
+                  "summary": "Résiliation en fin de période",
+                  "value": {
+                    "cancel_at_period_end": true,
                     "cancellation_reason": "Demande du client"
                   }
                 }

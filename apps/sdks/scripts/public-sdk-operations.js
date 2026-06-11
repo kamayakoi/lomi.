@@ -92,6 +92,8 @@ export const METHOD_NAME_BY_OP = {
   'GET /refunds': 'list',
   'GET /refunds/{id}': 'get',
   'POST /subscriptions/{id}/cancel': 'cancel',
+  'POST /subscriptions/{id}/uncancel': 'uncancel',
+  'POST /subscriptions/{id}/change-plan': 'changePlan',
 };
 
 export const HTTP_WITH_BODY = new Set(['post', 'patch', 'put']);

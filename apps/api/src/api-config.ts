@@ -403,6 +403,7 @@ export const EXPOSED_FUNCTIONS = [
   'fetch_subscriptions_for_customer',
   'get_customer_subscription',
   'cancel_customer_subscription',
+  'manage_subscription',
   // Transactions
   'fetch_transactions',
   'get_transaction',

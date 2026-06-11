@@ -64,8 +64,9 @@ Lors de la création ou de la mise à jour d’un webhook, vous souscrivez à de
 | `` `PAYMENT_SUCCEEDED` ``       | Un paiement ponctuel réussit.           | `` `Transaction` ``     |
 | `` `PAYMENT_FAILED` ``          | Une tentative de paiement ponctuel échoue.          | `` `Transaction` ``     |
 | `` `SUBSCRIPTION_CREATED` ``    | Un abonnement est créé.              | `` `Subscription` ``    |
+| `` `SUBSCRIPTION_UPDATED` ``    | Un abonnement a changé (pause, reprise, plan, annulation planifiée, etc.). | `` `Subscription` `` (avec `previous_attributes`) |
 | `` `SUBSCRIPTION_RENEWED` ``    | Un abonnement est renouvelé avec succès.         | `` `Subscription` ``    |
-| `` `SUBSCRIPTION_CANCELLED` ``   | Un abonnement est annulé.                 | `` `Subscription` ``    |
+| `` `SUBSCRIPTION_CANCELLED` ``   | Un abonnement est annulé ou expiré.                 | `` `Subscription` ``    |
 | `` `REFUND_COMPLETED` ``        | Un remboursement est traité avec succès.         | `` `Refund` ``          |
 | `` `REFUND_FAILED` ``           | Une tentative de remboursement échoue.                    | `` `Refund` ``          |
 | `` `REFUND_CREATED` ``         | Une tentative de remboursement est créée.               | `` `Refund` ``          |
@@ -75,7 +76,39 @@ Lors de la création ou de la mise à jour d’un webhook, vous souscrivez à de
   Les **échecs de paiement au renouvellement** émettent **`PAYMENT_FAILED`** sur la transaction concernée. Il n’existe pas de webhook dédié « échec abonnement ». Utilisez **`SUBSCRIPTION_RENEWED`** pour les cycles réussis. Voir [Abonnements](/build/subscriptions) et [Comportement du tunnel — Abonnements](/build/payments/checkout-behavior#subscription-checkout).
 </Callout>
 
-_(La structure précise des charges par type sera documentée sur la ressource concernée — Transactions, Abonnements, etc.)_
+### Charge utile `SUBSCRIPTION_UPDATED`
+
+Les changements non terminaux utilisent une enveloppe de type Stripe : état actuel dans `object`, ce qui a changé dans `previous_attributes`, et `context` optionnel pour le débogage.
+
+```json filename="Exemple de charge (SUBSCRIPTION_UPDATED)"
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "event": "SUBSCRIPTION_UPDATED",
+  "timestamp": "2026-06-11T14:30:00.000Z",
+  "data": {
+    "object": {
+      "subscription_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+      "status": "paused",
+      "price_id": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+      "cancel_at_period_end": false,
+      "next_billing_date": "2026-07-01",
+      "plan_name": "Pro Mensuel",
+      "billing_interval": "month"
+    },
+    "previous_attributes": {
+      "status": "active"
+    },
+    "context": {
+      "source": "merchant_api",
+      "actor": "merchant"
+    }
+  }
+}
+```
+
+Réconciliez les droits d’accès à partir de `data.object`. Utilisez `previous_attributes` pour distinguer pause, changement de plan, etc. `context.source` vaut `merchant_api`, `customer_portal` ou `cron`.
+
+_(Les autres charges sont documentées sur les ressources API concernées — Transactions, Abonnements, etc.)_
 
 Les abonnements et les corps JSON utilisent des noms d’événement en **SCREAMING_SNAKE_CASE** (par ex. `PAYMENT_SUCCEEDED`). Certains outils peuvent afficher des alias avec **points** (par ex. `payment.succeeded`) — utilisez les valeurs ci-dessus pour configurer vos points de terminaison et comparer le champ `event`.
 

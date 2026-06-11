@@ -64,8 +64,9 @@ When creating or updating a webhook, you subscribe it to specific event types. l
 | `` `PAYMENT_SUCCEEDED` ``       | A one-time payment is successful.           | `` `Transaction` ``     |
 | `` `PAYMENT_FAILED` ``          | A one-time payment attempt failed.          | `` `Transaction` ``     |
 | `` `SUBSCRIPTION_CREATED` ``    | A new subscription is created.              | `` `Subscription` ``    |
+| `` `SUBSCRIPTION_UPDATED` ``    | A subscription changed (pause, resume, plan change, cancel scheduled, etc.). | `` `Subscription` `` (with `previous_attributes`) |
 | `` `SUBSCRIPTION_RENEWED` ``    | A subscription successfully renews.         | `` `Subscription` ``    |
-| `` `SUBSCRIPTION_CANCELLED` ``   | A subscription is cancelled.                 | `` `Subscription` ``    |
+| `` `SUBSCRIPTION_CANCELLED` ``   | A subscription is cancelled or expired.      | `` `Subscription` ``    |
 | `` `REFUND_COMPLETED` ``        | A refund is successfully processed.         | `` `Refund` ``          |
 | `` `REFUND_FAILED` ``           | A refund attempt failed.                    | `` `Refund` ``          |
 | `` `REFUND_CREATED` ``         | A refund attempt was created.               | `` `Refund` ``          |
@@ -75,7 +76,39 @@ When creating or updating a webhook, you subscribe it to specific event types. l
   **Renewal payment failures** emit **`PAYMENT_FAILED`** on the failed transaction. There is no separate subscription payment-failed webhook. Use **`SUBSCRIPTION_RENEWED`** for successful billing cycles. See [Subscriptions](/build/subscriptions) and [Checkout behavior — Subscription checkout](/build/payments/checkout-behavior#subscription-checkout).
 </Callout>
 
-_(Note: The specific structure of the data payload for each event type will be documented under the respective API resource, e.g., Transactions, Subscriptions.)_
+### `SUBSCRIPTION_UPDATED` payload
+
+Non-terminal subscription changes use a Stripe-style envelope: current state in `object`, what changed in `previous_attributes`, and optional `context` for debugging.
+
+```json filename="Example webhook payload (SUBSCRIPTION_UPDATED)"
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "event": "SUBSCRIPTION_UPDATED",
+  "timestamp": "2026-06-11T14:30:00.000Z",
+  "data": {
+    "object": {
+      "subscription_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+      "status": "paused",
+      "price_id": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+      "cancel_at_period_end": false,
+      "next_billing_date": "2026-07-01",
+      "plan_name": "Pro Monthly",
+      "billing_interval": "month"
+    },
+    "previous_attributes": {
+      "status": "active"
+    },
+    "context": {
+      "source": "merchant_api",
+      "actor": "merchant"
+    }
+  }
+}
+```
+
+Reconcile entitlements from `data.object`. Use `previous_attributes` to branch logic (e.g. plan upgrade vs pause). `context.source` is `merchant_api`, `customer_portal`, or `cron`.
+
+_(Other event payloads are documented under their API resources, e.g. Transactions, Subscriptions.)_
 
 Webhook subscriptions and JSON payloads use **SCREAMING_SNAKE_CASE** event names (for example `PAYMENT_SUCCEEDED`). Some docs or OpenAPI tooling may show **dotted** names (for example `payment.succeeded`) as a human-readable alias for the same logical event—use the enum values above when configuring endpoints and when comparing `event` in request bodies.
 

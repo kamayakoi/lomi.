@@ -64,6 +64,8 @@
   "POST /products/{id}/prices/{priceId}/set-default",
   "POST /refunds",
   "POST /subscriptions/{id}/cancel",
+  "POST /subscriptions/{id}/change-plan",
+  "POST /subscriptions/{id}/uncancel",
   "POST /webhooks",
   "POST /webhooks/{id}/test",
   "POST /webhooks/{webhookId}/logs/{logId}/retry"

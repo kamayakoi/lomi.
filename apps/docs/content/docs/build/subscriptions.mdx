@@ -168,16 +168,28 @@ Subscriptions are created when a customer completes checkout for a **recurring**
 
 ---
 
+## Merchant-owned billing UI
+
+If customers manage subscriptions in **your** app (not the lomi. customer portal):
+
+1. Call lomi. APIs when they cancel, pause, upgrade, or resume (`POST /subscriptions/{id}/cancel`, `PATCH /subscriptions/{id}`, etc.).
+2. Listen for **`SUBSCRIPTION_UPDATED`** and **`SUBSCRIPTION_CANCELLED`** webhooks (same events whether the change came from your API, the portal, or cron).
+3. Reconcile entitlements with `GET /subscriptions/{id}` when you need authoritative state.
+
+lomi. is the billing source of truth; your app should not cancel only in your database without calling the API.
+
+---
+
 ## Cancel a subscription
 
-Cancel an active subscription. This is the **only** modification allowed.
+Cancel immediately or at period end.
 
 ### Request Body
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `cancel_at_period_end` | `boolean` | No | If `true`, cancel at end of billing period. If `false`, cancel immediately (default). |
-| `reason` | `string` | No | Cancellation reason |
+| `cancellation_reason` | `string` | No | Cancellation reason |
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>
 
@@ -189,7 +201,7 @@ const cancelled = await lomi.subscriptions.cancel('sub_abc123...');
 // Cancel at period end
 const scheduledCancel = await lomi.subscriptions.cancel('sub_abc123...', {
   cancel_at_period_end: true,
-  reason: 'Customer requested cancellation',
+  cancellation_reason: 'Customer requested cancellation',
 });
 
 console.log(`Subscription will cancel at: ${scheduledCancel.cancel_at}`);
@@ -204,7 +216,7 @@ cancelled = client.subscriptions.cancel('sub_abc123...')
 # Cancel at period end
 scheduled_cancel = client.subscriptions.cancel('sub_abc123...', {
     "cancel_at_period_end": True,
-    "reason": "Customer requested cancellation"
+    "cancellation_reason": "Customer requested cancellation"
 })
 ```
 </Tab>
@@ -216,12 +228,32 @@ curl -X POST "https://api.lomi.africa/subscriptions/sub_abc123.../cancel" \
   -H "Content-Type: application/json" \
   -d '{
     "cancel_at_period_end": true,
-    "reason": "Customer requested cancellation"
+    "cancellation_reason": "Customer requested cancellation"
   }'
 ```
 </Tab>
 
 </Tabs>
+
+---
+
+## Uncancel a scheduled cancellation
+
+```bash
+curl -X POST "https://api.lomi.africa/subscriptions/sub_abc123.../uncancel" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+
+---
+
+## Change plan
+
+```bash
+curl -X POST "https://api.lomi.africa/subscriptions/sub_abc123.../change-plan" \
+  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"price_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6"}'
+```
 
 ---
 
@@ -257,8 +289,9 @@ Subscribe to these **SCREAMING_SNAKE_CASE** events (same as [Webhooks](/build/we
 | Event | Description |
 |-------|-------------|
 | `SUBSCRIPTION_CREATED` | New subscription after successful signup (including trial signup). |
+| `SUBSCRIPTION_UPDATED` | Subscription changed (pause, resume, plan change, cancel scheduled, uncancel, etc.). Payload includes `previous_attributes`. |
 | `SUBSCRIPTION_RENEWED` | A billing cycle renewed successfully. |
-| `SUBSCRIPTION_CANCELLED` | Subscription was cancelled. |
+| `SUBSCRIPTION_CANCELLED` | Subscription was cancelled or expired. |
 
 Renewal **payment failures** do not emit a separate subscription webhook. Listen for **`PAYMENT_FAILED`** on the failed renewal transaction, and monitor subscription `status` (`past_due`, `paused`, etc.) via the API.
 

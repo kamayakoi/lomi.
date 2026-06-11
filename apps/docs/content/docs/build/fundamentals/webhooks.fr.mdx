@@ -29,8 +29,9 @@ Vous pouvez vous abonner aux notifications pour les événements suivants :
 - `REFUND_COMPLETED` : un remboursement a été traité avec succès.
 - `REFUND_FAILED` : le processus de remboursement a échoué.
 - `SUBSCRIPTION_CREATED` : un nouvel abonnement a été créé.
+- `SUBSCRIPTION_UPDATED` : un abonnement a changé (pause, reprise, changement de plan, annulation planifiée, etc.). La charge utile inclut `previous_attributes`.
 - `SUBSCRIPTION_RENEWED` : un abonnement a été renouvelé avec succès.
-- `SUBSCRIPTION_CANCELLED` : un abonnement a été annulé.
+- `SUBSCRIPTION_CANCELLED` : un abonnement a été annulé ou a expiré.
 
 ## 1. Mettre en place votre point de terminaison webhook
 
