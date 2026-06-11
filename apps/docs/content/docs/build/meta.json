@@ -22,6 +22,8 @@
     "refunds",
     "payouts",
     "balance-and-settlement",
+    "---Platform---",
+    "platform",
     "---Reliability---",
     "webhooks",
     "advanced-guides",

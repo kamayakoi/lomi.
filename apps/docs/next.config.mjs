@@ -162,7 +162,10 @@ function legacyDocsRedirects() {
       destination: '/build/balance-and-settlement',
     },
     { source: '/reference/platform/accounts', destination: '/api/balances' },
-    { source: '/reference/platform/customers', destination: '/api/customers' },
+    {
+      source: '/reference/platform/customers',
+      destination: '/build/platform/customers',
+    },
     {
       source: '/reference/platform/customer-subscriptions',
       destination: '/api/subscriptions',
@@ -171,11 +174,16 @@ function legacyDocsRedirects() {
       source: '/reference/platform/webhook-delivery-logs',
       destination: '/api/webhooks',
     },
-    { source: '/reference/platform/merchants', destination: '/api' },
-    { source: '/reference/platform/organizations', destination: '/api' },
+    {
+      source: '/reference/platform/merchants',
+      destination: '/build/platform/merchants',
+    },
+    {
+      source: '/reference/platform/organizations',
+      destination: '/build/platform/organizations',
+    },
     { source: '/reference/platform/:path*', destination: '/api' },
     { source: '/build/platform/accounts', destination: '/api/balances' },
-    { source: '/build/platform/customers', destination: '/api/customers' },
     {
       source: '/build/platform/customer-subscriptions',
       destination: '/api/subscriptions',
@@ -184,9 +192,6 @@ function legacyDocsRedirects() {
       source: '/build/platform/webhook-delivery-logs',
       destination: '/api/webhooks',
     },
-    { source: '/build/platform/merchants', destination: '/api' },
-    { source: '/build/platform/organizations', destination: '/api' },
-    { source: '/build/platform/:path*', destination: '/api' },
     { source: '/ui', destination: '/build/lomi-ui' },
     { source: '/ui/:path*', destination: '/build/lomi-ui/:path*' },
     {

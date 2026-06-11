@@ -189,7 +189,7 @@ export async function GET() {
 
   lines.push('## Guides to read next');
   lines.push('');
-  const whatIs = pageBySlugPath(pages, 'core/introduction/what-is-lomi');
+  const whatIs = pageBySlugPath(pages, 'start/overview');
   if (whatIs) {
     lines.push(
       `- [${whatIs.data.title ?? 'What is lomi.?'}](${docsOrigin}${whatIs.url})`,
