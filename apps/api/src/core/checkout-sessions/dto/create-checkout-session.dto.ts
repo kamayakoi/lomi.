@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsIn, IsOptional } from 'class-validator';
 
 /**
  * Line item for multi-product checkout
@@ -205,6 +206,16 @@ export class CreateCheckoutSessionDto {
     ],
     required: false,
   })
+  @IsOptional()
+  @IsIn([
+    'system',
+    'shopify',
+    'woocommerce',
+    'prestashop',
+    'magento',
+    'odoo',
+    'bubble',
+  ])
   integration_source?: string;
 
   @ApiProperty({
