@@ -155,11 +155,7 @@ export class SubscriptionsService {
     return this.findOne(id, user);
   }
 
-  async changePlan(
-    id: string,
-    priceId: string,
-    user: AuthContext,
-  ) {
+  async changePlan(id: string, priceId: string, user: AuthContext) {
     await this.findOne(id, user);
 
     const { data, error } = await this.supabase.getClient().rpc(

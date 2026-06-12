@@ -498,8 +498,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     body: 'Returns annualized recurring revenue for the merchant tied to the given ID.',
     whenToUse:
       'Use for annual planning views when you track merchants individually.',
-    related:
-      '[Merchant MRR](/api/merchants/MerchantsController_getMrr)',
+    related: '[Merchant MRR](/api/merchants/MerchantsController_getMrr)',
   },
   MerchantsController_getBalance: {
     summary: 'Get merchant balance',
@@ -507,8 +506,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     whenToUse:
       'Use when a merchant ID is the scope key for wallet or treasury displays.',
     caveats: 'Requires `currency_code` (XOF, USD, or EUR).',
-    related:
-      '[Account balances](/api/balances/AccountsController_getBalance)',
+    related: '[Account balances](/api/balances/AccountsController_getBalance)',
   },
   ProvidersController_findAll: {
     summary: 'List payment providers',
