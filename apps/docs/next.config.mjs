@@ -38,6 +38,10 @@ async function legacyApiRedirects() {
 function legacyDocsRedirects() {
   return [
     {
+      source: '/introduction/what-is-lomi',
+      destination: '/start/overview',
+    },
+    {
       source: '/core/introduction/what-is-lomi',
       destination: '/start/overview',
     },
