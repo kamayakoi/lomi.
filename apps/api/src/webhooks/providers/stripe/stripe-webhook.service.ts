@@ -483,7 +483,9 @@ export class StripeWebhookService {
           setup_intent_id: setupIntent.id,
           error: error.message,
         });
-        throw new Error('Failed to complete customer portal payment method setup');
+        throw new Error(
+          'Failed to complete customer portal payment method setup',
+        );
       }
 
       return {

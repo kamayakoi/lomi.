@@ -71,10 +71,12 @@ export class CustomerPortalService {
   }
 
   async listPaymentMethods(session: PortalSessionContext) {
-    const { data, error } = await this.supabase.getClient().rpc(
-      'customer_portal_list_payment_methods' as never,
-      { p_session_token: session.sessionToken } as never,
-    );
+    const { data, error } = await this.supabase
+      .getClient()
+      .rpc(
+        'customer_portal_list_payment_methods' as never,
+        { p_session_token: session.sessionToken } as never,
+      );
     if (error) throw new BadRequestException(error.message);
     return data ?? [];
   }

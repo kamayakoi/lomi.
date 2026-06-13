@@ -80,7 +80,9 @@ export class CustomerPortalController {
 
   @Post('payment-methods/setup-intent')
   @ApiOperation({ summary: 'Create Stripe SetupIntent for adding a card' })
-  createPaymentMethodSetupIntent(@PortalSession() session: PortalSessionContext) {
+  createPaymentMethodSetupIntent(
+    @PortalSession() session: PortalSessionContext,
+  ) {
     return this.customerPortalService.createPaymentMethodSetupIntent(session);
   }
 
