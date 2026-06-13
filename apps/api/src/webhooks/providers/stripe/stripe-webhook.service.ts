@@ -8,6 +8,7 @@ import { WebhookEvent } from '../../../utils/types/api';
 import Stripe from 'stripe';
 import { constructStripeWebhookEvent } from '../../../utils/stripe/stripe-keys';
 import { StripeClientsService } from '../../../utils/stripe/stripe-clients.service';
+import { normalizePaymentEnvironment } from '../../../utils/payment-environment';
 
 @Injectable()
 export class StripeWebhookService {
@@ -732,6 +733,14 @@ export class StripeWebhookService {
     txnData?: any,
   ) {
     if (!txnData) return;
+
+    // Sandbox card payments are delivered by DB trigger (trigger_sandbox_stripe_payment_webhook).
+    if (
+      event === 'PAYMENT_SUCCEEDED' &&
+      normalizePaymentEnvironment(txnData.environment) === 'test'
+    ) {
+      return;
+    }
 
     try {
       await maybeNotifySubscriptionRenewed(
