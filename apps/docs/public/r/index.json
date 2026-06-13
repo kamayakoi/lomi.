@@ -1,12 +1,11 @@
 {
-  "$schema": "https://ui.shadcn.com/schema/registry.json",
   "name": "lomi-ui",
   "version": "1.0.0",
   "homepage": "https://docs.lomi.africa/ui",
+  "registry_url": "https://docs.lomi.africa/r/registry.json",
   "items": [
     {
       "name": "payment-provider-selector",
-      "type": "registry:block",
       "title": "Payment Provider Selector",
       "description": "Select Wave, MTN, Orange Money, SPI, or card payment rails.",
       "dependencies": [
@@ -15,7 +14,6 @@
     },
     {
       "name": "mobile-money-checkout-card",
-      "type": "registry:block",
       "title": "Mobile Money Checkout Card",
       "description": "A focused checkout card for Wave, MTN, Orange Money, and SPI.",
       "dependencies": [
@@ -24,13 +22,11 @@
     },
     {
       "name": "checkout-summary-card",
-      "type": "registry:block",
       "title": "Checkout Summary Card",
       "description": "A dark checkout summary inspired by Lomi hosted checkout."
     },
     {
       "name": "payment-status-card",
-      "type": "registry:block",
       "title": "Payment Status Card",
       "description": "Show success, failed, and pending checkout outcomes.",
       "dependencies": [
@@ -39,7 +35,6 @@
     },
     {
       "name": "pricing-table",
-      "type": "registry:block",
       "title": "Pricing Table",
       "description": "A Lomi-styled plan selector for checkout, subscription, and pricing pages.",
       "dependencies": [
@@ -48,7 +43,6 @@
     },
     {
       "name": "invoice-history",
-      "type": "registry:block",
       "title": "Invoice History",
       "description": "A compact invoice and receipt table for customer billing surfaces.",
       "dependencies": [
@@ -57,7 +51,6 @@
     },
     {
       "name": "subscription-management-card",
-      "type": "registry:block",
       "title": "Subscription Management Card",
       "description": "Show and manage a customer's current subscription.",
       "dependencies": [
@@ -66,13 +59,11 @@
     },
     {
       "name": "usage-meter",
-      "type": "registry:block",
       "title": "Usage Meter",
       "description": "Track usage limits for checkout sessions, webhooks, payouts, or subscriptions."
     },
     {
       "name": "payment-failure-card",
-      "type": "registry:block",
       "title": "Payment Failure Card",
       "description": "Help customers retry or recover from a failed payment.",
       "dependencies": [
