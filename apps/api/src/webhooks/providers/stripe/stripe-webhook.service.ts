@@ -417,6 +417,82 @@ export class StripeWebhookService {
     const metadata = setupIntent.metadata || {};
     const paymentFlow = metadata.payment_flow;
 
+    const paymentMethodId =
+      typeof setupIntent.payment_method === 'string'
+        ? setupIntent.payment_method
+        : setupIntent.payment_method?.id || null;
+
+    if (paymentFlow === 'customer_portal_update') {
+      if (
+        !paymentMethodId ||
+        !metadata.internal_customer_id ||
+        !metadata.organization_id
+      ) {
+        this.logger.warn({
+          message: 'setup_intent_succeeded_missing_metadata',
+          setup_intent_id: setupIntent.id,
+          payment_flow: paymentFlow,
+        });
+        return {
+          eventType: 'setup_intent.succeeded',
+          setup_intent_id: setupIntent.id,
+          error: 'missing_metadata',
+        };
+      }
+
+      let cardDetails: Record<string, unknown> = {};
+      try {
+        const env = normalizePaymentEnvironment(metadata.environment);
+        const stripe = this.stripeClients.getClient(env);
+        const pm = await stripe.paymentMethods.retrieve(paymentMethodId);
+        const card = pm.card;
+        cardDetails = {
+          type: pm.type ?? 'card',
+          brand: card?.brand ?? null,
+          last4: card?.last4 ?? null,
+          exp_month: card?.exp_month ?? null,
+          exp_year: card?.exp_year ?? null,
+          country: card?.country ?? null,
+          fingerprint: card?.fingerprint ?? null,
+          is_international: card?.country != null && card.country !== 'CI',
+        };
+      } catch (retrieveError) {
+        this.logger.warn({
+          message: 'customer_portal_pm_retrieve_failed',
+          setup_intent_id: setupIntent.id,
+          error:
+            retrieveError instanceof Error
+              ? retrieveError.message
+              : String(retrieveError),
+        });
+      }
+
+      const { error } = await (this.supabase.getClient() as any).rpc(
+        'complete_customer_portal_payment_method_setup',
+        {
+          p_organization_id: metadata.organization_id,
+          p_customer_id: metadata.internal_customer_id,
+          p_stripe_payment_method_id: paymentMethodId,
+          p_card_details: cardDetails,
+        },
+      );
+
+      if (error) {
+        this.logger.error({
+          message: 'complete_customer_portal_payment_method_setup_failed',
+          setup_intent_id: setupIntent.id,
+          error: error.message,
+        });
+        throw new Error('Failed to complete customer portal payment method setup');
+      }
+
+      return {
+        eventType: 'setup_intent.succeeded',
+        setup_intent_id: setupIntent.id,
+        payment_flow: paymentFlow,
+      };
+    }
+
     if (
       paymentFlow !== 'subscription_trial_setup' &&
       paymentFlow !== 'subscription_deferred_setup'
@@ -427,11 +503,6 @@ export class StripeWebhookService {
         skipped: true,
       };
     }
-
-    const paymentMethodId =
-      typeof setupIntent.payment_method === 'string'
-        ? setupIntent.payment_method
-        : setupIntent.payment_method?.id || null;
 
     if (
       !paymentMethodId ||

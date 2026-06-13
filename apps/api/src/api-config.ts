@@ -361,6 +361,13 @@ export const EXPOSED_FUNCTIONS = [
   'create_or_update_customer',
   'create_customer_portal_launch_session',
   'merchant_list_customer_portal_audit_events',
+  'customer_portal_list_payment_methods',
+  'customer_portal_set_default_payment_method',
+  'customer_portal_attach_payment_method',
+  'customer_portal_detach_payment_method',
+  'customer_portal_resolve_stripe_context',
+  'customer_portal_validate_retry_payment',
+  'complete_customer_portal_payment_method_setup',
   // Checkout sessions
   'create_checkout_session',
   'create_checkout_session_with_line_items',

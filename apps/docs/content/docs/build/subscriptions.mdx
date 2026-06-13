@@ -175,6 +175,7 @@ If customers manage subscriptions in **your** app (not the lomi. customer portal
 1. Call lomi. APIs when they cancel, pause, upgrade, or resume (`POST /subscriptions/{id}/cancel`, `PATCH /subscriptions/{id}`, etc.).
 2. Listen for **`SUBSCRIPTION_UPDATED`** and **`SUBSCRIPTION_CANCELLED`** webhooks (same events whether the change came from your API, the portal, or cron).
 3. Reconcile entitlements with `GET /subscriptions/{id}` when you need authoritative state.
+4. For failed renewals, use the [customer portal retry payment](/docs/build/customer-portal#failed-payment-recovery) headless endpoint or redirect customers to the hosted portal billing/subscriptions pages.
 
 lomi. is the billing source of truth; your app should not cancel only in your database without calling the API.
 
