@@ -9,7 +9,7 @@ import type {
   ParameterObject,
   PathItemObject,
   ReferenceObject,
-} from 'fumadocs-openapi';
+} from '@/lib/openapi/types';
 import { normalizeOpenApiSecurity } from '@/lib/openapi/security-normalize';
 
 const OPENAPI_DOCUMENT_ID = './openapi.json';
