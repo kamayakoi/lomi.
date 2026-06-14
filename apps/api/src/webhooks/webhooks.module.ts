@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bullmq';
 import { WebhooksController } from './webhooks.controller';
+import { WebhooksInternalController } from './webhooks-internal.controller';
 import { WebhooksService } from './webhooks.service';
 import { WebhookSenderService } from './webhook-sender.service';
 import { WebhookListener } from './listeners/webhook.listener';
@@ -8,6 +9,7 @@ import { WebhookQueueProcessor } from './processors/webhook.processor';
 import { WaveWebhookModule } from './providers/wave/wave-webhook.module';
 import { StripeWebhookModule } from './providers/stripe/stripe-webhook.module';
 import { CliModule } from '../cli/cli.module';
+import { InternalCronGuard } from '../core/common/guards/internal-cron.guard';
 
 @Module({
   imports: [
@@ -24,12 +26,13 @@ import { CliModule } from '../cli/cli.module';
     StripeWebhookModule,
     CliModule,
   ],
-  controllers: [WebhooksController],
+  controllers: [WebhooksController, WebhooksInternalController],
   providers: [
     WebhooksService,
     WebhookSenderService,
     WebhookListener,
     WebhookQueueProcessor,
+    InternalCronGuard,
   ],
   exports: [WebhookSenderService],
 })

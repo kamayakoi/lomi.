@@ -461,6 +461,7 @@ export const EXPOSED_FUNCTIONS = [
   'webhook_outbox_upsert_event',
   'webhook_dispatch_ensure',
   'webhook_dispatch_should_process',
+  'fetch_pending_webhook_outbox_jobs',
   'record_webhook_delivery_attempt',
   'mark_webhook_dispatch_delivered',
   'mark_webhook_dispatch_dead_letter',
