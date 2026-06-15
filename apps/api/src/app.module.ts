@@ -36,6 +36,7 @@ import { MeModule } from './core/me/me.module';
 import { CliModule } from './cli/cli.module';
 import { CustomerPortalModule } from './core/customer-portal/customer-portal.module';
 import { HealthModule } from './health/health.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 const logger = new Logger('RedisConfig');
 
@@ -149,6 +150,7 @@ const logger = new Logger('RedisConfig');
     CliModule,
     CustomerPortalModule,
     HealthModule,
+    DashboardModule,
   ],
 
   controllers: [AppController],

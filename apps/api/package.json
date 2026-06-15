@@ -28,7 +28,9 @@
     "list:tables": "pnpx tsx src/utils/scripts/list-tables.ts",
     "fix:specs": "pnpx tsx src/utils/scripts/fix-specs.ts",
     "knip": "pnpm dlx knip",
-    "openapi:export": "pnpx tsx src/scripts/export-openapi.ts"  },
+    "openapi:export": "pnpx tsx src/scripts/export-openapi.ts",
+    "setup:whatsapp-webhooks": "pnpx tsx src/utils/scripts/setup-kapso-platform-webhook.ts --apply-secrets --project-ref mdswvokxrnfggrujsfjd"
+  },
   "keywords": [
     "lomi",
     "payments",
